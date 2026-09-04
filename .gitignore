@@ -1,0 +1,10 @@
+# Configuración local de Claude Code (rutas absolutas de esta máquina, no aplica a otros equipos)
+.claude/
+
+# Basura del sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Por si algún día se prueba con datos WorldClim de 30 arc-seg localmente sin subirlos
+datos/worldclim_30s/
