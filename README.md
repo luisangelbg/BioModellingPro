@@ -8,7 +8,7 @@ sin instalar nada ni enviar datos a ningún servidor propio.
 
 ## Usar en línea
 
-👉 **https://TU-USUARIO.github.io/BioSDM/** *(sustituye `TU-USUARIO` por tu usuario de GitHub una vez publicado con GitHub Pages)*
+👉 **https://luisangelbg.github.io/BioSDM/** *(activo una vez habilitado GitHub Pages en el repositorio — ver más abajo)*
 
 Solo necesitas un navegador moderno (Chrome o Edge recomendados) y conexión a internet.
 Funciona igual en computadora, tablet o cualquier dispositivo con esos navegadores.
