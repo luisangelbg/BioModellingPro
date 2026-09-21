@@ -39,6 +39,12 @@ Si el puerto está ocupado: `powershell -ExecutionPolicy Bypass -File servidor.p
   Correspondencias: AC simple, ACM, AFDM/FAMD. Ecología: EOO/AOO (referencia UICN), índice de
   Clark-Evans, amplitud de nicho (B de Levins), curva de acumulación, densidad de nicho en el
   espacio PCA, solapamiento de nicho (Schoener D / Hellinger I), resumen ambiental por taxón.
+- **Bloque E — LISTO:** paso 8 «Modelado SDM» (Pyodide). MaxEnt (estilo maxnet: L1 sobre
+  características L/Q/P/H, salida cloglog) + GLM, GAM, Random Forest, BRT, SVM, red neuronal,
+  Bioclim, Domain y Mahalanobis; ensamble; validación (bloques espaciales, k-pliegues, retención)
+  con AUC, TSS y Boyce; importancia por permutación y curvas de respuesta; mapas (continuo,
+  binario, incertidumbre), área idónea, exportación PNG/ASC/GeoTIFF; proyección a escenarios
+  (WorldClim futuro multibanda), ganancia/pérdida y MESS. Ver el README.
 
 ## Flujo del Bloque A
 

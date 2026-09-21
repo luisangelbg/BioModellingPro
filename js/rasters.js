@@ -298,6 +298,7 @@ function renderEnvResult() {
   buildTable('envTable', cols, t, 200);
   el('envResultCard').style.display = 'block';
   enableStep(6);
+  enableStep(8);
   if (window.buildStatsVarPicker) buildStatsVarPicker();
 
   // selector de variable del mapa temático

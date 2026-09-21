@@ -8,3 +8,6 @@ desktop.ini
 
 # Por si algún día se prueba con datos WorldClim de 30 arc-seg localmente sin subirlos
 datos/worldclim_30s/
+
+# archivos temporales de prueba
+_test/

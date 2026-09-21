@@ -28,7 +28,7 @@ Descarga o clona este repositorio y abre `index.html`:
 
   y luego abre `http://localhost:8765` en el navegador.
 
-## El flujo, en 7 pasos
+## El flujo, en 8 pasos
 
 1. **Buscar en GBIF** — resuelve el nombre científico y descarga los registros de presencia.
 2. **Filtrar** — por rango taxonómico, país, año, tipo de registro, recorte geográfico.
@@ -44,9 +44,42 @@ Descarga o clona este repositorio y abre `index.html`:
    DBSCAN), análisis de correspondencias (AC/ACM/AFM) y métricas ecológicas (área de
    distribución, patrón espacial, amplitud y solapamiento de nicho).
 
-En el paso 7 puedes elegir libremente qué variables entran al análisis — incluso
+8. **Modelado de distribución de especies (SDM)** — ajusta y valida modelos de idoneidad
+   del hábitat, los combina en un ensamble y proyecta mapas (ver abajo).
+
+En los pasos 7 y 8 puedes elegir libremente qué variables entran al análisis — incluso
 variables colineales que el paso 6 marcó para descartar, si consideras que son
 ecológicamente relevantes.
+
+### Paso 8 · Modelado de distribución de especies
+
+- **Algoritmos (10):** MaxEnt, GLM, GAM, Random Forest, BRT (boosting), SVM, red neuronal,
+  Bioclim, Domain y Mahalanobis, más un **ensamble** (media ponderada, mediana o comité de votos,
+  con pesos por AUC, TSS o Boyce).
+- **MaxEnt** se implementa al estilo del paquete R *maxnet* (Phillips et al. 2017): regresión
+  logística penalizada L1 sobre características lineales, cuadráticas, de producto y de bisagra,
+  con las constantes de regularización de maxnet y salida *cloglog*. Es estadísticamente
+  equivalente a MaxEnt (Renner & Warton 2013), pero **no idéntica** al programa Java (que no puede
+  ejecutarse en un navegador). Incluye exploración de clases de características y regularización
+  con validación cruzada y AICc (estilo ENMeval).
+- **Datos:** presencias (una por celda), fondo muestreado en el área accesible (radio en km
+  alrededor de los registros), predictoras elegibles (por defecto las no colineales del paso 6).
+- **Validación:** bloques espaciales (ENMeval), pliegues aleatorios o retención 70/30. Métricas:
+  AUC, TSS, índice continuo de Boyce, sensibilidad/especificidad y omisión; umbrales (máx. TSS,
+  percentil 10, mínima presencia, sens = espec). Random Forest y Domain usan predicciones
+  *out-of-bag* / «dejando uno fuera» para no sobreestimar el ajuste de entrenamiento.
+- **Variables:** importancia por permutación (en los datos de prueba) y curvas de respuesta.
+- **Mapas:** idoneidad continua, presencia/ausencia por umbral e incertidumbre entre modelos,
+  con área idónea en km². Exportación a PNG, malla ASCII y GeoTIFF (Float32, EPSG:4326).
+- **Proyección a otros escenarios** (p. ej. WorldClim futuro CMIP6, archivo de 19 bandas o
+  capas `bio_N` sueltas): mapas de ganancia/pérdida de área idónea y mapa de extrapolación
+  **MESS** (Elith et al. 2010) que señala dónde el clima no tiene análogo en el área de calibración.
+
+Referencias: Phillips et al. 2017 *Ecography* (maxnet); Renner & Warton 2013 *Biometrics*
+(equivalencia MaxEnt–proceso de Poisson); Elith et al. 2011 *Divers Distrib*; Muscarella et al. 2014
+*Methods Ecol Evol* (ENMeval); Valavi et al. 2021 *Ecography* (Random Forest con submuestreo) y
+2022 *Ecol Monogr* (comparación de métodos con solo presencias); Allouche et al. 2006 *J Appl Ecol*
+(TSS); Hirzel et al. 2006 *Ecol Modell* (Boyce); Elith et al. 2010 *Methods Ecol Evol* (MESS).
 
 ## Datos y créditos
 

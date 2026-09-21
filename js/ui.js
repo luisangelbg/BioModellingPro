@@ -10,6 +10,7 @@ function goToStep(n) {
   if (n === 4 && window.renderMap) setTimeout(window.renderMap, 60);
   if (n === 2 && window.invalidateMiniMap) setTimeout(window.invalidateMiniMap, 60);
   if (n === 5 && window.envMap) setTimeout(() => window.envMap.invalidateSize(), 60);
+  if (n === 8 && window.sdmOnShow) window.sdmOnShow();
   if (n === 7) {
     if (window.buildMlPickers) window.buildMlPickers();
     if (window.__clusterMap) setTimeout(() => window.__clusterMap.invalidateSize(), 60);

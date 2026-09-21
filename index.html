@@ -22,6 +22,7 @@
   <button class="step-btn" data-step="5" disabled><span class="step-num">5</span> Variables</button>
   <button class="step-btn" data-step="6" disabled><span class="step-num">6</span> Estadística</button>
   <button class="step-btn" data-step="7" disabled><span class="step-num">7</span> ML + Ecología</button>
+  <button class="step-btn" data-step="8" disabled><span class="step-num">8</span> Modelado SDM</button>
 </nav>
 
 <main>
@@ -520,6 +521,195 @@
     </div>
   </section>
 
+  <!-- PASO 8: MODELADO DE DISTRIBUCIÓN DE ESPECIES (Bloque E) -->
+  <section class="step-panel" id="panel-8">
+    <div class="card">
+      <h2>8. Modelado de distribución de especies (SDM)</h2>
+      <p class="hint">Modela la idoneidad del hábitat con <b>MaxEnt</b> y otros algoritmos, los valida, los combina en un
+        ensamble y proyecta mapas (también a otros escenarios climáticos). Cálculo en Python (Pyodide).
+        Lee las capas ráster cargadas en el paso 5 (para una malla fina conviene usar WorldClim a 2.5 arc-min o 30 arc-seg).</p>
+      <div id="sdmRasterStatus" class="messages"></div>
+
+      <div class="config-group">
+        <h3>Variables predictoras</h3>
+        <p class="hint">Por defecto van las no colineales del paso 6; puedes añadir cualquier otra (MaxEnt, GLM y los algoritmos
+          de árboles toleran cierta colinealidad, pero interpreta con cautela las curvas de respuesta).</p>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="sdmVarsRecommended">Solo recomendadas</button>
+          <button class="btn btn-secondary" id="sdmVarsAll">Todas</button>
+        </div>
+        <div class="checkbox-grid" id="sdmVarChecklist"></div>
+      </div>
+
+      <div class="config-group">
+        <h3>Registros de presencia</h3>
+        <label class="inline-label">Taxón <select id="sdmTaxon"></select></label>
+        <label class="checkbox-label" style="margin-top:6px"><input type="checkbox" id="sdmDedupe" checked>
+          Conservar una sola presencia por celda de la malla (recomendado: reduce el sesgo de muestreo)</label>
+      </div>
+
+      <div class="config-group">
+        <h3>Área de calibración y malla de proyección</h3>
+        <p class="hint">El fondo (pseudo-ausencias) se muestrea en las celdas a ≤ <i>R</i> km de algún registro (área accesible).
+          Los mapas se calculan sobre el recuadro de los registros ampliado por un margen.</p>
+        <label class="inline-label">Radio <i>R</i> (km) <input type="number" id="sdmRadius" value="300" min="20" step="50" style="width:80px"></label>
+        <label class="inline-label">Margen del mapa (°) <input type="number" id="sdmMargin" value="3" min="0" step="0.5" style="width:64px"></label>
+        <label class="inline-label">Máx. celdas de la malla <input type="number" id="sdmMaxCells" value="80000" min="5000" step="5000" style="width:90px"></label>
+        <label class="inline-label">Puntos de fondo <input type="number" id="sdmNBg" value="10000" min="500" step="500" style="width:80px"></label>
+        <label class="inline-label">Semilla <input type="number" id="sdmSeed" value="42" style="width:64px"></label>
+      </div>
+      <button class="btn btn-primary btn-lg" id="sdmPrepareBtn">Preparar datos del modelo →</button>
+      <div class="progress-wrap" id="sdmPrepProgress" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" id="sdmPrepFill"></div></div>
+        <span class="progress-label" id="sdmPrepLabel"></span>
+      </div>
+      <div class="messages" id="sdmMessages"></div>
+      <div class="results-summary" id="sdmPrepSummary"></div>
+      <div id="sdmDataMapWrap" style="display:none">
+        <h3>Área de calibración</h3>
+        <p class="hint">Verde: presencias usadas. Gris: muestra del fondo. Sombreado: área de calibración.</p>
+        <div id="mapSdmData" class="main-map" style="height:380px"></div>
+      </div>
+    </div>
+
+    <div id="sdmSections" style="display:none">
+
+      <div class="card">
+        <h2>Algoritmos y validación</h2>
+        <div class="config-group">
+          <h3>Algoritmos</h3>
+          <p class="hint">Todo se calcula en tu navegador. Tiempos orientativos (malla de ~10 mil celdas): los algoritmos de árboles,
+            GLM, GAM y los de envoltura tardan segundos; MaxEnt unos 7–15 s por ajuste (según el número de variables) y SVM / red
+            neuronal algo más. La validación repite cada ajuste una vez por pliegue, más el modelo final.</p>
+          <div class="checkbox-grid" id="sdmAlgoList"></div>
+        </div>
+        <div class="config-group">
+          <h3>MaxEnt</h3>
+          <label class="inline-label">Características
+            <label class="checkbox-label" style="display:inline-flex;margin:0 4px"><input type="checkbox" class="sdmFc" value="l" checked> L</label>
+            <label class="checkbox-label" style="display:inline-flex;margin:0 4px"><input type="checkbox" class="sdmFc" value="q" checked> Q</label>
+            <label class="checkbox-label" style="display:inline-flex;margin:0 4px"><input type="checkbox" class="sdmFc" value="h" checked> H</label>
+            <label class="checkbox-label" style="display:inline-flex;margin:0 4px"><input type="checkbox" class="sdmFc" value="p"> P</label>
+          </label>
+          <label class="inline-label">Multiplicador de regularización <input type="number" id="sdmRegmult" value="1" min="0.1" max="20" step="0.5" style="width:64px"></label>
+          <label class="inline-label">Nudos de bisagra <input type="number" id="sdmKnots" value="10" min="5" max="50" style="width:60px"></label>
+          <p class="hint">L = lineal, Q = cuadrática, H = bisagra, P = producto. «Explorar» prueba combinaciones de clases y regularización con validación cruzada y AICc (estilo ENMeval).</p>
+          <button class="btn btn-secondary" id="sdmTuneBtn">Explorar MaxEnt (ENMeval)</button>
+          <div class="table-scroll" id="sdmTuneTable"></div>
+        </div>
+        <div class="config-group">
+          <h3>Validación</h3>
+          <label class="inline-label">Esquema
+            <select id="sdmScheme">
+              <option value="block">Bloques espaciales (4)</option>
+              <option value="random">Pliegues aleatorios (k)</option>
+              <option value="holdout">Retención 70 / 30</option>
+            </select>
+          </label>
+          <label class="inline-label">k <input type="number" id="sdmK" value="4" min="2" max="10" style="width:56px"></label>
+          <p class="hint">Bloques espaciales evalúan la transferibilidad a otras zonas (más exigente). Las métricas se calculan con las presencias de prueba frente al fondo.</p>
+        </div>
+        <button class="btn btn-primary btn-lg" id="sdmRunBtn">Ejecutar modelos →</button>
+        <div class="progress-wrap" id="sdmRunProgress" style="display:none">
+          <div class="progress-bar"><div class="progress-fill" id="sdmRunFill"></div></div>
+          <span class="progress-label" id="sdmRunLabel"></span>
+        </div>
+        <div class="messages" id="sdmRunMessages"></div>
+      </div>
+
+      <div id="sdmResults" style="display:none">
+        <div class="card">
+          <div class="results-header"><h2>Desempeño de los modelos</h2>
+            <button class="btn btn-secondary" id="sdmDlMetrics">⬇ CSV de métricas</button></div>
+          <div class="table-scroll" id="sdmMetricsTable"></div>
+          <div id="figSdmMetrics" class="fig-box"></div>
+          <div id="figSdmRoc" class="fig-box"></div>
+        </div>
+        <div class="card">
+          <h2>Variables: importancia y curvas de respuesta</h2>
+          <div id="figSdmImp" class="fig-box"></div>
+          <div id="figSdmResp" class="fig-box"></div>
+          <button class="btn btn-secondary" id="sdmDlCoefs">⬇ CSV de coeficientes de MaxEnt</button>
+        </div>
+        <div class="card">
+          <h2>Ensamble</h2>
+          <div class="config-group">
+            <div class="checkbox-grid" id="sdmEnsList"></div>
+            <label class="inline-label">Método
+              <select id="sdmEnsMethod">
+                <option value="mean">Media ponderada</option>
+                <option value="median">Mediana</option>
+                <option value="committee">Promedio de comité (votos)</option>
+              </select>
+            </label>
+            <label class="inline-label">Pesos por
+              <select id="sdmEnsWeight">
+                <option value="auc">AUC de prueba</option>
+                <option value="tss">TSS</option>
+                <option value="boyce">Boyce</option>
+                <option value="equal">iguales</option>
+              </select>
+            </label>
+            <label class="inline-label">Incluir solo si AUC ≥ <input type="number" id="sdmEnsMinAuc" value="0.7" min="0.5" max="0.99" step="0.05" style="width:64px"></label>
+            <button class="btn btn-primary" id="sdmEnsBtn">Construir ensamble</button>
+          </div>
+          <div class="messages" id="sdmEnsMessages"></div>
+        </div>
+        <div class="card">
+          <div class="results-header"><h2>Mapas de idoneidad</h2></div>
+          <div class="config-group">
+            <label class="inline-label">Modelo <select id="sdmMapModel"></select></label>
+            <label class="inline-label">Mapa
+              <select id="sdmMapType">
+                <option value="cont">Idoneidad continua</option>
+                <option value="bin">Presencia / ausencia (umbral)</option>
+                <option value="sd">Incertidumbre (dispersión entre modelos)</option>
+              </select>
+            </label>
+            <label class="inline-label">Escenario <select id="sdmMapScn"><option value="">Presente</option></select></label>
+            <label class="inline-label">Umbral
+              <select id="sdmThrKind">
+                <option value="maxtss">Máx. TSS (sens + espec)</option>
+                <option value="p10">Percentil 10 de presencias</option>
+                <option value="mtp">Mínima presencia de entrenamiento</option>
+                <option value="eqss">Sensibilidad = especificidad</option>
+              </select>
+            </label>
+            <label class="inline-label">Opacidad <input type="range" id="sdmOpacity" min="0.2" max="1" step="0.05" value="0.8" style="width:90px"></label>
+            <label class="checkbox-label" style="display:inline-flex"><input type="checkbox" id="sdmShowPts" checked> Presencias</label>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" id="sdmMapPng">⬇ PNG</button>
+            <button class="btn btn-secondary" id="sdmMapAsc">⬇ Malla ASCII (.asc)</button>
+            <button class="btn btn-secondary" id="sdmMapTif">⬇ GeoTIFF</button>
+          </div>
+          <div id="mapSdm" class="main-map"></div>
+          <div id="sdmLegend" class="map-legend-panel"></div>
+          <h3>Área idónea (km²)</h3>
+          <div class="table-scroll" id="sdmAreaTable"></div>
+        </div>
+        <div class="card">
+          <h2>Proyección a otro escenario (opcional)</h2>
+          <p class="hint">Selecciona los <code>.tif</code> del otro escenario o periodo (p. ej. WorldClim futuro CMIP6: un archivo de 19 bandas
+            <code>wc2.1_…_bioc_&lt;modelo&gt;_&lt;ssp&gt;_&lt;periodo&gt;.tif</code>, o archivos <code>bio_N</code> sueltos). Debe cubrir el mismo recuadro.
+            Si usas altitud como predictora se conserva la del presente.</p>
+          <input type="file" id="sdmScnFiles" multiple accept=".tif,.tiff">
+          <label class="inline-label">Nombre <input type="text" id="sdmScnName" value="Futuro" style="width:180px"></label>
+          <button class="btn btn-primary" id="sdmProjBtn">Proyectar →</button>
+          <div class="messages" id="sdmProjMessages"></div>
+          <div id="sdmProjOut" style="display:none">
+            <h3>Cambio de área idónea</h3>
+            <div class="table-scroll" id="sdmChangeTable"></div>
+            <label class="inline-label">Ver mapa de <select id="sdmChangeModel"></select></label>
+            <button class="btn btn-secondary" id="sdmShowChange">Mapa de ganancia / pérdida</button>
+            <button class="btn btn-secondary" id="sdmShowMess">Mapa de extrapolación (MESS)</button>
+            <div id="sdmMessInfo" class="hint"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer class="app-footer">
@@ -545,6 +735,8 @@
 <script src="js/stats.js"></script>
 <script src="js/ml.js"></script>
 <script src="js/ecology.js"></script>
+<script src="js/sdm-py.js"></script>
+<script src="js/sdm.js"></script>
 <script src="js/export.js"></script>
 <script src="js/main.js"></script>
 </body>

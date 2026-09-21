@@ -60,6 +60,15 @@ Cada consulta tarda ~2–3 s en el servidor de ISRIC, así que para cientos de p
 
 Puedes dejar la consulta corriendo en segundo plano mientras haces otra cosa.
 
+## 4. Escenarios climáticos futuros (opcional, para el paso 8)
+
+Para proyectar los modelos de distribución al futuro descarga de WorldClim (proyecciones CMIP6,
+https://www.worldclim.org/data/cmip6/cmip6climate.html) el archivo **de la misma resolución** que
+usas en el presente, p. ej. `wc2.1_10m_bioc_ACCESS-CM2_ssp245_2041-2060.tif`. Es **un solo archivo de
+19 bandas** (BIO1–BIO19). En el paso 8 → «Proyección a otro escenario» selecciónalo tal cual.
+La altitud no cambia: se conserva la del presente. Cuando uses 30 arc-seg el archivo futuro también
+debe ser de 30 arc-seg (misma malla) o, si no coincide, se re-muestrea por celda (más lento).
+
 ## Estructura final esperada
 
 ```
