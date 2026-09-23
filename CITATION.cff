@@ -36,18 +36,12 @@ authors:
     family-names: "Mojica-Zárate"
     orcid: "https://orcid.org/0000-0002-9067-3983"
 version: "1.1.0"
-date-released: "2026-09-22"
+date-released: "2026-09-23"
 doi: "10.5281/zenodo.22907825"
 identifiers:
   - type: doi
     value: "10.5281/zenodo.22907825"
-    description: "Concept DOI: always resolves to the latest version. Cite this one."
-  - type: doi
-    value: "10.5281/zenodo.22907940"
-    description: "DOI of version 1.0.1."
-  - type: doi
-    value: "10.5281/zenodo.22907826"
-    description: "DOI of version 1.0.0."
+    description: "Concept DOI: cite this one. It always resolves to the latest version, and each version has its own DOI listed on that record."
 repository-code: "https://github.com/luisangelbg/BioModellingPro"
 url: "https://luisangelbg.github.io/BioModellingPro/"
 license: GPL-3.0-or-later
