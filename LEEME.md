@@ -14,7 +14,7 @@ barra superior y la elección se recuerda.
 - **Doble clic en `index.html`.** Funciona todo, incluido el ejemplo incluido (*Pinus cembroides*: 2 400
   registros de GBIF y capas de WorldClim y Köppen-Geiger recortadas). Necesitas internet para GBIF, los mapas base y
   el motor de Python (estadística, ML y modelado).
-- **En línea:** https://luisangelbg.github.io/BioModellingPro/ (cuando esté activo GitHub Pages).
+- **En línea:** https://luisangelbg.github.io/BioModellingPro/
 - **Servidor local opcional** (por ejemplo, para abrirlo desde una tablet en la misma red): doble clic en
   `Open BioModelling Pro.bat`, o clic derecho en `server.ps1` → *Ejecutar con PowerShell*, y abre
   `http://localhost:9400`.
@@ -77,6 +77,10 @@ estudio real carga los archivos completos de WorldClim (30 arc-seg a 10 arc-min)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(versión 1.0.0) [Software]. https://github.com/luisangelbg/BioModellingPro
+(versión 1.0.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+
+Ese DOI es el **DOI de concepto**: siempre lleva a la versión más reciente. La versión 1.0.0 tiene además el suyo,
+[10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), por si necesitas señalar exactamente el código
+que usaste.
 
 Licencia GPL v3 o posterior. Componentes de terceros: `vendor/THIRD-PARTY-NOTICES.txt`.

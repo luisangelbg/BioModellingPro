@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 — 2026-09-22
+
+- Archived in Zenodo. The citation now carries the DOI — the concept DOI
+  [10.5281/zenodo.22907825](https://doi.org/10.5281/zenodo.22907825), which always resolves to the latest
+  version — in the README, the Spanish readme, `CITATION.cff`, `codemeta.json`, the app's own citation section
+  (APA and BibTeX) and the credits page of the user manual. Documentation only: nothing changed in the analysis.
+
 ## 1.0.0 — 2026-09-22
 
 First archived release. Everything below was written before it, so it is all part of 1.0.0.

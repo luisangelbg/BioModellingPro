@@ -1,5 +1,7 @@
 # BioModelling Pro
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22907825.svg)](https://doi.org/10.5281/zenodo.22907825)
+
 **Biogeography and species distribution modelling, in your browser.** Download presence records
 from GBIF, clean them, extract bioclimatic, climate and soil variables, explore them with statistics
 and multivariate methods, and model the species distribution with ten algorithms and an ensemble —
@@ -11,7 +13,7 @@ top bar; the choice is remembered.
 
 ## Use it online
 
-👉 **https://luisangelbg.github.io/BioModellingPro/** *(active once GitHub Pages is enabled on the repository)*
+👉 **https://luisangelbg.github.io/BioModellingPro/**
 
 You only need a modern browser (Chrome or Edge recommended) and an internet connection for GBIF, the base
 maps and the Python engine.
@@ -119,7 +121,10 @@ server.ps1, *.bat          optional local web server (Windows)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(Version 1.0.0) [Computer software]. https://github.com/luisangelbg/BioModellingPro
+(Version 1.0.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+
+That DOI is the **concept DOI**: it always resolves to the latest version. Version 1.0.0 also has its own,
+[10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), if you need to point at exactly the code you used.
 
 See [`CITATION.cff`](CITATION.cff). Please also cite the data sources and the methods you use.
 
