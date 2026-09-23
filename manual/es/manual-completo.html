@@ -136,7 +136,7 @@
   txt(68, 152, 'BioModelling', { size: 78, peso: 600, color: TINTA });
   txt(68, 226, 'Pro', { size: 78, peso: 600, color: INK });
   el('rect', { x: 196, y: 196, width: 586, height: 1.2, fill: '#c9d6cf' });
-  txt(782, 192, 'versión 1.0.1', { sans: true, size: 11, peso: 400, color: GRIS, ancla: 'end' });
+  txt(782, 192, 'versión 1.0.2', { sans: true, size: 11, peso: 400, color: GRIS, ancla: 'end' });
   txt(68, 268, 'Biogeografía y modelado de la distribución de especies', { size: 25, peso: 500, color: TINTA });
   txt(68, 294, 'Biogeography and species distribution modelling', { size: 18, peso: 400, cursiva: true, color: GRIS });
 
@@ -521,17 +521,17 @@
         <div><b>Héctor Tecumshé Mojica-Zárate</b><span class="orc">ORCID 0000-0002-9067-3983</span></div>
       </div>
     </dd>
-    <dt>Programa</dt><dd>BioModelling Pro, versión 1.0.1 (septiembre de 2026)</dd>
-    <dt>Manual</dt><dd>Primera edición en español, 2026. Describe la versión 1.0.1 del programa.</dd>
+    <dt>Programa</dt><dd>BioModelling Pro, versión 1.0.2 (septiembre de 2026)</dd>
+    <dt>Manual</dt><dd>Primera edición en español, 2026. Describe la versión 1.0.2 del programa.</dd>
     <dt>Licencia del programa</dt><dd>Licencia Pública General de GNU, versión 3 o posterior (GPL-3.0-or-later).</dd>
     <dt>Derechos del manual</dt><dd>© 2026 las personas autoras. Todos los derechos reservados.</dd>
     <dt>Idioma de la interfaz</dt><dd>Español o inglés, con los botones <span class="ui">ES</span> · <span class="ui">EN</span> de la barra superior. En este manual los nombres de botones y menús se escriben como aparecen en pantalla <b>en español</b>, por ejemplo <span class="ui">Ejecutar modelos →</span>.</dd>
   </dl>
 
   <h4>Cómo citar el programa</h4>
-  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro: biogeografía y modelado de la distribución de especies en el navegador</i> (versión 1.0.1) [Programa de cómputo]. Zenodo. https://doi.org/10.5281/zenodo.22907825</div>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro: biogeografía y modelado de la distribución de especies en el navegador</i> (versión 1.0.2) [Programa de cómputo]. Zenodo. https://doi.org/10.5281/zenodo.22907825</div>
   <h4>Cómo citar este manual</h4>
-  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro. Manual de usuario</i> (1.ª ed.). Distribuido con BioModelling Pro, versión 1.0.1.</div>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro. Manual de usuario</i> (1.ª ed.). Distribuido con BioModelling Pro, versión 1.0.2.</div>
   <p class="small">Ese DOI es el <b>de concepto</b>: lleva siempre a la versión más reciente, y cada versión tiene además el suyo. La cita está también en la sección <span class="ui">Cómo citar</span> de la app, con su versión en BibTeX.</p>
 
   <div class="caja nota">
@@ -2739,7 +2739,9 @@
 
   <!-- ============================== F -->
   <h2 id="ap-f"><span class="num">F</span>Componentes de terceros</h2>
-  <p>Todo el análisis, las figuras y los mapas de BioModelling Pro son código propio. Lo que viene de fuera es esto, con su licencia; el detalle completo está en <code>vendor/THIRD-PARTY-NOTICES.txt</code>.</p>
+  <p class="lead">Todo el análisis, las figuras y los mapas de BioModelling Pro son código propio, con licencia GPL v3 o posterior. Lo que viene de fuera es esto, cada cosa con su licencia; el reparto completo está en <code>NOTICE.md</code> y las licencias enteras, en <code>vendor/THIRD-PARTY-NOTICES.txt</code>.</p>
+
+  <h3>F.1 · El código</h3>
   <table class="compacta">
     <thead><tr><th style="width:1.6in">Componente</th><th>Para qué y con qué licencia</th></tr></thead>
     <tbody>
@@ -2752,9 +2754,19 @@
       <tr><td><b>Tipografías</b></td><td>Cormorant, Crimson Pro y Jost, con licencia SIL Open Font License 1.1 (solo en este manual).</td></tr>
     </tbody>
   </table>
+  <h3>F.2 · Los datos, que también son de alguien</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.6in">Fuente</th><th>Qué es y en qué condiciones</th></tr></thead>
+    <tbody>
+      <tr><td><b>GBIF</b></td><td>Los registros del ejemplo (2400 de <i>Pinus cembroides</i>, descargados el 21 de septiembre de 2026). Cada registro conserva la licencia de la institución que lo publicó: CC0, CC BY o CC BY-NC. Las 70 instituciones y los 91 conjuntos de datos están en <code>datos/GBIF-FUENTES.md</code>.</td></tr>
+      <tr><td><b>WorldClim 2.1</b></td><td>Las bioclimáticas y la altitud. Uso académico y no comercial libre, pero <b>no se pueden redistribuir sin permiso previo</b>: por eso las capas globales no vienen con el programa y hay que descargarlas. El recorte del ejemplo (<code>js/example-rasters.js</code>) está ahí para enseñar y es separable: si lo borras, el programa sigue completo.</td></tr>
+      <tr><td><b>Köppen-Geiger</b></td><td>El mapa de clases climáticas a 1 km de Beck y colaboradores (2018). CC BY 4.0: se redistribuye citándolo, y por eso sí viaja con el programa.</td></tr>
+      <tr><td><b>SoilGrids (ISRIC)</b></td><td>El tipo de suelo del Bloque 5, consultado en línea punto por punto. CC BY 4.0.</td></tr>
+    </tbody>
+  </table>
   <div class="caja nota">
-    <div class="caja-t"><span class="ico">i</span>Datos</div>
-    <p>Los registros del ejemplo proceden de <b>GBIF</b> y conservan la licencia de cada publicador; las capas climáticas del ejemplo son un recorte de <b>WorldClim 2.1</b> y del mapa de <b>Köppen-Geiger</b> de Beck y colaboradores. Cítalos siempre que uses resultados obtenidos con ellos.</p>
+    <div class="caja-t"><span class="ico">i</span>Cita los datos, no solo el programa</div>
+    <p>Un resultado se apoya en tres cosas y las tres se citan: el programa, los <b>datos</b> con los que trabajaste y el <b>método</b> que aplicaste. Si descargas tus registros desde gbif.org en vez de desde la app, GBIF te da un DOI de descarga que identifica exactamente ese conjunto: úsalo. El reparto completo de lo propio y lo ajeno está en <code>NOTICE.md</code>.</p>
   </div>
 </section>
 

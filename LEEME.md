@@ -77,10 +77,23 @@ estudio real carga los archivos completos de WorldClim (30 arc-seg a 10 arc-min)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(versión 1.0.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+(versión 1.0.2) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 Ese DOI es el **DOI de concepto**: siempre lleva a la versión más reciente. La versión 1.0.0 tiene además el suyo,
 [10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), por si necesitas señalar exactamente el código
 que usaste.
 
-Licencia GPL v3 o posterior. Componentes de terceros: `vendor/THIRD-PARTY-NOTICES.txt`.
+## Licencia y qué alcanza
+
+El programa es software libre con **licencia GPL v3 o posterior** (archivo `LICENSE`), y esa licencia cubre el
+código fuente escrito por las personas autoras.
+
+Las bibliotecas que el programa usa y los datos que trae de ejemplo son de otras personas y conservan sus propias
+condiciones. Una conviene conocerla antes de redistribuir el programa: **WorldClim no permite redistribuir sus
+capas sin permiso previo**, por eso las capas globales no están en el repositorio y por eso el recorte del ejemplo
+es separable (si borras `js/example-rasters.js` el programa sigue funcionando completo; solo dejas de tener el
+botón «Usar las capas de ejemplo» del paso 5).
+
+`NOTICE.md` dice, fuente por fuente, qué es propio y qué es de terceros; `vendor/THIRD-PARTY-NOTICES.txt` trae las
+licencias completas de las bibliotecas, y `datos/GBIF-FUENTES.md`, las 70 instituciones que publicaron los
+registros del ejemplo.

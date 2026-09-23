@@ -245,7 +245,9 @@
 
   <!-- ============================== F -->
   <h2 id="ap-f"><span class="num">F</span>Componentes de terceros</h2>
-  <p>Todo el análisis, las figuras y los mapas de BioModelling Pro son código propio. Lo que viene de fuera es esto, con su licencia; el detalle completo está en <code>vendor/THIRD-PARTY-NOTICES.txt</code>.</p>
+  <p class="lead">Todo el análisis, las figuras y los mapas de BioModelling Pro son código propio, con licencia GPL v3 o posterior. Lo que viene de fuera es esto, cada cosa con su licencia; el reparto completo está en <code>NOTICE.md</code> y las licencias enteras, en <code>vendor/THIRD-PARTY-NOTICES.txt</code>.</p>
+
+  <h3>F.1 · El código</h3>
   <table class="compacta">
     <thead><tr><th style="width:1.6in">Componente</th><th>Para qué y con qué licencia</th></tr></thead>
     <tbody>
@@ -258,9 +260,19 @@
       <tr><td><b>Tipografías</b></td><td>Cormorant, Crimson Pro y Jost, con licencia SIL Open Font License 1.1 (solo en este manual).</td></tr>
     </tbody>
   </table>
+  <h3>F.2 · Los datos, que también son de alguien</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.6in">Fuente</th><th>Qué es y en qué condiciones</th></tr></thead>
+    <tbody>
+      <tr><td><b>GBIF</b></td><td>Los registros del ejemplo (2400 de <i>Pinus cembroides</i>, descargados el 21 de septiembre de 2026). Cada registro conserva la licencia de la institución que lo publicó: CC0, CC BY o CC BY-NC. Las 70 instituciones y los 91 conjuntos de datos están en <code>datos/GBIF-FUENTES.md</code>.</td></tr>
+      <tr><td><b>WorldClim 2.1</b></td><td>Las bioclimáticas y la altitud. Uso académico y no comercial libre, pero <b>no se pueden redistribuir sin permiso previo</b>: por eso las capas globales no vienen con el programa y hay que descargarlas. El recorte del ejemplo (<code>js/example-rasters.js</code>) está ahí para enseñar y es separable: si lo borras, el programa sigue completo.</td></tr>
+      <tr><td><b>Köppen-Geiger</b></td><td>El mapa de clases climáticas a 1 km de Beck y colaboradores (2018). CC BY 4.0: se redistribuye citándolo, y por eso sí viaja con el programa.</td></tr>
+      <tr><td><b>SoilGrids (ISRIC)</b></td><td>El tipo de suelo del Bloque 5, consultado en línea punto por punto. CC BY 4.0.</td></tr>
+    </tbody>
+  </table>
   <div class="caja nota">
-    <div class="caja-t"><span class="ico">i</span>Datos</div>
-    <p>Los registros del ejemplo proceden de <b>GBIF</b> y conservan la licencia de cada publicador; las capas climáticas del ejemplo son un recorte de <b>WorldClim 2.1</b> y del mapa de <b>Köppen-Geiger</b> de Beck y colaboradores. Cítalos siempre que uses resultados obtenidos con ellos.</p>
+    <div class="caja-t"><span class="ico">i</span>Cita los datos, no solo el programa</div>
+    <p>Un resultado se apoya en tres cosas y las tres se citan: el programa, los <b>datos</b> con los que trabajaste y el <b>método</b> que aplicaste. Si descargas tus registros desde gbif.org en vez de desde la app, GBIF te da un DOI de descarga que identifica exactamente ese conjunto: úsalo. El reparto completo de lo propio y lo ajeno está en <code>NOTICE.md</code>.</p>
   </div>
 </section>
 

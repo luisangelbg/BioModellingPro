@@ -11,3 +11,7 @@ datos/worldclim_30s/
 
 # Temporary test files
 _test/
+
+# Capas de WorldClim descargadas por la usuaria: su licencia NO permite redistribuirlas
+# (worldclim.org/about.html). Se quedan en el equipo, no en el repositorio.
+datos/worldclim/

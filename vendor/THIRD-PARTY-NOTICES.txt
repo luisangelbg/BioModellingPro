@@ -26,11 +26,19 @@ LOADED FROM A CONTENT-DELIVERY NETWORK (not redistributed here)
 
 DATA
 ----
+See NOTICE.md at the root of the project: it states, source by source, what is redistributed here and what is
+not. In short:
 - Map tiles are requested from public tile servers and carry their own attribution, shown on the map.
-- The example raster files in datos/ are derived from WorldClim 2.1 (Fick & Hijmans, 2017, Int. J. Climatol.,
-  free for non-commercial use with attribution) and from the Koeppen-Geiger maps of Beck et al. (2018,
-  Scientific Data, CC BY 4.0). Species records are requested from the Global Biodiversity Information
-  Facility (GBIF) and remain under the licences declared by their publishers.
+- WorldClim 2.1 (Fick & Hijmans, 2017, Int. J. Climatol.) is free for academic and other non-commercial use,
+  but REDISTRIBUTION OR COMMERCIAL USE IS NOT ALLOWED WITHOUT PRIOR PERMISSION (worldclim.org/about.html).
+  The global layers are therefore not distributed here; datos/LEE-ME.md says how to download them. The only
+  WorldClim material that travels with the program is the cropped subset of the bundled example
+  (js/example-rasters.js), which is there for teaching, is separable, and is not covered by the GPL.
+- The Koeppen-Geiger maps of Beck et al. (2018, Scientific Data) are CC BY 4.0 and are redistributed with
+  attribution, both in datos/koppen/ and in the bundled example.
+- Species records are requested from the Global Biodiversity Information Facility (GBIF) and remain under the
+  licences declared by their publishers. The publishers of the bundled example are listed in
+  datos/GBIF-FUENTES.md.
 - js/mexico-states.js holds the boundaries of the 32 federal entities of Mexico used by the region filter of
   step 2. They come from Natural Earth (admin 1 states and provinces, 1:10 million scale, naturalearthdata.com),
   which is in the public domain and requires no permission, filtered to Mexico and simplified with the

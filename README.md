@@ -89,11 +89,13 @@ JPEG, WebP, SVG, **TIFF** and georeferenced **GeoTIFF** for further editing in Q
 - **[SoilGrids](https://soilgrids.org)** (ISRIC; Poggio et al. 2021) — WRB soil classification.
 
 The bundled example layers are a crop of WorldClim 10 arc-minutes and of the Köppen-Geiger map (longitude −122° to −86°,
-latitude 13° to 40°, covering the whole of Mexico), embedded in `js/example-rasters.js`, so the example needs no download. For a real study load the full files;
-see [`datos/LEE-ME.md`](datos/LEE-ME.md). The `datos/` folder also holds the world-wide 10 arc-minute files to try the
-folder picker.
+latitude 13° to 40°, covering the whole of Mexico), embedded in `js/example-rasters.js`, so the example needs no
+download. For a real study load the full files; [`datos/LEE-ME.md`](datos/LEE-ME.md) says where to get them — WorldClim
+does not allow its layers to be redistributed, so they are not in this repository and you download them yourself.
 
-Third-party libraries and their licences: [`vendor/THIRD-PARTY-NOTICES.txt`](vendor/THIRD-PARTY-NOTICES.txt).
+Who is behind the records of the example: [`datos/GBIF-FUENTES.md`](datos/GBIF-FUENTES.md), 70 institutions and 91
+datasets. What is ours and what is not, source by source: [`NOTICE.md`](NOTICE.md). Third-party libraries and their
+licences: [`vendor/THIRD-PARTY-NOTICES.txt`](vendor/THIRD-PARTY-NOTICES.txt).
 
 ## Privacy and architecture
 
@@ -113,7 +115,10 @@ js/                        one file per block (i18n, state, ui, maps, GBIF, filt
 js/example-records.js      bundled GBIF example (Pinus cembroides)
 js/example-rasters.js      bundled example layers (cropped WorldClim and Köppen-Geiger)
 vendor/                    Leaflet, geotiff.js, html2canvas and their licences
-datos/                     world-wide 10 arc-minute layers and instructions for full-resolution data
+datos/                     the Köppen-Geiger layer, where to download the climate layers, and who published
+                           the records of the example
+manual/                    the user manual in Spanish, in HTML by parts and as a PDF
+NOTICE.md                  what is ours and what belongs to someone else, source by source
 server.ps1, *.bat          optional local web server (Windows)
 ```
 
@@ -121,13 +126,21 @@ server.ps1, *.bat          optional local web server (Windows)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(Version 1.0.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+(Version 1.0.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 That DOI is the **concept DOI**: it always resolves to the latest version. Version 1.0.0 also has its own,
 [10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), if you need to point at exactly the code you used.
 
 See [`CITATION.cff`](CITATION.cff). Please also cite the data sources and the methods you use.
 
-## Licence
+## Licence, and what it covers
 
-GNU General Public License v3.0 or later. See [`LICENSE`](LICENSE).
+The program is free software under the **GNU General Public License v3.0 or later** (see [`LICENSE`](LICENSE)).
+That licence covers the source code written by the authors.
+
+The libraries the program bundles or loads, and the data it ships as an example, belong to other people and keep
+their own terms — and one of them has a restriction worth knowing before you redistribute the program:
+**WorldClim does not allow redistribution of its layers without prior permission**, which is why the global layers
+are not in this repository and why the bundled example subset is separable. [`NOTICE.md`](NOTICE.md) says exactly
+what is whose, source by source, and [`datos/GBIF-FUENTES.md`](datos/GBIF-FUENTES.md) lists the 70 institutions
+whose records make up the example.

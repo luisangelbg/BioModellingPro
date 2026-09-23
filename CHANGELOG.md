@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.2 — 2026-09-22
+
+Documentation and licensing hygiene. Nothing changed in the analysis.
+
+- **New `NOTICE.md`**: what belongs to the authors and what belongs to someone else, source by source, for both
+  code and data, with the terms of each one and whether it is redistributed here.
+- **The global WorldClim layers are no longer in the repository.** Their terms allow academic and other
+  non-commercial use but not redistribution without prior permission, so `datos/worldclim/` now ships empty and
+  `datos/LEE-ME.md` says how to download the layers. The cropped subset of the bundled example stays — it is what
+  makes the program work from a double click — flagged as WorldClim material, not covered by the GPL, and
+  separable: deleting `js/example-rasters.js` leaves the program complete.
+- **New `datos/GBIF-FUENTES.md`**: the 70 institutions and 91 datasets that published the 2,400 records of the
+  example, with how many records each one contributed and how to cite them.
+- The Köppen-Geiger layer, which is CC BY 4.0, keeps travelling with the program, now with its attribution stated.
+- The licence sections of the README and the Spanish readme, the third-party notices and appendix F of the manual
+  (now with a table of the data sources) say all of this too.
+
 ## 1.0.1 — 2026-09-22
 
 - Archived in Zenodo. The citation now carries the DOI — the concept DOI

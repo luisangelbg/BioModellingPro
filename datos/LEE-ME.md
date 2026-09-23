@@ -15,11 +15,20 @@ by double-clicking `index.html`.*
 
 ## Contenido de esta carpeta / What is here
 
-- `worldclim/wc2.1_10m_bio_1.tif` … `bio_19.tif` y `wc2.1_10m_elev.tif` — WorldClim 2.1, 10 arc-min ≈ 18 km, mundo completo.
-- `koppen/Beck_KG_V1_present_0p0083.tif` — Köppen-Geiger a 1 km (Beck et al. 2018), mundo completo.
+- `koppen/Beck_KG_V1_present_0p0083.tif` — Köppen-Geiger a 1 km (Beck et al. 2018, CC BY 4.0), mundo completo.
+  Viaja con el programa porque su licencia lo permite.
+- `worldclim/` — **no viene en el repositorio**. Las condiciones de uso de WorldClim permiten el uso académico y
+  no comercial, pero **no la redistribución sin permiso previo** (https://www.worldclim.org/about.html), así que
+  las capas no se distribuyen aquí: descárgalas con las instrucciones de abajo y déjalas en esa carpeta. El
+  programa las lee igual y el repositorio la ignora.
 
-Sirven para probar el selector de carpeta del paso 5 con archivos reales, o para estudios de baja resolución.
-*They let you try the folder picker of step 5 with real files, or run low-resolution studies.*
+Sirven para probar el selector de carpeta del paso 5 con archivos reales, o para estudios de baja resolución; el
+ejemplo incrustado no las necesita.
+
+*`koppen/` ships with the program because CC BY 4.0 allows it. `worldclim/` is not in the repository on purpose:
+WorldClim allows academic and non-commercial use but not redistribution without prior permission, so you download
+the layers yourself with the instructions below and drop them in that folder. They let you try the folder picker
+of step 5 with real files; the bundled example does not need them.*
 
 ## Para un estudio real (30 arc-seg ≈ 1 km) / For a real study
 
