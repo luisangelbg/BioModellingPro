@@ -1,0 +1,53 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "BioModelling Pro: biogeography and species distribution modelling in the browser"
+abstract: >-
+  BioModelling Pro is a self-contained web application for biogeographic analysis and species
+  distribution modelling that runs entirely in the browser, with no installation and no
+  server-side computation. It downloads presence records from GBIF, filters and cleans them
+  with nine coordinate-quality rules, extracts bioclimatic, elevation, Koeppen-Geiger climate
+  and soil variables, and explores them with descriptive statistics, normality tests,
+  correlation and collinearity diagnostics, principal component analysis, clustering,
+  correspondence analysis and ecological metrics of range, spatial pattern and niche. It fits
+  ten species distribution algorithms (a MaxEnt-style penalised logistic model, GLM, GAM,
+  random forest, boosted regression trees, support vector machine, neural network, Bioclim,
+  Domain and Mahalanobis distance) and an ensemble, validates them with spatial blocks, AUC,
+  TSS and the Boyce index, and projects them to climate scenarios with extrapolation maps.
+  The interface is bilingual (Spanish and English) with light and dark themes.
+type: software
+authors:
+  - given-names: "Luis Ángel"
+    family-names: "Barrera-Guzmán"
+    email: lbarrerag@chapingo.mx
+    orcid: "https://orcid.org/0000-0001-8057-2583"
+  - given-names: "Gabriela"
+    family-names: "Ramírez-Ojeda"
+    orcid: "https://orcid.org/0000-0001-9679-6514"
+  - given-names: "Jorge"
+    family-names: "Cadena-Iñiguez"
+    orcid: "https://orcid.org/0000-0002-6427-0646"
+  - given-names: "Daniel Alejandro"
+    family-names: "Cadena-Zamudio"
+    orcid: "https://orcid.org/0000-0002-6972-7414"
+  - given-names: "Jorge David"
+    family-names: "Cadena-Zamudio"
+    orcid: "https://orcid.org/0000-0002-2855-4561"
+  - given-names: "Héctor Tecumshé"
+    family-names: "Mojica-Zárate"
+    orcid: "https://orcid.org/0000-0002-9067-3983"
+version: "1.0.0"
+date-released: "2026-09-21"
+repository-code: "https://github.com/luisangelbg/BioModellingPro"
+url: "https://luisangelbg.github.io/BioModellingPro/"
+license: GPL-3.0-or-later
+keywords:
+  - species distribution modelling
+  - ecological niche modelling
+  - biogeography
+  - GBIF
+  - bioclimatic variables
+  - MaxEnt
+  - ensemble modelling
+  - climate change projections
+  - multivariate analysis
+  - web application

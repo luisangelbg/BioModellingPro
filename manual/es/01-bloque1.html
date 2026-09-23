@@ -1,0 +1,217 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 1 · Registros de presencia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 70%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 15%; margin-right: 15%; }
+  .campos { font-size: 9.6pt; }
+  .campos td:first-child { font-family: var(--mono); font-size: 8.6pt; color: var(--marino); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b1" data-pestana="1" data-orden="2" style="--acento: var(--b1)">
+  <div class="cap-apertura">
+    <div class="cap-num">1</div>
+    <div class="cap-etiqueta">Bloque 1 · El punto de partida</div>
+    <h1>Registros de presencia: GBIF y tus propios datos</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">De dónde salen los puntos que se van a modelar. Cómo se resuelve un nombre científico, cómo se descargan los registros de GBIF sin perder el control de lo que llega, y cómo entra una tabla propia de campo o de herbario.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>1.1</b>Qué es un registro de presencia</li>
+      <li><b>1.2</b>GBIF en dos minutos</li>
+      <li><b>1.3</b>Resolver el nombre científico</li>
+      <li><b>1.4</b>Traer los registros y filtrar por país</li>
+      <li><b>1.5</b>Lo que llega y cómo se ve</li>
+      <li><b>1.6</b>Tus propios registros</li>
+      <li><b>1.7</b>¿Cuántos registros hacen falta?</li>
+      <li><b>1.8</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 1.1 -->
+  <h2 id="b1-1"><span class="num">1.1</span>Qué es un registro de presencia</h2>
+  <p class="lead">Un <b>registro de presencia</b> es la afirmación de que un organismo de cierta especie estuvo en cierto lugar en cierto momento, hecha por alguien que lo vio o lo colectó. Todo lo que hace este programa descansa en esa frase, así que vale la pena desarmarla.</p>
+  <p>Un registro útil para modelar necesita tres cosas: un <b>nombre</b> en el que podamos confiar, unas <b>coordenadas</b> en grados decimales y una <b>idea de su precisión</b>. El resto —quién lo colectó, en qué herbario está, qué año fue— sirve para filtrar y para dar crédito, pero no entra en el modelo.</p>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Presencia no es lo contrario de ausencia</div>
+    <p>Que no haya registros en una zona puede significar tres cosas muy distintas: que la especie no está, que está pero nadie ha ido a buscarla, o que fue buscada y no encontrada. Los datos de GBIF casi nunca distinguen entre ellas. Por eso los métodos de este programa son de <b>solo presencia</b>: aprenden del contraste entre los sitios donde la especie fue registrada y una muestra del ambiente disponible en la región, no entre presencias y ausencias verdaderas. Es la diferencia entre decir «aquí el clima se parece al de los lugares donde vive» y «aquí vive».</p>
+  </div>
+
+  <table class="compacta campos">
+    <thead><tr><th style="width:1.45in">Campo</th><th>Qué es y por qué importa</th></tr></thead>
+    <tbody>
+      <tr><td>decimalLatitude<br>decimalLongitude</td><td>La coordenada en grados decimales, con el signo negativo al oeste de Greenwich y al sur del ecuador. México entero cae entre −118° y −86° de longitud y entre 14° y 33° de latitud: cualquier valor fuera de ahí, en un estudio nacional, es sospechoso.</td></tr>
+      <tr><td>coordinateUncertaintyInMeters</td><td>El radio dentro del cual está el punto de verdad. Un registro de herbario antiguo georreferenciado a partir de «10 km al norte de Durango» puede traer 10,000 m; una observación con teléfono trae 5 o 10 m. Si la incertidumbre es mayor que el tamaño de la celda de tus capas, el punto puede caer en el clima equivocado.</td></tr>
+      <tr><td>basisOfRecord</td><td>De qué clase de evidencia viene: ejemplar de herbario, observación humana, ejemplar vivo (jardines botánicos), material fósil… El ejemplar vivo es el que más problemas da: son plantas cultivadas fuera de su distribución natural.</td></tr>
+      <tr><td>taxonRank, taxonKey</td><td>El rango del nombre (especie, subespecie, variedad) y su clave numérica en GBIF, que es lo que de verdad identifica al taxón, por encima de cómo esté escrito el nombre.</td></tr>
+      <tr><td>year, month</td><td>La fecha. Sirve para descartar registros muy viejos, cuyo sitio quizá ya no existe, y para estudiar el cambio en el tiempo.</td></tr>
+      <tr><td>issues</td><td>Las banderas que GBIF levanta solo: coordenadas redondeadas, país deducido de la coordenada, coordenada probablemente invertida… Se conservan porque ayudan a decidir en el Bloque 3.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 1.2 -->
+  <h2 id="b1-2"><span class="num">1.2</span>GBIF en dos minutos</h2>
+  <p>GBIF —la Infraestructura Mundial de Información en Biodiversidad— no colecta datos: los <b>reúne</b>. Herbarios, museos, proyectos de ciencia ciudadana y monitoreos nacionales publican ahí sus catálogos, y GBIF los ofrece con un formato común y una taxonomía unificada. Eso tiene dos consecuencias que conviene tener presentes todo el tiempo:</p>
+  <ul>
+    <li><b>La calidad es la del publicador, no la de GBIF.</b> Un error de transcripción en un herbario llega intacto a tu descarga. Por eso existe el Bloque 3.</li>
+    <li><b>La cobertura es desigual.</b> Hay países, grupos y regiones con miles de registros y otros casi vacíos. La densidad de puntos habla tanto del esfuerzo de colecta como de la especie.</li>
+  </ul>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Cita los datos, no solo el programa</div>
+    <p>Toda publicación que use registros de GBIF debe citar la descarga. La app consulta el servicio en línea, que <b>no</b> emite un identificador permanente; por eso, en el momento de descargar, anota la <b>fecha</b>, el <b>nombre buscado</b>, la <b>clave taxonómica</b> y los <b>filtros</b> que usaste —incluidos los países, si filtraste por ellos—: con eso cualquiera puede repetir la consulta. Si tu revista exige un DOI de la descarga, repite la misma consulta desde el portal de GBIF y cita el identificador que te dé.</p>
+  </div>
+
+  <!-- 1.3 -->
+  <h2 id="b1-3"><span class="num">1.3</span>Resolver el nombre científico</h2>
+  <p>Antes de descargar nada hay que ponerse de acuerdo sobre de qué especie estamos hablando. Escribe el nombre en el campo y pulsa <span class="ui">Buscar nombre</span>: la app pregunta a GBIF cuál es el nombre aceptado y con qué clave lo tiene registrado.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b1-buscar.png" alt="Tarjeta de búsqueda con el nombre Pinus cembroides resuelto: nombre aceptado, autoría, rango, estatus, familia, género, clave taxonómica y confianza del match"></div>
+    <figcaption><b>Figura 1.1.</b> El nombre resuelto. La clave <code>5285172</code> es lo que se manda a GBIF; el nombre escrito solo sirvió para llegar a ella. El botón <span class="ui">Usar registros de ejemplo</span>, a la derecha, carga los 2,400 registros que vienen con el programa sin tocar internet.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Lo que dice</th><th>Cómo leerlo</th></tr></thead>
+    <tbody>
+      <tr><td><b>Nombre aceptado</b></td><td>Si es distinto del que escribiste, escribiste un sinónimo. No es un error: GBIF te lleva al nombre válido y los registros publicados con el sinónimo vienen incluidos.</td></tr>
+      <tr><td><b>Rango</b></td><td><code>SPECIES</code>, <code>SUBSPECIES</code>, <code>VARIETY</code>… Si buscas una subespecie, solo llegarán sus registros; si buscas la especie, puedes incluir o excluir los infraespecíficos al descargar.</td></tr>
+      <tr><td><b>Estatus</b></td><td><code>ACCEPTED</code> es lo que quieres ver. <code>SYNONYM</code> o <code>DOUBTFUL</code> piden una revisión taxonómica antes de seguir.</td></tr>
+      <tr><td><b>Confianza</b></td><td>Qué tan seguro está GBIF de haber entendido el nombre, con el tipo de coincidencia (<code>EXACT</code>, <code>FUZZY</code>…). Una coincidencia difusa con confianza baja suele ser un nombre mal escrito.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Si la app no encuentra el nombre</div>
+    <p>Revisa la ortografía y que sea el nombre científico completo (género y epíteto). Los nombres comunes no funcionan: «piñonero» no es un nombre científico y GBIF no lo resolverá. Si el nombre es reciente y aún no está en la taxonomía de GBIF, usa el de la especie a la que pertenecía antes y filtra después por el nombre escrito en el Bloque 2.</p>
+  </div>
+
+  <!-- 1.4 -->
+  <h2 id="b1-4"><span class="num">1.4</span>Traer los registros</h2>
+  <p>Con el nombre resuelto, la tarjeta de descarga controla <i>qué</i> se pide, <i>de dónde</i> y <i>cuánto</i>. Las tres decisiones viajan dentro de la consulta a GBIF: lo que se excluye aquí no se descarga, y el total que la app anuncia ya viene filtrado.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b1-traer.png" alt="Tarjeta de descarga con las casillas de solo registros con coordenadas, sin problemas geoespaciales e incluir infraespecíficos, el máximo de registros y el botón de traer"></div>
+    <figcaption><b>Figura 1.2.</b> Las tres casillas y el tope. La descarga se hace por páginas, con barra de progreso, y se puede detener.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:2.1in">Opción</th><th>Qué hace y cuándo cambiarla</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">Solo registros con coordenadas</span></td><td>Descarta los que no traen punto. Déjala activada: un registro sin coordenadas no sirve para modelar.</td></tr>
+      <tr><td><span class="ui">Sin problemas geoespaciales</span></td><td>Pide a GBIF que excluya los registros que él mismo marcó con banderas graves de coordenadas. Es un primer filtro barato, pero <b>no sustituye</b> al Bloque 3.</td></tr>
+      <tr><td><span class="ui">Incluir infraespecíficos</span></td><td>Trae también subespecies y variedades. Actívala si quieres modelar la especie completa o comparar sus subtaxones; desactívala si tu pregunta es solo sobre la especie en sentido estricto.</td></tr>
+      <tr><td><span class="ui">Países</span></td><td>Pide solo los registros de los países marcados (sección siguiente). Es el filtro que más reduce la descarga.</td></tr>
+      <tr><td><span class="ui">Máximo de registros</span></td><td>El tope de la descarga. Sirve para no esperar de más mientras exploras.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>El filtro de países</h3>
+  <p>Debajo de las casillas está el filtro de <b>países</b>, que no recorta lo descargado: le pide a GBIF, desde el principio, <b>solo</b> los registros de los países que marques. La diferencia es grande cuando la especie es común: el maíz tiene 153,301 registros con coordenadas en el mundo y <b>51,288</b> en México. El conteo que anuncia GBIF ya viene filtrado, así que sabes de entrada cuántos vas a traer.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b1-paises.png" alt="Filtro de países con los atajos de México, Centroamérica y Sudamérica, la lista de los veintiún países con su código y el aviso de cuántos se pedirán"></div>
+    <figcaption><b>Figura 1.3.</b> Los veintiún países de México, Centroamérica y Sudamérica, con un atajo por región. Los botones funcionan como interruptor, y <span class="ui">sin filtro</span> los desmarca todos: sin ninguno marcado se descarga del mundo entero, como siempre.</figcaption>
+  </figure>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Cuándo <i>no</i> conviene filtrar por país</div>
+    <p>Cuando la distribución cruza una frontera hacia fuera de la lista. El piñonero del ejemplo vive también en el suroeste de Estados Unidos: filtrar a México dejaría fuera 670 registros y recortaría el nicho de verdad, no solo el mapa. La regla es la del capítulo 2: el área de estudio se decide por biología, no por comodidad.</p>
+  </div>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>El tope no toma una muestra al azar</div>
+    <p>GBIF entrega los registros <b>más recientes primero</b>. Si tu especie tiene 20,000 registros y pones un tope de 2,000, no obtendrás 2,000 registros representativos: obtendrás los 2,000 más nuevos, que están sesgados hacia la ciencia ciudadana y hacia las zonas con teléfono y señal. Para un estudio serio, sube el tope por encima del total que reporta la búsqueda y deja que baje todo.</p>
+  </div>
+
+  <!-- 1.5 -->
+  <h2 id="b1-5"><span class="num">1.5</span>Lo que llega y cómo se ve</h2>
+  <p>Terminada la descarga, la última tarjeta resume lo que hay y muestra las primeras filas. Es el momento de la primera revisión: cuántos son, de qué países, de qué años.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b1-descargados.png" alt="Tarjeta de registros descargados con las tarjetas de resumen —2,400 registros, 119 infraespecíficos, 5 países y años 1982 a 2026— y la tabla de registros"></div>
+    <figcaption><b>Figura 1.4.</b> El ejemplo recién cargado. La tabla se recorre de lado para ver el resto de los campos. Las cuatro cifras de arriba son la primera prueba de olfato: cinco países para un pino mexicano ya dice que hay algo que revisar.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El ejemplo, en números</div>
+    <p>Los 2,400 registros del piñonero que trae el programa se reparten así: <b>México 1,719</b>, <b>Estados Unidos 670</b>, <b>Nueva Zelanda 8</b>, <b>Francia 2</b> y <b>Austria 1</b>. Hay siete formas nombradas —la especie, con 2,281 registros, y seis subespecies y variedades— y las fechas van de 1982 a 2026. Por tipo de evidencia: 1,343 observaciones humanas, 967 ejemplares de herbario y 90 de otras clases.</p>
+    <p>Los once registros europeos y neozelandeses son árboles cultivados en jardines botánicos y arboretos. Son legítimos como registros —esos árboles existen— pero no dicen nada sobre dónde <i>puede vivir</i> la especie por sí sola. Quedarán fuera en el Bloque 2 o en el 3.</p>
+  </div>
+
+  <!-- 1.6 -->
+  <h2 id="b1-6"><span class="num">1.6</span>Tus propios registros</h2>
+  <p>No todo está en GBIF: los datos de tu propio muestreo, los de una tesis que aún no se publica o los de un herbario local casi nunca lo están. La segunda tarjeta del bloque acepta esos datos y los trata igual que a los de GBIF.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b1-propios.png" alt="Tarjeta de carga de registros propios con la zona de arrastre, la asignación de columnas, la vista previa de cinco filas y las tarjetas de filas leídas, registros válidos, taxones y omitidas"></div>
+    <figcaption><b>Figura 1.5.</b> Cinco filas pegadas desde una hoja de cálculo. La app reconoció sola las columnas <code>especie</code>, <code>longitud</code> y <code>latitud</code>; si se hubiera equivocado, los tres menús permiten corregirla.</figcaption>
+  </figure>
+
+  <ol class="pasos">
+    <li><b>Prepara la tabla.</b> Bastan tres columnas: especie, longitud y latitud. Los encabezados pueden estar en español o en inglés. Si quieres partir de algo, <span class="ui">Descargar plantilla</span> da un archivo con las columnas ya puestas.</li>
+    <li><b>Súbela o pégala.</b> Arrastra un archivo <code>.csv</code>, <code>.txt</code> o <code>.xlsx</code>, o copia las celdas desde tu hoja de cálculo y pégalas en el cuadro de texto.</li>
+    <li><b>Revisa la asignación de columnas.</b> La app propone cuál es cuál; corrígela si hace falta. Las columnas opcionales —país, estado, localidad, año, mes, altitud e incertidumbre— se reconocen solas y se aprovechan en los filtros.</li>
+    <li><b>Mira las cuatro tarjetas</b> de filas leídas, registros válidos, taxones y omitidas, y la lista de taxones con su conteo. Si «omitidas» no es cero, alguna fila tenía coordenadas vacías, de texto o fuera de rango.</li>
+    <li><b>Pulsa <span class="ui">Usar estos registros →</span></b> y decide si reemplazan a los de GBIF o se suman a ellos.</li>
+  </ol>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">Si tus datos vienen así…</th><th>La app hace esto</th></tr></thead>
+    <tbody>
+      <tr><td>Grados, minutos y segundos<br><span class="small">24° 01' 18" N, 104° 39' 12" O</span></td><td>Los convierte a grados decimales, con el signo que corresponde al hemisferio.</td></tr>
+      <tr><td>Coma decimal<br><span class="small">−104,6532</span></td><td>La entiende como separador decimal.</td></tr>
+      <tr><td>Longitud y latitud invertidas</td><td>Marca la casilla <span class="ui">Intercambiar longitud y latitud</span> y se corrigen todas de golpe.</td></tr>
+      <tr><td>Longitudes sin el signo negativo</td><td>La casilla de abajo las hace negativas, que es el caso común en América.</td></tr>
+      <tr><td>Archivo guardado en Windows<br><span class="small">con acentos que se ven raros</span></td><td>Reconoce la codificación antigua y repara los acentos.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 1.7 -->
+  <h2 id="b1-7"><span class="num">1.7</span>¿Cuántos registros hacen falta?</h2>
+  <p>La pregunta llega siempre, y la respuesta honesta es: <b>menos de los que se cree, si están bien repartidos</b>. Lo que necesita un modelo no es cantidad de puntos, sino que esos puntos cubran el rango de condiciones en que vive la especie. Cincuenta registros repartidos por toda la sierra enseñan más que quinientos apiñados en dos cañadas.</p>
+  <div class="caja regla">
+    <div class="caja-t"><span class="ico">✓</span>Órdenes de magnitud</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:26%"><b>Menos de 15</b></td><td>No modeles con algoritmos flexibles. Un modelo de envolvente sencillo y una descripción del ambiente son más honestos.</td></tr>
+      <tr><td><b>De 15 a 30</b></td><td>Es posible modelar, con pocas variables (tres o cuatro), modelos sencillos y validación cuidadosa. Los trabajos que han medido el efecto del tamaño de muestra encuentran que ahí empieza a haber resultados aprovechables.</td></tr>
+      <tr><td><b>Más de 50</b></td><td>Terreno cómodo para los diez algoritmos y el ensamble del Bloque 9.</td></tr>
+      <tr><td><b>Muchos miles</b></td><td>El problema deja de ser el número y pasa a ser el <b>sesgo</b>: adelgazar a una presencia por celda suele mejorar el modelo más que agregar datos.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">Son órdenes de magnitud de la literatura, no umbrales oficiales: el número mínimo real depende de cuán estrecho sea el nicho y de cuánta variación ambiental haya en tu región.</p>
+  </div>
+
+  <!-- 1.8 -->
+  <h2 id="b1-8"><span class="num">1.8</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>«No se pudo conectar con GBIF»</td><td>Sin internet, o el servicio no responde. La app funciona igual con el ejemplo incluido o con tus propios archivos; vuelve a intentar la descarga más tarde.</td></tr>
+      <tr><td>La descarga se corta a la mitad<br><span class="small">«se perdió la conexión con GBIF»</span></td><td>En descargas de decenas de miles de registros puede caerse la conexión al leer una página. La app reintenta hasta seis veces con esperas crecientes y, si aun así no lo consigue, ofrece un botón para <b>usar los registros que ya llegaron</b> en lugar de perderlos. Con ese conjunto puedes seguir trabajando o volver a intentar la descarga completa más tarde.</td></tr>
+      <tr><td>Llegan muchos menos registros de los que esperabas</td><td>Revisa el tope y las casillas: <span class="ui">Solo registros con coordenadas</span> descarta muchos registros de herbario antiguos que nunca se georreferenciaron.</td></tr>
+      <tr><td>Aparecen países donde la especie no vive</td><td>Casi siempre son ejemplares cultivados o errores de coordenada. No los borres a mano: el Bloque 2 los filtra por país y el Bloque 3 los detecta por reglas, y así queda constancia de cuántos fueron.</td></tr>
+      <tr><td>Todos los registros son de los últimos cinco años</td><td>El tope se quedó corto y GBIF entregó solo los más recientes. Súbelo.</td></tr>
+      <tr><td>Tu archivo se carga pero «registros válidos» es mucho menor que «filas leídas»</td><td>Columnas mal asignadas, coordenadas con texto («s/d», «—») o celdas vacías. Corrige la asignación o limpia la hoja y vuelve a cargarla.</td></tr>
+      <tr><td>Los puntos salen en el océano Índico</td><td>Longitud y latitud invertidas, o longitudes sin signo. Las dos casillas del final de la tarjeta lo arreglan.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Antes de seguir al Bloque 2</div>
+    <p>Descarga el CSV crudo si vas a trabajar varios días: así no dependes de que GBIF entregue exactamente lo mismo la próxima vez. Los registros descargados quedan también en el informe final, con su fecha y su consulta.</p>
+  </div>
+</section>
+
+</body>
+</html>

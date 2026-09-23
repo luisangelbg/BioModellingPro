@@ -1,0 +1,220 @@
+﻿/* BioModelling Pro — manual de usuario: páginas interiores.
+   Hojas blancas con vivos en verde de bosque y negro; un color por bloque de la app.
+   Cada hoja la arma paginar.js: encabezados, números de página y números del índice. */
+
+:root {
+  --marino: #14453a;
+  --marino-2: #1d6153;
+  --marino-suave: #e9f2ee;
+  --negro: #111111;
+  --tinta: #1f2724;
+  --gris: #5d6a64;
+  --linea: #d7e1dc;
+  --papel: #ffffff;
+
+  /* un color por bloque: bosque de pinos, cielo, laguna, matorral, ocre de la sierra, barranca… */
+  --b0: #14453a;  /* introducción y preliminares */
+  --b1: #1d5bb0;  /* 1 · registros de presencia */
+  --b2: #0f766e;  /* 2 · filtros y regiones */
+  --b3: #2f7d4f;  /* 3 · depuración de coordenadas */
+  --b4: #b7791f;  /* 4 · mapa de registros */
+  --b5: #c2410c;  /* 5 · variables ambientales */
+  --b6: #b4234a;  /* 6 · correlación y selección */
+  --b7: #7e3fb0;  /* 7 · estadística descriptiva */
+  --b8: #2b8fb3;  /* 8 · multivariado, ecología y diversidad */
+  --b9: #4f46a5;  /* 9 · modelado de la distribución */
+  --b10: #4d7c0f; /* 10 · adaptación agroclimática */
+  --bx: #111111;  /* apéndices */
+
+  --serif: 'Cormorant', 'Palatino Linotype', serif;
+  --texto: 'Crimson Pro', 'Georgia', serif;
+  --sans: 'Jost', 'Segoe UI', system-ui, sans-serif;
+  --mono: ui-monospace, 'Cascadia Mono', 'Consolas', monospace;
+}
+
+/* ================================================================ hojas (paginar.js) */
+@page { size: 8.5in 11in; margin: 0; }
+.hoja { width: 8.5in; height: 11in; position: relative; overflow: hidden; background: #fff; break-after: page; page-break-after: always; }
+.hoja-cuerpo { position: absolute; top: 0.95in; bottom: 0.9in; overflow: hidden; }
+.hoja.impar .hoja-cuerpo { left: 0.95in; right: 0.85in; }
+.hoja.par .hoja-cuerpo { left: 0.85in; right: 0.95in; }
+.hoja-cuerpo > :first-child { margin-top: 0 !important; }
+.cabeza { position: absolute; top: 0.52in; left: 0.95in; right: 0.85in; display: flex; justify-content: space-between; align-items: baseline; gap: 0.2in; font-family: var(--sans); font-size: 7.5pt; color: var(--gris); border-bottom: 0.8px solid var(--negro); padding-bottom: 0.06in; }
+.hoja.par .cabeza { left: 0.85in; right: 0.95in; }
+.cabeza .cab-man { letter-spacing: 0.14em; text-transform: uppercase; color: var(--marino); }
+.cabeza .cab-cap { flex: 1; letter-spacing: 0.04em; }
+.hoja.impar .cabeza .cab-cap { text-align: right; }
+.cabeza .cab-num { font-size: 9pt; font-weight: 500; color: var(--negro); min-width: 0.3in; }
+.hoja.impar .cabeza .cab-num { text-align: right; }
+.pie { position: absolute; bottom: 0.45in; left: 0; right: 0; text-align: center; font-family: var(--sans); font-size: 8.5pt; color: var(--negro); }
+/* pestaña de color del bloque en el borde exterior */
+.pestana { position: absolute; height: 0.56in; width: 0.3in; background: var(--acento, var(--marino)); color: #fff; font-family: var(--sans); font-size: 8.5pt; font-weight: 500; display: grid; place-items: center; letter-spacing: 0.02em; }
+.hoja.impar .pestana { right: 0; border-radius: 5px 0 0 5px; }
+.hoja.par .pestana { left: 0; border-radius: 0 5px 5px 0; }
+
+/* ================================================================ vista en pantalla */
+@media screen {
+  body { background: #7d8594; margin: 0; }
+  .libro { padding: 28px 0; }
+  .hoja { margin: 0 auto 28px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28); }
+  html:not(.paginado) body > section { max-width: 6.7in; margin: 0 auto; background: #fff; padding: 0.5in; }
+}
+@media print {
+  body { margin: 0; background: none; }
+}
+
+
+/* ================================================================ texto base */
+html { font-size: 11pt; }
+body { font-family: var(--texto); color: var(--tinta); line-height: 1.42; -webkit-print-color-adjust: exact; print-color-adjust: exact; hyphens: auto; }
+p { margin: 0 0 0.62em; text-align: justify; orphans: 3; widows: 3; }
+b, strong { color: var(--negro); font-weight: 600; }
+em, i { font-style: italic; }
+a { color: var(--marino); text-decoration: none; }
+sub, sup { font-size: 0.72em; line-height: 0; }
+ul, ol { margin: 0.2em 0 0.7em; padding-left: 1.35em; }
+li { margin-bottom: 0.22em; }
+li::marker { color: var(--marino); }
+
+h1, h2, h3, h4 { font-family: var(--serif); color: var(--negro); break-after: avoid; page-break-after: avoid; }
+h2 { font-size: 20pt; font-weight: 600; margin: 1.1em 0 0.35em; line-height: 1.12; padding-bottom: 0.12em; border-bottom: 1.2px solid var(--negro); display: flex; align-items: baseline; gap: 0.45em; }
+h2 .num { font-family: var(--sans); font-size: 10.5pt; font-weight: 500; color: #fff; background: var(--acento, var(--marino)); padding: 0.1em 0.5em; border-radius: 3px; letter-spacing: 0.05em; position: relative; top: -0.2em; }
+h3 { font-size: 14.5pt; font-weight: 600; margin: 0.9em 0 0.25em; color: var(--marino); }
+h4 { font-family: var(--sans); font-size: 8.5pt; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; margin: 0.9em 0 0.3em; color: var(--acento, var(--marino)); }
+
+.lead { font-size: 12.6pt; line-height: 1.45; color: var(--negro); }
+.small { font-size: 9.5pt; }
+.mono, code { font-family: var(--mono); font-size: 0.86em; background: var(--marino-suave); padding: 0.05em 0.3em; border-radius: 3px; color: var(--marino); }
+/* texto de la interfaz (en inglés, tal como aparece en la app) */
+.ui { font-family: var(--sans); font-size: 0.82em; font-weight: 500; color: var(--marino); border: 1px solid #b7cfc4; border-radius: 4px; padding: 0.02em 0.42em; white-space: nowrap; background: #f3f8f5; }
+.ruta { font-family: var(--sans); font-size: 0.82em; color: var(--marino); white-space: nowrap; }
+.ruta .sep { color: var(--gris); padding: 0 0.25em; }
+
+/* ================================================================ apertura de capítulo */
+.cap-apertura { position: relative; padding-top: 1.35in; margin-bottom: 0.3in; }
+.cap-apertura .cap-num { font-family: var(--serif); font-size: 120pt; font-weight: 500; line-height: 0.8; color: var(--acento, var(--marino)); }
+.cap-apertura .cap-etiqueta { font-family: var(--sans); font-size: 8.5pt; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gris); margin: 0.25in 0 0.08in; }
+.cap-apertura h1 { font-size: 34pt; font-weight: 600; line-height: 1.04; margin: 0 0 0.16in; }
+.cap-apertura .cap-regla { height: 3px; background: var(--negro); width: 1.2in; margin: 0.14in 0 0.22in; }
+.cap-apertura .cap-resumen { font-size: 12.5pt; color: var(--tinta); max-width: 5.6in; }
+.cap-apertura .cap-franja { display: flex; gap: 3px; margin-top: 0.35in; }
+.cap-apertura .cap-franja span { height: 7px; flex: 1; }
+/* multi-column (columns:) stalls the paginator: two-column lists use a grid instead */
+.cap-contenido { list-style: none; padding: 0; margin: 0.3in 0 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.4in; font-family: var(--sans); font-size: 9pt; }
+.cap-contenido li { break-inside: avoid; padding: 0.05in 0; border-top: 1px solid var(--linea); color: var(--tinta); }
+.cap-contenido li b { color: var(--acento, var(--marino)); font-weight: 500; margin-right: 0.4em; }
+
+/* ================================================================ recuadros */
+.caja { break-inside: avoid; margin: 0.16in 0 0.2in; padding: 0.12in 0.16in 0.1in 0.2in; border-radius: 0 6px 6px 0; position: relative; font-size: 10.5pt; }
+.caja > .caja-t { font-family: var(--sans); font-size: 8pt; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 0.05in; display: flex; align-items: center; gap: 0.5em; }
+.caja > .caja-t .ico { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; color: #fff; font-size: 9pt; letter-spacing: 0; font-weight: 600; }
+.caja p:last-child, .caja ul:last-child, .caja ol:last-child { margin-bottom: 0; }
+
+.nota { background: #eef5f1; border-left: 3px solid var(--marino); }
+.nota > .caja-t { color: var(--marino); }
+.nota .ico { background: var(--marino); }
+
+.importante { background: #fff; border: 1.4px solid var(--negro); border-left-width: 5px; border-radius: 0 6px 6px 0; }
+.importante > .caja-t { color: var(--negro); }
+.importante .ico { background: var(--negro); }
+
+.dato { background: var(--marino); color: #eef2f9; border-radius: 6px; display: flex; gap: 0.2in; align-items: center; padding: 0.14in 0.2in; }
+.dato .dato-cifra { font-family: var(--serif); font-size: 34pt; font-weight: 600; line-height: 0.9; color: #fff; white-space: nowrap; font-variant-numeric: lining-nums; min-width: 0.6in; text-align: center; flex: none; }
+.dato .dato-txt { font-size: 10.5pt; }
+.dato .dato-txt b { color: #fff; }
+.dato .caja-t { font-family: var(--sans); font-size: 8pt; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #b8d3c7; margin-bottom: 0.04in; }
+
+.teoria { background: #fbfaf4; border-left: 3px solid var(--acento, var(--marino)); }
+.teoria > .caja-t { color: var(--acento, var(--marino)); }
+.teoria .ico { background: var(--acento, var(--marino)); }
+
+.regla { padding: 0; border: 1.2px solid var(--marino); border-radius: 6px; overflow: hidden; background: #fff; }
+.regla > .caja-t { background: var(--marino); color: #fff; padding: 0.07in 0.16in; margin: 0; }
+.regla > .caja-t .ico { background: #fff; color: var(--marino); }
+.regla table { margin: 0; border: 0; }
+.regla table td, .regla table th { border-left: 0; border-right: 0; }
+.regla .regla-pie { font-size: 9.3pt; color: var(--gris); padding: 0.06in 0.16in 0.08in; margin: 0; }
+
+.ejemplo { background: #fff; border: 1px dashed var(--acento, var(--marino)); border-radius: 6px; }
+.ejemplo > .caja-t { color: var(--acento, var(--marino)); }
+.ejemplo .ico { background: var(--acento, var(--marino)); }
+
+/* pasos numerados */
+ol.pasos { list-style: none; counter-reset: paso; padding-left: 0; margin: 0.1in 0 0.16in; }
+ol.pasos > li { counter-increment: paso; position: relative; padding: 0.02in 0 0.08in 0.42in; break-inside: avoid; }
+ol.pasos > li::before { content: counter(paso); position: absolute; left: 0; top: 0.01in; width: 0.25in; height: 0.25in; border-radius: 50%; background: var(--acento, var(--marino)); color: #fff; font-family: var(--sans); font-size: 9pt; font-weight: 500; display: grid; place-items: center; }
+ol.pasos > li::after { content: ""; position: absolute; left: 0.123in; top: 0.28in; bottom: -0.02in; width: 1px; background: var(--linea); }
+ol.pasos > li:last-child::after { display: none; }
+
+/* ================================================================ tablas */
+table { width: 100%; border-collapse: collapse; margin: 0.1in 0 0.18in; font-family: var(--sans); font-size: 8.8pt; line-height: 1.35; break-inside: auto; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th { background: var(--marino); color: #fff; font-weight: 500; text-align: left; padding: 0.06in 0.08in; letter-spacing: 0.02em; vertical-align: bottom; }
+td { padding: 0.055in 0.08in; border-bottom: 1px solid var(--linea); vertical-align: top; color: var(--tinta); }
+/* long interface labels may wrap inside a table cell */
+td .ui { white-space: normal; display: inline; line-height: 1.6; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+tbody tr:nth-child(even) td { background: #f7f8fb; }
+table.compacta td { padding: 0.035in 0.07in; }
+td.c, th.c { text-align: center; }
+.si { color: var(--negro); font-size: 10pt; }
+.parcial { color: var(--gris); font-size: 10pt; }
+.no { color: #b6bcc8; }
+caption { caption-side: top; text-align: left; font-family: var(--sans); font-size: 8.5pt; color: var(--gris); padding-bottom: 0.05in; letter-spacing: 0.02em; }
+caption b { color: var(--negro); font-weight: 500; }
+
+/* chips de bloque */
+.chip { display: inline-flex; align-items: center; justify-content: center; min-width: 1.6em; padding: 0.05em 0.42em; border-radius: 3px; color: #fff; font-family: var(--sans); font-size: 8pt; font-weight: 500; letter-spacing: 0.02em; white-space: nowrap; }
+.k1 { background: var(--b1); } .k2 { background: var(--b2); } .k3 { background: var(--b3); } .k4 { background: var(--b4); } .k5 { background: var(--b5); }
+.k6 { background: var(--b6); } .k7 { background: var(--b7); } .k8 { background: var(--b8); } .k9 { background: var(--b9); } .k10 { background: var(--b10); } .k0 { background: var(--b0); } .kx { background: var(--bx); }
+
+/* ================================================================ figuras */
+figure { margin: 0.16in 0 0.22in; break-inside: avoid; }
+/* a screenshot that does not need the full width */
+figure.media .marco { width: 84%; margin: 0 auto; }
+figure.media figcaption { margin-left: 8%; margin-right: 8%; }
+figure img, figure svg { display: block; width: 100%; height: auto; }
+figure .marco { border: 1px solid var(--linea); border-radius: 6px; overflow: hidden; position: relative; box-shadow: 0 1px 0 var(--linea); }
+figcaption { font-family: var(--sans); font-size: 8.6pt; line-height: 1.4; color: var(--gris); margin-top: 0.07in; padding-left: 0.1in; border-left: 2px solid var(--acento, var(--marino)); }
+figcaption b { color: var(--negro); font-weight: 500; }
+/* marcas numeradas sobre capturas */
+.marca { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--negro); color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--negro); font-family: var(--sans); font-size: 9pt; font-weight: 500; display: grid; place-items: center; }
+.leyenda-marcas { list-style: none; padding: 0; margin: 0.06in 0 0.16in; font-family: var(--sans); font-size: 8.8pt; display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.3in; }
+.leyenda-marcas li { break-inside: avoid; position: relative; padding-left: 24px; margin-bottom: 0.06in; }
+.leyenda-marcas li span.n { position: absolute; left: 0; top: 0; width: 17px; height: 17px; border-radius: 50%; background: var(--negro); color: #fff; font-size: 8pt; display: grid; place-items: center; }
+
+/* dos columnas */
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.22in; }
+.dos > * { min-width: 0; }
+/* narrow boxes: justified text leaves rivers of space */
+.dos .caja p { text-align: left; }
+
+/* ================================================================ índice general */
+.indice h1 { font-size: 30pt; font-weight: 600; margin: 0.35in 0 0.05in; }
+.indice .indice-sub { font-family: var(--sans); font-size: 8.5pt; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gris); margin-bottom: 0.25in; }
+.toc { list-style: none; padding: 0; margin: 0; }
+.toc > li { break-inside: avoid; margin: 0 0 0.06in; }
+.toc .toc-cap { display: grid; grid-template-columns: 0.46in 1fr auto; align-items: center; gap: 0.12in; padding: 0.035in 0; border-bottom: 1.1px solid var(--negro); }
+.toc .toc-cap .chip { font-size: 10pt; padding: 0.14em 0; width: 0.42in; }
+.toc .toc-cap a { font-family: var(--serif); font-size: 15pt; font-weight: 600; color: var(--negro); }
+.toc .toc-cap .toc-tag { font-family: var(--sans); font-size: 7.5pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gris); }
+.toc ul { list-style: none; padding: 0 0 0 0.58in; margin: 0.04in 0 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 0.35in; }
+.toc ul li { break-inside: avoid; font-size: 10pt; line-height: 1.3; margin: 0 0 0.025in; display: flex; gap: 0.3em; }
+.toc ul li a { color: var(--tinta); flex: 1; display: flex; }
+.toc ul li a .t { flex: 1; }
+.toc .toc-pag { font-family: var(--sans); font-size: 8.5pt; color: var(--marino); padding-left: 0.4em; }
+.toc .toc-cap a.pag .toc-pag { font-size: 10pt; font-weight: 500; }
+/* dotted leader between an entry and its page */
+.toc ul li a { align-items: baseline; }
+.toc ul li a .t { flex: 0 1 auto; }
+.toc .lider { flex: 1 1 0.3in; border-bottom: 1px dotted #b7cfc4; margin: 0 0.1em 0.25em 0.35em; min-width: 0.25in; }
+.toc ul li .n { font-family: var(--sans); font-size: 8pt; color: var(--gris); min-width: 2.1em; padding-top: 0.12em; }
+
+/* ================================================================ créditos */
+.creditos { font-size: 10pt; }
+.creditos .cred-titulo { font-family: var(--serif); font-size: 26pt; font-weight: 600; color: var(--negro); line-height: 1.05; margin-top: 0.4in; }
+.creditos .cred-sub { font-family: var(--serif); font-style: italic; font-size: 14pt; color: var(--marino); margin: 0.04in 0 0.3in; }
+.creditos dl { display: grid; grid-template-columns: 1.55in 1fr; gap: 0.07in 0.2in; margin: 0 0 0.3in; font-size: 10pt; }
+.creditos dt { font-family: var(--sans); font-size: 7.8pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gris); padding-top: 0.03in; }
+.creditos dd { margin: 0; }
+.cita { font-size: 10pt; background: #f3f8f5; border: 1px solid var(--linea); border-radius: 6px; padding: 0.1in 0.16in; margin: 0.06in 0 0.14in; text-align: left; }

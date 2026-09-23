@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 5 · Variables ambientales</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 74%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 13%; margin-right: 13%; }
+  table.bio { font-size: 9.4pt; }
+  table.bio td:first-child { font-family: var(--sans); font-weight: 500; color: var(--b5); white-space: nowrap; }
+  table.bio td:last-child { white-space: nowrap; font-family: var(--sans); font-size: 8.6pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b5" data-pestana="5" data-orden="6" style="--acento: var(--b5)">
+  <div class="cap-apertura">
+    <div class="cap-num">5</div>
+    <div class="cap-etiqueta">Bloque 5 · El ambiente de cada punto</div>
+    <h1>Variables ambientales: clima, altitud, Köppen y suelo</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Aquí los puntos dejan de ser coordenadas y se convierten en una tabla de condiciones: diecinueve variables bioclimáticas, la altitud, el tipo de clima y, si lo pides, el suelo. Esa tabla es la materia prima de todo lo que sigue.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>5.1</b>Qué son las variables bioclimáticas</li>
+      <li><b>5.2</b>Tres formas de cargar las capas</li>
+      <li><b>5.3</b>Cómo se extrae el valor de un punto</li>
+      <li><b>5.4</b>Köppen-Geiger y tipo de suelo</li>
+      <li><b>5.5</b>El resultado</li>
+      <li><b>5.6</b>El mapa temático</li>
+      <li><b>5.7</b>Los extremos delatan</li>
+      <li><b>5.8</b>Qué resolución usar</li>
+      <li><b>5.9</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 5.1 -->
+  <h2 id="b5-1"><span class="num">5.1</span>Qué son las variables bioclimáticas</h2>
+  <p class="lead">Las diecinueve variables bioclimáticas no son datos crudos: son <b>resúmenes</b> calculados a partir de las series mensuales de temperatura y de lluvia, pensados para tener sentido biológico. No dicen cuánto llovió un día, sino cuánto llueve en el trimestre más seco, o cuánto cae la temperatura en el mes más frío: las cosas que limitan a una planta.</p>
+
+  <table class="compacta bio">
+    <thead><tr><th style="width:0.7in">Clave</th><th>Qué mide</th><th style="width:0.7in">Unidad</th></tr></thead>
+    <tbody>
+      <tr><td>BIO1</td><td>Temperatura media anual</td><td>°C</td></tr>
+      <tr><td>BIO2</td><td>Rango diurno medio de temperatura</td><td>°C</td></tr>
+      <tr><td>BIO3</td><td>Isotermalidad (BIO2 / BIO7 × 100)</td><td>%</td></tr>
+      <tr><td>BIO4</td><td>Estacionalidad de la temperatura (desviación estándar × 100)</td><td>°C×100</td></tr>
+      <tr><td>BIO5</td><td>Temperatura máxima del mes más cálido</td><td>°C</td></tr>
+      <tr><td>BIO6</td><td>Temperatura mínima del mes más frío</td><td>°C</td></tr>
+      <tr><td>BIO7</td><td>Rango anual de temperatura (BIO5 − BIO6)</td><td>°C</td></tr>
+      <tr><td>BIO8</td><td>Temperatura media del trimestre más húmedo</td><td>°C</td></tr>
+      <tr><td>BIO9</td><td>Temperatura media del trimestre más seco</td><td>°C</td></tr>
+      <tr><td>BIO10</td><td>Temperatura media del trimestre más cálido</td><td>°C</td></tr>
+      <tr><td>BIO11</td><td>Temperatura media del trimestre más frío</td><td>°C</td></tr>
+      <tr><td>BIO12</td><td>Precipitación anual</td><td>mm</td></tr>
+      <tr><td>BIO13</td><td>Precipitación del mes más húmedo</td><td>mm</td></tr>
+      <tr><td>BIO14</td><td>Precipitación del mes más seco</td><td>mm</td></tr>
+      <tr><td>BIO15</td><td>Estacionalidad de la precipitación (coeficiente de variación)</td><td>%</td></tr>
+      <tr><td>BIO16</td><td>Precipitación del trimestre más húmedo</td><td>mm</td></tr>
+      <tr><td>BIO17</td><td>Precipitación del trimestre más seco</td><td>mm</td></tr>
+      <tr><td>BIO18</td><td>Precipitación del trimestre más cálido</td><td>mm</td></tr>
+      <tr><td>BIO19</td><td>Precipitación del trimestre más frío</td><td>mm</td></tr>
+      <tr><td>ELEV</td><td>Altitud sobre el nivel del mar</td><td>m</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Por qué se repiten entre sí</div>
+    <p>Las diecinueve salen de las mismas doce temperaturas y las mismas doce lluvias mensuales. BIO1 y BIO11, o BIO12 y BIO16, miden casi lo mismo en la mayor parte del mundo. Meterlas todas en un modelo no aporta información nueva y sí provoca colinealidad: por eso existe el Bloque 6, que es el que decide con cuáles quedarse.</p>
+  </div>
+
+  <!-- 5.2 -->
+  <h2 id="b5-2"><span class="num">5.2</span>Tres formas de cargar las capas</h2>
+  <p>La app no descarga capas por ti: los archivos de clima pesan cientos de megabytes y se distribuyen con sus propias condiciones. Lo que hace es <b>leerlos de tu disco</b> sin subirlos a ningún lado.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b5-capas.png" alt="Tarjeta de carga de capas ráster con los tres botones: elegir carpeta, elegir archivos y usar las capas de ejemplo, cada uno con su explicación y su estado"></div>
+    <figcaption><b>Figura 5.1.</b> Las tres formas de cargar las capas, cada una con su propio botón y su propio aviso de estado, para que nunca haya duda de cuál se usó.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.7in">Forma</th><th>Cuándo conviene</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">📁 Elegir carpeta…</span></td><td>Tienes descomprimida la carpeta de WorldClim. Eliges la carpeta completa y la app toma de ella solo los archivos que reconoce. Es lo más cómodo para un estudio real.</td></tr>
+      <tr><td><span class="ui">📄 Elegir archivos…</span></td><td>Tus capas están repartidas o quieres cargar solo algunas. Se seleccionan varias a la vez con Ctrl o Mayús.</td></tr>
+      <tr><td><span class="ui">🧪 Usar las capas de ejemplo</span></td><td>Para aprender o para probar: las capas incluidas en el programa, a 10 minutos de arco, recortadas a México y el suroeste de Estados Unidos. No requieren descargar nada.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Qué nombres reconoce</div>
+    <p>La app identifica las capas por su nombre de archivo, con el patrón de WorldClim: <code>wc2.1_<i>res</i>_bio_1.tif</code> … <code>bio_19.tif</code> y <code>elev.tif</code>. Si tus archivos tienen otro nombre, basta renombrarlos con ese patrón. El apéndice A recoge las reglas completas.</p>
+  </div>
+
+  <!-- 5.3 -->
+  <h2 id="b5-3"><span class="num">5.3</span>Cómo se extrae el valor de un punto</h2>
+  <p>Para cada registro y cada capa, la app convierte la coordenada en fila y columna de la malla y lee el valor. Dos detalles importan:</p>
+  <ul>
+    <li><b>Solo lee la ventana que necesita.</b> Un archivo de 30 segundos de arco tiene miles de millones de celdas; la app abre el archivo, calcula dónde caen tus puntos y lee únicamente esos pedazos. Por eso funciona en el navegador con capas que no cabrían en la memoria.</li>
+    <li><b>El muestreo se elige en <span class="ui">Opciones de muestreo</span>.</b> <span class="ui">Bilineal (recomendada)</span> promedia las cuatro celdas vecinas ponderando por distancia, lo que evita los saltos bruscos entre celdas contiguas; <span class="ui">Vecino más cercano</span> devuelve el valor de la celda tal cual. La interpolación se aplica <b>solo a las variables continuas</b>: las categóricas, como Köppen, se leen siempre por vecino más cercano, porque promediar códigos de clima no significa nada.</li>
+  </ul>
+  <p>Cuando un punto cae en una celda sin dato —el mar, o fuera del recorte de tus capas— la variable queda vacía. La casilla <span class="ui">Descartar puntos sin dato en alguna variable bioclimática</span>, activada de fábrica, los deja fuera de la tabla; si la desactivas, se conservan con huecos y cada análisis decidirá qué hacer con ellos.</p>
+
+  <!-- 5.4 -->
+  <h2 id="b5-4"><span class="num">5.4</span>Köppen-Geiger y tipo de suelo</h2>
+  <p>Dos variables <b>categóricas</b> completan el cuadro. La clasificación de <b>Köppen-Geiger</b> resume el clima en una etiqueta —árido de estepa frío, templado con invierno seco…— que se entiende de inmediato y que se usa mucho en ecología descriptiva. Es una capa más, en un archivo pequeño, y se carga igual que las demás.</p>
+
+  <figure class="chica">
+    <div class="marco"><img src="../img/b5-suelo.png" alt="Tarjeta de consulta de tipo de suelo con el aviso de que es una consulta en línea punto por punto y los botones de consultar y detener"></div>
+    <figcaption><b>Figura 5.2.</b> El tipo de suelo se consulta en línea, punto por punto y con pausas. Es la única función de la app que envía coordenadas a un servicio externo, y por eso está separada y es opcional.</figcaption>
+  </figure>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>El suelo tarda</div>
+    <p>El servicio público de suelos limita cuántas consultas por segundo acepta, así que la app pregunta despacio: con cientos de puntos, la consulta puede tardar varios minutos, y se puede detener y reanudar. Para un modelo con muchos registros conviene decidir primero si el suelo es realmente necesario: en la mayoría de los estudios de nicho climático no lo es.</p>
+  </div>
+
+  <!-- 5.5 -->
+  <h2 id="b5-5"><span class="num">5.5</span>El resultado</h2>
+  <p>La extracción produce la tabla que alimenta todo lo demás: una fila por registro, una columna por variable.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b5-tabla.png" alt="Tarjeta de resultado de la extracción con las tarjetas de puntos con variables, variables continuas, clima de Köppen y suelo, y la tabla de puntos por variables"></div>
+    <figcaption><b>Figura 5.3.</b> El ejemplo: 1,885 puntos con 20 variables continuas y el clima de Köppen. El botón de descarga entrega la tabla completa en CSV, que es el archivo que se anexa a un artículo o se abre en otro programa.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El ambiente del piñonero, en tres números</div>
+    <p>Con los 1,885 registros depurados del ejemplo, la mitad central de los puntos —del primer al tercer cuartil— vive así:</p>
+    <ul>
+      <li><b>Temperatura media anual</b> entre <b>14.8 y 17.9 °C</b>, con mediana de 16.2 °C (extremos 2.6 y 22.7).</li>
+      <li><b>Precipitación anual</b> entre <b>414 y 551 mm</b>, con mediana de 486 mm (extremos 69 y 2,098).</li>
+      <li><b>Altitud</b> entre <b>1,473 y 2,210 m</b>, con mediana de 1,978 m (extremos 27 y 3,065).</li>
+    </ul>
+    <p>Y por tipo de clima: <b>1,272</b> registros en clima árido de estepa frío (BSk), <b>227</b> en templado con invierno seco y verano templado (Cwb), <b>186</b> en árido de estepa cálido (BSh), <b>95</b> en árido desértico cálido (BWh) y <b>71</b> en templado sin estación seca (Cfb). El retrato es el de un pino de montaña semiárida y fresca.</p>
+  </div>
+
+  <!-- 5.6 -->
+  <h2 id="b5-6"><span class="num">5.6</span>El mapa temático</h2>
+  <p>La última tarjeta pinta los puntos según el valor de la variable que elijas. Es la manera más rápida de ver si una variable tiene estructura geográfica —y si el gradiente que muestra tiene sentido.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b5-mapa.png" alt="Mapa temático de los registros coloreados por precipitación anual, con la leyenda de seis clases en milímetros"></div>
+    <figcaption><b>Figura 5.4.</b> Los registros coloreados por <b>BIO12</b>, precipitación anual, en seis clases. Se ve el contraste entre la Sierra Madre Occidental, con sus valores intermedios, y los puntos más secos del altiplano y del norte. El mapa se edita y se exporta con el mismo estudio del capítulo 4.</figcaption>
+  </figure>
+
+  <!-- 5.7 -->
+  <h2 id="b5-7"><span class="num">5.7</span>Los extremos delatan</h2>
+  <p>Antes de seguir, mira los valores mínimos y máximos de dos o tres variables. Es un control de calidad gratuito: el ambiente denuncia registros que la geografía no pudo denunciar.</p>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Tres extremos del ejemplo</div>
+    <ul>
+      <li>El registro más bajo está a <b>27 m de altitud</b>, en el valle de Mexicali, con <b>69 mm</b> de lluvia anual. Un pino de sierra no vive en el desierto a nivel del mar: es un árbol plantado o una coordenada equivocada.</li>
+      <li>Dos registros en Texas, a 143 y 169 m, con 1,096 y 849 mm de lluvia: zonas urbanas del este del estado, muy lejos de las condiciones del resto.</li>
+      <li>El más lluvioso llega a <b>2,098 mm</b> en el centro de Veracruz, a 689 m. Otra vez, un valor que pide revisión.</li>
+    </ul>
+    <p>Ninguno de los tres había sido marcado por las reglas geográficas del Bloque 3, porque están dentro del área de distribución general. Aparecen al mirar el ambiente. Se pueden quitar volviendo al Bloque 2 con un filtro, o dejarlos y anotar la decisión.</p>
+  </div>
+
+  <!-- 5.8 -->
+  <h2 id="b5-8"><span class="num">5.8</span>Qué resolución usar</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.3in">Resolución</th><th style="width:0.9in">Celda</th><th>Cuándo</th></tr></thead>
+    <tbody>
+      <tr><td>30 segundos</td><td>≈ 1 km</td><td>Estudios locales o de montaña, donde el relieve cambia el clima en pocos kilómetros. Los archivos son enormes: conviene recortarlos antes.</td></tr>
+      <tr><td>2.5 minutos</td><td>≈ 4.6 km</td><td>El punto medio razonable para un estudio estatal o regional.</td></tr>
+      <tr><td>5 minutos</td><td>≈ 9 km</td><td>Estudios nacionales con registros de precisión desigual.</td></tr>
+      <tr><td>10 minutos</td><td>≈ 18 km</td><td>Estudios continentales, exploración rápida y ejemplos de enseñanza —es la resolución de las capas incluidas—.</td></tr>
+    </tbody>
+  </table>
+  <p>La regla práctica: <b>la celda no debería ser más fina que la precisión de tus coordenadas</b>. Con registros georreferenciados a 5 km, una capa de 1 km da una falsa sensación de detalle.</p>
+
+  <!-- 5.9 -->
+  <h2 id="b5-9"><span class="num">5.9</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>«No se reconoció ninguna capa»</td><td>Los nombres de archivo no siguen el patrón esperado, o elegiste una carpeta que no contiene los <code>.tif</code>. Renómbralos o entra a la subcarpeta correcta.</td></tr>
+      <tr><td>Muchos puntos sin dato</td><td>Tus capas no cubren toda el área de los registros —el caso típico de una capa recortada— o los puntos caen en el mar. Compara la extensión de las capas con la de tus datos.</td></tr>
+      <tr><td>La extracción tarda mucho</td><td>Normal con capas de 30 segundos y miles de puntos: se leen 20 archivos grandes. La barra de progreso avanza por capa.</td></tr>
+      <tr><td>Los valores de temperatura parecen multiplicados</td><td>Algunas distribuciones antiguas guardan la temperatura en décimas de grado. Si BIO1 sale en 162 en lugar de 16.2, tus capas son de ese tipo.</td></tr>
+      <tr><td>El suelo se queda a medias</td><td>El servicio limitó las consultas. Pulsa de nuevo: continúa donde se quedó y conserva lo ya consultado.</td></tr>
+      <tr><td>Köppen sale vacío</td><td>Falta la capa de Köppen-Geiger, que es un archivo aparte, o quedó fuera de la selección de archivos.</td></tr>
+      <tr><td>El botón de continuar al Bloque 6 avisa en vez de avanzar</td><td>Todavía no has pulsado <span class="ui">Extraer valores ráster →</span>. La correlación se calcula sobre esa tabla, así que primero hay que crearla; al terminar la extracción quedan disponibles también los bloques 7, 8 y 9.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

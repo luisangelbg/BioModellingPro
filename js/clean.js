@@ -1,7 +1,7 @@
-/* Paso 3: depuración de coordenadas (reglas tipo CoordinateCleaner). */
+/* Step 3: coordinate cleaning (rules for the usual georeferencing errors of biodiversity records). */
 
-/* Centroides aproximados de país (ISO-3166 alfa-2) -> [lat, lon].
-   Se usan para detectar registros geo-referenciados al centro del país. */
+/* Approximate country centroids (ISO-3166 alpha-2) -> [lat, lon].
+   Used to detect records georeferenced to the centre of the country. */
 const COUNTRY_CENTROIDS = {
   AF:[33.94,67.71],AL:[41.15,20.17],DZ:[28.03,1.66],AO:[-11.20,17.87],AR:[-38.42,-63.62],
   AM:[40.07,45.04],AU:[-25.27,133.78],AT:[47.52,14.55],AZ:[40.14,47.58],BS:[25.03,-77.40],
@@ -41,24 +41,33 @@ const COUNTRY_CENTROIDS = {
 };
 
 const CLEAN_RULES = [
-  { id: 'invalid',     title: 'Coordenadas ausentes o fuera de rango', defaultOn: true, info: false,
-    desc: 'Latitud/longitud vacía, no numérica, |lat|>90 o |lon|>180.' },
-  { id: 'zeroZero',    title: 'Coordenada (0, 0)', defaultOn: true, info: false,
-    desc: 'Punto en el golfo de Guinea; casi siempre un error de georreferenciación.' },
-  { id: 'latEqLon',    title: 'Latitud ≈ longitud', defaultOn: false, info: true,
-    desc: '|lat| y |lon| casi idénticos (lejos de 0); patrón sospechoso de error.' },
-  { id: 'gbifIssues',  title: 'Issues geoespaciales de GBIF', defaultOn: false, info: true,
-    desc: 'Registros con COUNTRY_COORDINATE_MISMATCH, PRESUMED_SWAPPED_COORDINATE, etc.' },
-  { id: 'exactDup',    title: 'Duplicados exactos de coordenada', defaultOn: true, info: false,
-    desc: 'Misma lat/lon exacta que otro registro (se conserva el primero).' },
-  { id: 'roundedDup',  title: 'Duplicados por redondeo', defaultOn: true, info: false,
-    desc: 'Misma lat/lon al redondear a N decimales (se conserva el primero).' },
-  { id: 'lowPrec',     title: 'Baja precisión', defaultOn: false, info: true,
-    desc: 'Incertidumbre mayor al umbral, o coordenadas con ≤2 decimales.' },
-  { id: 'countryCentroid', title: 'Centroide de país', defaultOn: true, info: false,
-    desc: 'A menos de ~10 km del centro geográfico del país indicado.' },
-  { id: 'spatialOutlier', title: 'Outliers espaciales', defaultOn: true, info: false,
-    desc: 'Distancia al centro del enjambre mayor a k·IQR (por taxón).' },
+  { id: 'invalid', defaultOn: true, info: false,
+    title: { es: 'Coordenadas ausentes o fuera de rango', en: 'Missing or out-of-range coordinates' },
+    desc: { es: 'Latitud/longitud vacía, no numérica, |lat|>90 o |lon|>180.', en: 'Empty or non-numeric latitude/longitude, |lat|>90 or |lon|>180.' } },
+  { id: 'zeroZero', defaultOn: true, info: false,
+    title: { es: 'Coordenada (0, 0)', en: 'Coordinate (0, 0)' },
+    desc: { es: 'Punto en el golfo de Guinea; casi siempre un error de georreferenciación.', en: 'A point in the Gulf of Guinea; almost always a georeferencing error.' } },
+  { id: 'latEqLon', defaultOn: false, info: true,
+    title: { es: 'Latitud ≈ longitud', en: 'Latitude ≈ longitude' },
+    desc: { es: '|lat| y |lon| casi idénticos (lejos de 0); patrón sospechoso de error.', en: '|lat| and |lon| almost identical (far from 0); a suspicious pattern.' } },
+  { id: 'gbifIssues', defaultOn: false, info: true,
+    title: { es: 'Issues geoespaciales de GBIF', en: 'GBIF geospatial issues' },
+    desc: { es: 'Registros con COUNTRY_COORDINATE_MISMATCH, PRESUMED_SWAPPED_COORDINATE, etc.', en: 'Records with COUNTRY_COORDINATE_MISMATCH, PRESUMED_SWAPPED_COORDINATE, etc.' } },
+  { id: 'exactDup', defaultOn: true, info: false,
+    title: { es: 'Duplicados exactos de coordenada', en: 'Exact coordinate duplicates' },
+    desc: { es: 'Misma lat/lon exacta que otro registro (se conserva el primero).', en: 'Exactly the same lat/lon as another record (the first is kept).' } },
+  { id: 'roundedDup', defaultOn: true, info: false,
+    title: { es: 'Duplicados por redondeo', en: 'Duplicates after rounding' },
+    desc: { es: 'Misma lat/lon al redondear a N decimales (se conserva el primero).', en: 'Same lat/lon after rounding to N decimals (the first is kept).' } },
+  { id: 'lowPrec', defaultOn: false, info: true,
+    title: { es: 'Baja precisión', en: 'Low precision' },
+    desc: { es: 'Incertidumbre mayor al umbral, o coordenadas con ≤2 decimales.', en: 'Uncertainty above the threshold, or coordinates with ≤2 decimals.' } },
+  { id: 'countryCentroid', defaultOn: true, info: false,
+    title: { es: 'Centroide de país', en: 'Country centroid' },
+    desc: { es: 'A menos de ~10 km del centro geográfico del país indicado.', en: 'Within ~10 km of the geographic centre of the stated country.' } },
+  { id: 'spatialOutlier', defaultOn: true, info: false,
+    title: { es: 'Valores atípicos espaciales', en: 'Spatial outliers' },
+    desc: { es: 'Distancia al centro de la nube mayor a k·IQR (por taxón).', en: 'Distance to the centre of the point cloud greater than k·IQR (per taxon).' } },
 ];
 
 function buildCleanRules() {
@@ -71,8 +80,8 @@ function buildCleanRules() {
     div.innerHTML = `
       <input type="checkbox" data-rule="${rule.id}" ${state.cleanRules[rule.id] ? 'checked' : ''}>
       <div class="rule-body">
-        <div class="rule-title">${rule.title}${rule.info ? '<span class="tag-info">informativa</span>' : ''}</div>
-        <div class="rule-desc">${rule.desc}</div>
+        <div class="rule-title">${labHTML(rule.title)}${rule.info ? `<span class="tag-info">${L2('informativa', 'informative')}</span>` : ''}</div>
+        <div class="rule-desc">${labHTML(rule.desc)}</div>
       </div>
       <span class="rule-hits zero" id="hits-${rule.id}">—</span>`;
     div.querySelector('input').addEventListener('change', e => {
@@ -92,9 +101,9 @@ function readCleanParams() {
   };
 }
 
-/* Marca cada registro de `recs` con _drop = idRegla (o null) y devuelve el conteo por regla.
-   Las reglas se aplican en cadena: un registro ya descartado no lo vuelve a marcar otra regla.
-   `preview=true` evalúa TODAS las reglas (para la vista previa de "cuántos marcaría cada una"). */
+/* Marks each record of `recs` with _drop = rule id (or null) and returns the count per rule.
+   Rules are applied in a chain: a record already dropped is not marked again by another rule.
+   `preview=true` evaluates ALL the rules (for the preview of how many each one would flag). */
 function computeCleaning(recs, preview) {
   readCleanParams();
   const P = state.cleanParams;
@@ -108,7 +117,7 @@ function computeCleaning(recs, preview) {
     if (r.decimalLatitude == null || r.decimalLongitude == null ||
         Math.abs(r.decimalLatitude) > 90 || Math.abs(r.decimalLongitude) > 180) mark(r, 'invalid');
   }
-  // a partir de aquí las coordenadas se asumen válidas; saltamos las que no lo sean
+  // from here on the coordinates are assumed valid; invalid ones are skipped
   const coordOk = r => r._drop == null && r.decimalLatitude != null && r.decimalLongitude != null &&
     Math.abs(r.decimalLatitude) <= 90 && Math.abs(r.decimalLongitude) <= 180;
 
@@ -125,7 +134,7 @@ function computeCleaning(recs, preview) {
   if (on('gbifIssues')) for (const r of recs) {
     if (coordOk(r) && BAD_ISSUES.some(i => (r.issues || '').includes(i))) mark(r, 'gbifIssues');
   }
-  // duplicados exactos / por redondeo
+  // exact duplicates / duplicates after rounding
   const seenExact = new Set(), seenRound = new Set(), d = P.dupDecimals;
   for (const r of recs) {
     if (!coordOk(r)) continue;
@@ -170,15 +179,15 @@ function median(arr) {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
-/* Vista previa sobre el set filtrado: cuántos registros atribuiría cada regla
-   si se aplicaran todas en cadena (el total no se doble-cuenta). */
+/* Preview on the filtered set: how many records each rule would claim
+   if all the rules were applied in a chain (the total is not double-counted). */
 function previewCleanHits() {
   const recs = state.filtered.map(r => ({ ...r }));
   const counts = computeCleaning(recs, true);
   CLEAN_RULES.forEach(rule => {
     const span = el('hits-' + rule.id);
     const n = counts[rule.id];
-    span.textContent = n ? `${n.toLocaleString()} marcados` : '0';
+    span.innerHTML = n ? L2(`${n.toLocaleString('en-US')} marcados`, `${n.toLocaleString('en-US')} flagged`) : '0';
     span.className = 'rule-hits ' + (n ? 'some' : 'zero');
   });
 }
@@ -195,29 +204,30 @@ function runClean() {
   state.cleanReport = { counts, kept: kept.length, input: recs.length, all: recs };
 
   statTiles('cleanSummary', [
-    ['Entraron', recs.length.toLocaleString()],
-    ['Depurados', kept.length.toLocaleString()],
-    ['Descartados', (recs.length - kept.length).toLocaleString()],
-    ['% conservado', recs.length ? (kept.length / recs.length * 100).toFixed(1) + '%' : '—'],
+    [{ es: 'Entraron', en: 'Entered' }, recs.length.toLocaleString('en-US')],
+    [{ es: 'Depurados', en: 'Cleaned' }, kept.length.toLocaleString('en-US')],
+    [{ es: 'Descartados', en: 'Discarded' }, (recs.length - kept.length).toLocaleString('en-US')],
+    [{ es: '% conservado', en: '% kept' }, recs.length ? (kept.length / recs.length * 100).toFixed(1) + '%' : '—'],
   ]);
 
   const ruleRows = CLEAN_RULES.map(rule => ({
     regla: rule.title,
-    estado: state.cleanRules[rule.id] ? 'aplicada' : 'desactivada',
-    descartados: state.cleanRules[rule.id] ? (counts[rule.id] || 0).toLocaleString() : '—',
+    estado: state.cleanRules[rule.id] ? { es: 'aplicada', en: 'applied' } : { es: 'desactivada', en: 'switched off' },
+    descartados: state.cleanRules[rule.id] ? (counts[rule.id] || 0).toLocaleString('en-US') : '—',
   }));
   buildTable('cleanRuleTable', [
-    { key: 'regla', label: 'Regla' },
-    { key: 'estado', label: 'Estado' },
-    { key: 'descartados', label: 'Registros descartados' },
+    { key: 'regla', label: { es: 'Regla', en: 'Rule' } },
+    { key: 'estado', label: { es: 'Estado', en: 'Status' } },
+    { key: 'descartados', label: { es: 'Registros descartados', en: 'Records discarded' } },
   ], ruleRows);
 
   el('cleanReportCard').style.display = 'block';
   enableStep(4);
   enableStep(5);
-  el('envNPts').textContent = kept.length.toLocaleString();
-  showMessage('cleanSummary', 'success',
-    `Dataset depurado: ${kept.length.toLocaleString()} registros listos para el mapa y el análisis.`);
+  el('envNPts').textContent = el('envNPts2').textContent = kept.length.toLocaleString('en-US');
+  clearMessages('cleanMessages');
+  showMessage('cleanMessages', 'success', L2(`Dataset depurado: ${kept.length.toLocaleString('en-US')} registros listos para el mapa y el análisis.`,
+    `Cleaned dataset: ${kept.length.toLocaleString('en-US')} records ready for the map and the analysis.`));
 }
 
 el('toStep4Btn').addEventListener('click', () => goToStep(4));

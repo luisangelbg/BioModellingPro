@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual de usuario · Preliminares e introducción</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<!-- reparte el contenido en hojas tamaño carta, con encabezados, números de página e índice -->
+<script src="../paginar.js"></script>
+<style>
+  .bloques-10 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.06in 0.22in; }
+  figure.reducida { width: 74%; margin-left: auto; margin-right: auto; }
+  .autoria { display: grid; grid-template-columns: 1fr 1fr; gap: 0.04in 0.2in; margin: 0.06in 0 0.1in; }
+  .autoria div { font-size: 10.5pt; }
+  .autoria .orc { font-family: var(--sans); font-size: 8pt; color: var(--gris); display: block; }
+</style>
+</head>
+<body>
+
+<!-- ====================================================================== CRÉDITOS -->
+<section class="preliminares creditos" id="creditos">
+  <div class="cred-titulo">BioModelling Pro</div>
+  <div class="cred-sub">Manual de usuario · Biogeografía y modelado de la distribución de especies</div>
+
+  <dl>
+    <dt>Autoría</dt>
+    <dd>
+      <div class="autoria">
+        <div><b>Luis Ángel Barrera-Guzmán</b><span class="orc">ORCID 0000-0001-8057-2583</span></div>
+        <div><b>Gabriela Ramírez-Ojeda</b><span class="orc">ORCID 0000-0001-9679-6514</span></div>
+        <div><b>Jorge Cadena-Iñiguez</b><span class="orc">ORCID 0000-0002-6427-0646</span></div>
+        <div><b>Daniel Alejandro Cadena-Zamudio</b><span class="orc">ORCID 0000-0002-6972-7414</span></div>
+        <div><b>Jorge David Cadena-Zamudio</b><span class="orc">ORCID 0000-0002-2855-4561</span></div>
+        <div><b>Héctor Tecumshé Mojica-Zárate</b><span class="orc">ORCID 0000-0002-9067-3983</span></div>
+      </div>
+    </dd>
+    <dt>Programa</dt><dd>BioModelling Pro, versión 1.0.0 (septiembre de 2026)</dd>
+    <dt>Manual</dt><dd>Primera edición en español, 2026. Describe la versión 1.0.0 del programa.</dd>
+    <dt>Licencia del programa</dt><dd>Licencia Pública General de GNU, versión 3 o posterior (GPL-3.0-or-later).</dd>
+    <dt>Derechos del manual</dt><dd>© 2026 las personas autoras. Todos los derechos reservados.</dd>
+    <dt>Idioma de la interfaz</dt><dd>Español o inglés, con los botones <span class="ui">ES</span> · <span class="ui">EN</span> de la barra superior. En este manual los nombres de botones y menús se escriben como aparecen en pantalla <b>en español</b>, por ejemplo <span class="ui">Ejecutar modelos →</span>.</dd>
+  </dl>
+
+  <h4>Cómo citar el programa</h4>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro: biogeografía y modelado de la distribución de especies en el navegador</i> (versión 1.0.0) [Programa de cómputo].</div>
+  <h4>Cómo citar este manual</h4>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro. Manual de usuario</i> (1.ª ed.). Distribuido con BioModelling Pro, versión 1.0.0.</div>
+  <p class="small">El identificador de objeto digital (DOI) se añadirá a las dos citas cuando la versión 1.0.0 quede archivada. Mientras tanto, la cita del programa está también en la sección <span class="ui">Cómo citar</span> de la portada de la app, con su versión en BibTeX.</p>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Tus datos no salen de tu computadora</div>
+    <p>BioModelling Pro trabaja dentro del navegador: los archivos que abres se leen en tu equipo y <b>ningún dato tuyo se sube a ningún servidor</b>. Sí hace falta internet para consultar GBIF, dibujar el mapa base y descargar el motor de cálculo la primera vez. La única consulta que envía coordenadas es la de tipo de suelo del Bloque 5, que es opcional.</p>
+  </div>
+
+  <p class="small" style="margin-top:0.1in;color:#5d6a64">Las ilustraciones, los diagramas y las capturas de este manual son originales. Los datos del ejemplo se describen en la sección I.7.</p>
+</section>
+
+<!-- ====================================================================== ÍNDICE -->
+<section class="preliminares indice" id="indice" data-nueva-hoja>
+  <h1>Índice</h1>
+  <div class="indice-sub">Contenido general del manual</div>
+
+  <ol class="toc">
+    <li>
+      <div class="toc-cap"><span class="chip k0">P</span><a href="#como-leer">Cómo leer este manual</a><a class="pag" href="#como-leer"></a></div>
+    </li>
+    <li>
+      <div class="toc-cap"><span class="chip k0">In</span><a href="#cap-intro">Introducción a BioModelling Pro</a><a class="pag" href="#cap-intro"></a></div>
+      <ul>
+        <li><span class="n">I.1</span><a href="#si-1"><span class="t">¿Qué es BioModelling Pro?</span></a></li>
+        <li><span class="n">I.2</span><a href="#si-2"><span class="t">Preguntas que responde</span></a></li>
+        <li><span class="n">I.3</span><a href="#si-3"><span class="t">Cinco ideas clave del modelado de nicho</span></a></li>
+        <li><span class="n">I.4</span><a href="#si-4"><span class="t">Datos que acepta</span></a></li>
+        <li><span class="n">I.5</span><a href="#si-5"><span class="t">Qué necesitas y cómo abrirlo</span></a></li>
+        <li><span class="n">I.6</span><a href="#si-6"><span class="t">Recorrido por la interfaz</span></a></li>
+        <li><span class="n">I.7</span><a href="#si-7"><span class="t">El ejemplo incluido: el piñonero</span></a></li>
+        <li><span class="n">I.8</span><a href="#si-8"><span class="t">Flujo de trabajo recomendado</span></a></li>
+        <li><span class="n">I.9</span><a href="#si-9"><span class="t">Cómo leer los números: escalas y umbrales</span></a></li>
+      </ul>
+    </li>
+    <li><div class="toc-cap"><span class="chip k1">B1</span><a href="#cap-b1">Registros de presencia: GBIF y tus propios datos</a><a class="pag" href="#cap-b1"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k2">B2</span><a href="#cap-b2">Filtros: taxón, país, años, recuadro y estados</a><a class="pag" href="#cap-b2"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k3">B3</span><a href="#cap-b3">Depuración de coordenadas</a><a class="pag" href="#cap-b3"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k4">B4</span><a href="#cap-b4">El mapa de registros y el estudio de mapas</a><a class="pag" href="#cap-b4"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k5">B5</span><a href="#cap-b5">Variables ambientales: clima, altitud, Köppen y suelo</a><a class="pag" href="#cap-b5"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k6">B6</span><a href="#cap-b6">Correlación y selección de variables</a><a class="pag" href="#cap-b6"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k7">B7</span><a href="#cap-b7">Estadística descriptiva y estudio de figuras</a><a class="pag" href="#cap-b7"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k8">B8</span><a href="#cap-b8">Multivariado, ecología y diversidad</a><a class="pag" href="#cap-b8"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k9">B9</span><a href="#cap-b9">Modelado de la distribución y proyección al futuro</a><a class="pag" href="#cap-b9"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k10">B10</span><a href="#cap-b10">Adaptación agroclimática de cultivos</a><a class="pag" href="#cap-b10"></a></div></li>
+    <li><div class="toc-cap"><span class="chip kx">A</span><a href="#apendices">Apéndices</a><a class="pag" href="#apendices"></a></div></li>
+  </ol>
+</section>
+
+<!-- ====================================================================== CÓMO LEER ESTE MANUAL -->
+<section class="preliminares" id="como-leer" data-nueva-hoja style="--acento: var(--b0)">
+  <h2 style="margin-top:0.2in">Cómo leer este manual</h2>
+  <p class="lead">El manual sigue el mismo orden que la app: diez bloques numerados que se recorren de izquierda a derecha en la barra superior. Cada capítulo explica un bloque y lleva su mismo número: el capítulo 3 es el Bloque 3, y sus secciones, figuras y tablas se numeran 3.1, 3.2… Cada capítulo empieza con la teoría indispensable, sigue con lo que calcula la app y cómo se lee, y termina con un ejemplo paso a paso con los datos que ya vienen dentro del programa. La introducción va antes de los bloques y se numera aparte: I.1, I.2…</p>
+
+  <h3>Un color para cada bloque</h3>
+  <p>El color del bloque aparece en la apertura de su capítulo, en los números de sección, en la pestaña del borde de la hoja y en el índice, y es el mismo de la franja de la portada. Así sabes de un vistazo en qué parte de la app estás.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:0.6in">Bloque</th><th style="width:1.5in">Nombre en la app</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip k1">1</span></td><td><span class="ui">1 GBIF</span></td><td>Busca la especie en GBIF y trae sus registros con coordenadas, o carga los tuyos desde un archivo</td></tr>
+      <tr><td><span class="chip k2">2</span></td><td><span class="ui">2 Filtrar</span></td><td>Filtra por taxón, país, año, tipo de registro, recuadro geográfico y estado o región de México</td></tr>
+      <tr><td><span class="chip k3">3</span></td><td><span class="ui">3 Depurar</span></td><td>Nueve reglas de calidad de coordenadas con un reporte de antes y después</td></tr>
+      <tr><td><span class="chip k4">4</span></td><td><span class="ui">4 Mapa</span></td><td>Mapa de los registros y estudio de mapas: capas base, leyenda, escala, rosa de los vientos y exportación</td></tr>
+      <tr><td><span class="chip k5">5</span></td><td><span class="ui">5 Variables</span></td><td>Extrae en cada punto las 19 variables bioclimáticas, la altitud, el clima de Köppen-Geiger y el suelo</td></tr>
+      <tr><td><span class="chip k6">6</span></td><td><span class="ui">6 Correlación</span></td><td>Matriz de correlación, VIF y una selección de variables poco colineales que respeta las que fijas</td></tr>
+      <tr><td><span class="chip k7">7</span></td><td><span class="ui">7 Estadística</span></td><td>Descriptiva, histogramas, cajas, normalidad y transformaciones, con figuras editables al detalle</td></tr>
+      <tr><td><span class="chip k8">8</span></td><td><span class="ui">8 ML y ecología</span></td><td>ACP, agrupamientos, correspondencias, área de distribución, amplitud de nicho y diversidad</td></tr>
+      <tr><td><span class="chip k9">9</span></td><td><span class="ui">9 Modelado SDM</span></td><td>Diez algoritmos y un ensamble, validación, umbrales, mapas y proyección a escenarios futuros</td></tr>
+      <tr><td><span class="chip k10">10</span></td><td><span class="ui">10 Agroclima</span></td><td>Índices agroclimáticos y aptitud de cultivos sobre el mismo clima, hoy y a futuro</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Tipos de recuadros</h3>
+  <div class="dos">
+    <div class="caja nota" style="margin:0"><div class="caja-t"><span class="ico">i</span>Nota</div><p>Aclaraciones y consejos prácticos que ahorran tiempo.</p></div>
+    <div class="caja importante" style="margin:0"><div class="caja-t"><span class="ico">!</span>Importante</div><p>Lo que puede cambiar tus conclusiones si se pasa por alto.</p></div>
+    <div class="caja teoria" style="margin:0"><div class="caja-t"><span class="ico">θ</span>Teoría en breve</div><p>La idea detrás de un análisis, sin fórmulas innecesarias.</p></div>
+    <div class="caja ejemplo" style="margin:0"><div class="caja-t"><span class="ico">▸</span>Ejemplo</div><p>Un caso con los datos incluidos en el programa, paso a paso.</p></div>
+  </div>
+  <div class="caja regla" style="margin-top:0.18in">
+    <div class="caja-t"><span class="ico">✓</span>Regla de decisión</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:40%"><b>Si</b> el resultado cae en este caso…</td><td><b>entonces</b> esta es la lectura recomendada.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">Son guías para interpretar, no leyes: lo que sabes de tu especie y de tu región siempre manda.</p>
+  </div>
+  <div class="caja dato">
+    <div class="dato-cifra">97</div>
+    <div class="dato-txt"><div class="caja-t">Dato clave</div>Fichas de ayuda que la app trae dentro, una por índice o estadístico, con su escala de lectura, el error más común y la referencia de donde sale.</div>
+  </div>
+
+  <h3>Convenciones de escritura</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:38%">Así se escribe</th><th>Significa</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">Preparar datos del modelo →</span></td><td>Un botón, casilla o menú de la app, con su texto tal como aparece en pantalla en español.</td></tr>
+      <tr><td><span class="ruta">Estudio de mapa<span class="sep">›</span>Exportar<span class="sep">›</span>Recortar al país</span></td><td>Una ruta: abre el primer elemento, luego el segundo y así.</td></tr>
+      <tr><td><code>decimalLatitude</code>, <code>.tif</code></td><td>Un nombre de columna, archivo o valor que se escribe tal cual.</td></tr>
+      <tr><td>BIO1, BIO12 · AUC, TSS</td><td>Variables e índices; su significado se explica la primera vez que aparecen y se reúne en el glosario.</td></tr>
+      <tr><td><i>Pinus cembroides</i></td><td>Los nombres científicos van en cursiva, como en cualquier texto biológico.</td></tr>
+      <tr><td><span class="si">●</span> <span class="parcial">◐</span> <span class="no">—</span></td><td>Disponible · disponible en parte o con condiciones · no aplica.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Si vienes de otro programa</div>
+    <p>Quien ya haya modelado nichos reconocerá el camino: registros depurados, capas ambientales, selección de variables, ajuste, validación y proyección. Lo que cambia es que aquí todo ocurre en una sola ventana, sin instalar nada, y que cada resultado trae su ficha de lectura al lado. Los nombres de los métodos son los de la literatura, y se citan por su artículo original.</p>
+  </div>
+</section>
+
+<!-- ====================================================================== INTRODUCCIÓN -->
+<section class="capitulo" id="cap-intro" data-pestana="In" data-orden="1" style="--acento: var(--b0)">
+  <div class="cap-apertura">
+    <div class="cap-num">In</div>
+    <div class="cap-etiqueta">Introducción · Antes de los bloques</div>
+    <h1>Introducción a BioModelling Pro</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Qué es el programa, qué preguntas de biogeografía responde, qué datos acepta y cómo se recorre de principio a fin. Incluye las cinco ideas del modelado de nicho que sostienen el resto del manual.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>I.1</b>¿Qué es BioModelling Pro?</li>
+      <li><b>I.2</b>Preguntas que responde</li>
+      <li><b>I.3</b>Cinco ideas clave del modelado de nicho</li>
+      <li><b>I.4</b>Datos que acepta</li>
+      <li><b>I.5</b>Qué necesitas y cómo abrirlo</li>
+      <li><b>I.6</b>Recorrido por la interfaz</li>
+      <li><b>I.7</b>El ejemplo incluido: el piñonero</li>
+      <li><b>I.8</b>Flujo de trabajo recomendado</li>
+      <li><b>I.9</b>Cómo leer los números</li>
+    </ul>
+  </div>
+
+  <!-- I.1 -->
+  <h2 id="si-1"><span class="num">I.1</span>¿Qué es BioModelling Pro?</h2>
+  <p class="lead">BioModelling Pro es una plataforma para hacer un estudio de distribución de especies completo, <b>del registro al mapa</b>: descarga los registros de presencia, los depura, extrae el clima, la altitud y el suelo en cada punto, los explora con estadística y métodos multivariados, ajusta y valida modelos de distribución, proyecta el resultado a escenarios de clima futuro y evalúa la aptitud agroclimática de cultivos sobre ese mismo territorio.</p>
+  <p>Todo ocurre dentro del navegador. No hay que instalar nada, no hace falta programar y los datos no salen de tu computadora. El mismo camino sirve para una especie silvestre, para un pariente silvestre de un cultivo o para un cultivo: cambia la pregunta, no el flujo.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="Jost, sans-serif" role="img"
+         aria-label="Los diez bloques de BioModelling Pro en dos filas, del registro de presencia al mapa de idoneidad y a la aptitud de cultivos">
+      <defs>
+        <marker id="flA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#5d6a64"/></marker>
+      </defs>
+      <g font-size="10">
+        <!-- fila 1: datos -->
+        <text x="16" y="24" font-size="8.5" fill="#5d6a64" letter-spacing="1.6">LOS DATOS</text>
+        <g>
+          <rect x="16" y="34" width="120" height="54" rx="8" fill="#eaf1fa" stroke="#1d5bb0"/>
+          <text x="76" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#123f7d">1 · Registros</text>
+          <text x="76" y="70" text-anchor="middle" fill="#2c3c50">GBIF o archivo propio</text>
+          <rect x="152" y="34" width="120" height="54" rx="8" fill="#e6f2f0" stroke="#0f766e"/>
+          <text x="212" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#0b4f4a">2 · Filtrar</text>
+          <text x="212" y="70" text-anchor="middle" fill="#254946">taxón, país, estados</text>
+          <rect x="288" y="34" width="120" height="54" rx="8" fill="#eaf4ee" stroke="#2f7d4f"/>
+          <text x="348" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#1f5c39">3 · Depurar</text>
+          <text x="348" y="70" text-anchor="middle" fill="#2b4a3a">nueve reglas</text>
+          <rect x="424" y="34" width="120" height="54" rx="8" fill="#fbf2e0" stroke="#b7791f"/>
+          <text x="484" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#8a5a12">4 · Mapa</text>
+          <text x="484" y="70" text-anchor="middle" fill="#57492f">ver y exportar</text>
+          <rect x="560" y="34" width="124" height="54" rx="8" fill="#fbeee6" stroke="#c2410c"/>
+          <text x="622" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#8a2f08">5 · Variables</text>
+          <text x="622" y="70" text-anchor="middle" fill="#5c3c2c">clima, altitud, suelo</text>
+        </g>
+        <path d="M136 61 L150 61 M272 61 L286 61 M408 61 L422 61 M544 61 L558 61" stroke="#5d6a64" stroke-width="1.4" marker-end="url(#flA)" fill="none"/>
+        <!-- bajada: pasa por debajo del rótulo de la fila -->
+        <path d="M622 92 C540 132 220 132 76 134" stroke="#5d6a64" stroke-width="1.4" fill="none" stroke-dasharray="5 4" marker-end="url(#flA)"/>
+        <!-- fila 2: análisis -->
+        <text x="16" y="120" font-size="8.5" fill="#5d6a64" letter-spacing="1.6">EL ANÁLISIS</text>
+        <g>
+          <rect x="16" y="138" width="120" height="54" rx="8" fill="#fbeaee" stroke="#b4234a"/>
+          <text x="76" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#8c1738">6 · Correlación</text>
+          <text x="76" y="174" text-anchor="middle" fill="#55303a">qué variables usar</text>
+          <rect x="152" y="138" width="120" height="54" rx="8" fill="#f4edfb" stroke="#7e3fb0"/>
+          <text x="212" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#5c2a85">7 · Estadística</text>
+          <text x="212" y="174" text-anchor="middle" fill="#463357">describir y probar</text>
+          <rect x="288" y="138" width="120" height="54" rx="8" fill="#e8f4f9" stroke="#2b8fb3"/>
+          <text x="348" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#19647f">8 · Multivariado</text>
+          <text x="348" y="174" text-anchor="middle" fill="#2c4753">nicho y diversidad</text>
+          <rect x="424" y="128" width="120" height="74" rx="8" fill="#eceafa" stroke="#4f46a5"/>
+          <text x="484" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#37307c">9 · Modelado</text>
+          <text x="484" y="166" text-anchor="middle" fill="#3b3a52">diez algoritmos</text>
+          <text x="484" y="180" text-anchor="middle" fill="#3b3a52">validación y mapas</text>
+          <text x="484" y="194" text-anchor="middle" fill="#3b3a52">futuro</text>
+          <rect x="560" y="138" width="124" height="54" rx="8" fill="#f0f5e4" stroke="#4d7c0f"/>
+          <text x="622" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#3a5f0b">10 · Agroclima</text>
+          <text x="622" y="174" text-anchor="middle" fill="#41502f">aptitud de cultivos</text>
+        </g>
+        <path d="M136 165 L150 165 M272 165 L286 165 M408 165 L422 165 M544 165 L558 165" stroke="#5d6a64" stroke-width="1.4" marker-end="url(#flA)" fill="none"/>
+        <!-- salidas -->
+        <text x="16" y="232" font-size="8.5" fill="#5d6a64" letter-spacing="1.6">LO QUE TE LLEVAS</text>
+        <g font-size="9.5" fill="#1f2724">
+          <rect x="16" y="242" width="210" height="44" rx="8" fill="#ffffff" stroke="#d7e1dc"/>
+          <text x="121" y="260" text-anchor="middle" font-weight="600">Mapas</text>
+          <text x="121" y="275" text-anchor="middle" fill="#3f4f49">PNG, TIFF, GeoTIFF y SVG</text>
+          <rect x="242" y="242" width="210" height="44" rx="8" fill="#ffffff" stroke="#d7e1dc"/>
+          <text x="347" y="260" text-anchor="middle" font-weight="600">Tablas y figuras</text>
+          <text x="347" y="275" text-anchor="middle" fill="#3f4f49">CSV y figuras editables a 600 ppp</text>
+          <rect x="468" y="242" width="216" height="44" rx="8" fill="#ffffff" stroke="#d7e1dc"/>
+          <text x="576" y="260" text-anchor="middle" font-weight="600">Métricas del modelo</text>
+          <text x="576" y="275" text-anchor="middle" fill="#3f4f49">AUC, TSS, Boyce y umbrales</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption><b>Figura I.1.</b> Los diez bloques. Los cinco primeros preparan los datos; los cinco siguientes los analizan. Cada bloque deja lista la entrada del que sigue, y todos beben del mismo conjunto depurado.</figcaption>
+  </figure>
+
+  <!-- I.2 -->
+  <h2 id="si-2"><span class="num">I.2</span>Preguntas que responde</h2>
+  <p>Estas son preguntas reales de tesis, de artículo y de proyecto que el programa contesta con los datos que tú ya tienes o que puedes descargar en unos minutos:</p>
+  <ul>
+    <li><b>¿Dónde vive hoy mi especie y dónde <i>podría</i> vivir?</b> El mapa de idoneidad del Bloque 9 señala las zonas con el clima que la especie ocupa, incluso donde nadie la ha colectado todavía.</li>
+    <li><b>¿Qué variables del clima explican su distribución?</b> La importancia por permutación y las curvas de respuesta del Bloque 9 lo dicen, después de que el Bloque 6 descarta las variables que se repiten entre sí.</li>
+    <li><b>¿Qué tan bien predice mi modelo?</b> Validación por bloques espaciales con AUC, TSS y el índice de Boyce, y umbrales para convertir la idoneidad en un mapa de presencia y ausencia.</li>
+    <li><b>¿Qué pasará con el cambio climático?</b> La proyección a varios escenarios, periodos y modelos climáticos, con el área que se gana y se pierde, el desplazamiento del centro de la distribución y los refugios.</li>
+    <li><b>¿Qué tan amenazada está?</b> La extensión de la presencia (EOO) y el área de ocupación (AOO) del Bloque 8, con los umbrales de las listas rojas.</li>
+    <li><b>¿Los subtaxones ocupan ambientes distintos?</b> Solapamiento de nicho, ordenaciones y agrupamientos del Bloque 8.</li>
+    <li><b>¿Qué cultivo conviene a esta región, hoy y en treinta años?</b> El Bloque 10 calcula grados-día, heladas, horas frío, balance hídrico y aptitud por cultivo, con su calendario de siembra y su factor limitante.</li>
+  </ul>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Lo que un modelo de distribución no es</div>
+    <p>Un mapa de idoneidad <b>no</b> es un mapa de presencia comprobada, ni un censo, ni una predicción de abundancia. Dice dónde el ambiente se parece al de los lugares donde la especie ha sido registrada. Que una zona salga idónea no significa que la especie esté ahí: puede no haber llegado, puede haber sido eliminada, o puede que la excluya un competidor, el suelo o el uso de la tierra. Esa distinción, con nombre y apellido, es la sección I.3.</p>
+  </div>
+
+  <!-- I.3 -->
+  <h2 id="si-3"><span class="num">I.3</span>Cinco ideas clave del modelado de nicho</h2>
+  <p>Cinco ideas bastan para entender todo lo que hace la app. Vuelven en cada capítulo.</p>
+
+  <h3>1. El nicho es un espacio de variables, la distribución es un espacio geográfico</h3>
+  <p>Hutchinson (1957) definió el nicho como el conjunto de condiciones en las que una población persiste: un volumen en un espacio de <i>n</i> variables (temperatura, lluvia, altitud…). Ese volumen no se ve en un mapa, pero cada punto del mapa tiene su lugar dentro de él. Modelar consiste en ir y venir entre los dos espacios: se aprende el nicho en el espacio ambiental y se dibuja en el geográfico.</p>
+
+  <figure class="reducida">
+    <svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" font-family="Jost, sans-serif" role="img"
+         aria-label="A la izquierda, el espacio ambiental con los registros formando una nube dentro de una envolvente; a la derecha, el mismo resultado pintado sobre el mapa">
+      <defs>
+        <marker id="flB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#14453a"/></marker>
+        <radialGradient id="gIdo" cx="42%" cy="46%" r="58%">
+          <stop offset="0%" stop-color="#e5462f"/><stop offset="42%" stop-color="#f79a3a"/>
+          <stop offset="72%" stop-color="#8bd0a7"/><stop offset="100%" stop-color="#ffffff"/>
+        </radialGradient>
+      </defs>
+      <!-- espacio ambiental -->
+      <text x="18" y="22" font-size="9" fill="#5d6a64" letter-spacing="1.4">ESPACIO AMBIENTAL</text>
+      <path d="M40 210 L240 210 M40 210 L40 40" stroke="#1f2724" stroke-width="1.2" fill="none"/>
+      <text x="140" y="232" font-size="9.5" text-anchor="middle" fill="#3f4f49">BIO1 · temperatura media</text>
+      <text x="26" y="125" font-size="9.5" text-anchor="middle" fill="#3f4f49" transform="rotate(-90 26 125)">BIO12 · lluvia anual</text>
+      <ellipse cx="135" cy="120" rx="66" ry="48" fill="#8bd0a7" opacity="0.28" transform="rotate(-24 135 120)"/>
+      <ellipse cx="135" cy="120" rx="66" ry="48" fill="none" stroke="#1d6153" stroke-width="1.4" stroke-dasharray="4 3" transform="rotate(-24 135 120)"/>
+      <g fill="#13312b">
+        <circle cx="104" cy="139" r="2.6"/><circle cx="118" cy="128" r="2.6"/><circle cx="131" cy="118" r="2.6"/>
+        <circle cx="146" cy="110" r="2.6"/><circle cx="159" cy="101" r="2.6"/><circle cx="112" cy="151" r="2.6"/>
+        <circle cx="126" cy="136" r="2.6"/><circle cx="141" cy="127" r="2.6"/><circle cx="155" cy="118" r="2.6"/>
+        <circle cx="97" cy="126" r="2.6"/><circle cx="168" cy="112" r="2.6"/><circle cx="133" cy="101" r="2.6"/>
+        <circle cx="120" cy="112" r="2.6"/><circle cx="150" cy="135" r="2.6"/><circle cx="108" cy="116" r="2.6"/>
+      </g>
+      <text x="196" y="86" font-size="8.5" fill="#1d6153">envolvente</text>
+      <text x="196" y="97" font-size="8.5" fill="#1d6153">del nicho</text>
+      <!-- flechas -->
+      <path d="M252 105 L296 105" stroke="#14453a" stroke-width="1.6" marker-end="url(#flB)" fill="none"/>
+      <path d="M296 145 L252 145" stroke="#14453a" stroke-width="1.6" marker-end="url(#flB)" fill="none"/>
+      <text x="274" y="98" font-size="8" text-anchor="middle" fill="#14453a">se dibuja</text>
+      <text x="274" y="162" font-size="8" text-anchor="middle" fill="#14453a">se aprende</text>
+      <!-- espacio geográfico -->
+      <text x="312" y="22" font-size="9" fill="#5d6a64" letter-spacing="1.4">ESPACIO GEOGRÁFICO</text>
+      <rect x="312" y="34" width="228" height="180" rx="6" fill="#fbfcfb" stroke="#d7e1dc"/>
+      <path d="M330 180 C352 150 344 120 366 96 C386 74 414 66 440 78 C470 92 486 120 504 140 C518 156 522 176 512 192 C476 200 396 200 330 180 Z"
+            fill="url(#gIdo)" stroke="#14453a" stroke-width="1.1"/>
+      <g fill="#13312b">
+        <circle cx="392" cy="124" r="2.4"/><circle cx="406" cy="112" r="2.4"/><circle cx="418" cy="132" r="2.4"/>
+        <circle cx="430" cy="118" r="2.4"/><circle cx="444" cy="134" r="2.4"/><circle cx="402" cy="142" r="2.4"/>
+        <circle cx="458" cy="122" r="2.4"/><circle cx="376" cy="140" r="2.4"/>
+      </g>
+      <text x="330" y="212" font-size="8.5" fill="#5d6a64">idoneidad alta</text>
+      <text x="470" y="212" font-size="8.5" fill="#5d6a64" text-anchor="end">baja</text>
+    </svg>
+    <figcaption><b>Figura I.2.</b> Los dos espacios. El modelo aprende en el espacio ambiental —dónde caen los registros dentro del rango de temperatura y lluvia— y proyecta ese resultado sobre el mapa. Los mismos puntos aparecen en los dos lados.</figcaption>
+  </figure>
+
+  <h3>2. Nicho fundamental, nicho realizado y lo que el modelo alcanza a ver</h3>
+  <p>El nicho <b>fundamental</b> es todo lo que la fisiología permite; el <b>realizado</b> es la parte que la especie ocupa de verdad, ya recortada por los competidores, los depredadores y la historia. Con registros de presencia se estima algo cercano al realizado, y solo dentro del ambiente que existe en la región de estudio. Por eso el área que se elige para modelar cambia el resultado: es una decisión del investigador, no un detalle técnico.</p>
+
+  <h3>3. El diagrama BAM: no todo lo idóneo está ocupado</h3>
+  <p>Soberón y Peterson (2005) lo resumieron en tres conjuntos: <b>B</b> lo que permiten las interacciones bióticas, <b>A</b> lo que permite el ambiente abiótico y <b>M</b> lo que la especie ha podido alcanzar con su movilidad. La distribución observada vive en la intersección. La app modela sobre todo la parte <b>A</b>; por eso hay zonas idóneas sin presencia.</p>
+
+  <figure class="reducida">
+    <svg viewBox="0 0 560 210" xmlns="http://www.w3.org/2000/svg" font-family="Jost, sans-serif" role="img"
+         aria-label="Diagrama BAM: tres círculos, condiciones abióticas, interacciones bióticas y área alcanzable, con la distribución observada en su intersección">
+      <g>
+        <circle cx="186" cy="100" r="76" fill="#c2410c" opacity="0.14" stroke="#c2410c"/>
+        <circle cx="262" cy="100" r="76" fill="#2f7d4f" opacity="0.14" stroke="#2f7d4f"/>
+        <circle cx="224" cy="150" r="76" fill="#1d5bb0" opacity="0.12" stroke="#1d5bb0"/>
+        <text x="132" y="62" font-size="13" font-weight="600" fill="#8a2f08">A</text>
+        <text x="308" y="62" font-size="13" font-weight="600" fill="#1f5c39">B</text>
+        <text x="220" y="204" font-size="13" font-weight="600" fill="#123f7d">M</text>
+        <circle cx="224" cy="118" r="17" fill="#14453a"/>
+        <text x="224" y="122" font-size="9" fill="#fff" text-anchor="middle" font-weight="600">Go</text>
+      </g>
+      <g font-size="9.5" fill="#1f2724">
+        <text x="352" y="56">A · ambiente abiótico</text><text x="352" y="70" font-size="8.5" fill="#5d6a64">clima, altitud, suelo: lo que modela la app</text>
+        <text x="352" y="96">B · interacciones bióticas</text><text x="352" y="110" font-size="8.5" fill="#5d6a64">competencia, herbivoría, polinizadores</text>
+        <text x="352" y="136">M · área alcanzable</text><text x="352" y="150" font-size="8.5" fill="#5d6a64">dispersión e historia: el área de estudio</text>
+        <text x="352" y="176">Go · distribución ocupada</text><text x="352" y="190" font-size="8.5" fill="#5d6a64">lo que en realidad se observa en campo</text>
+      </g>
+    </svg>
+    <figcaption><b>Figura I.3.</b> El diagrama BAM. La app estima sobre todo <b>A</b>; el área de estudio que elijas en el Bloque 9 es tu hipótesis sobre <b>M</b>, y <b>B</b> casi siempre queda fuera del modelo. Conviene decirlo así en el artículo.</figcaption>
+  </figure>
+
+  <h3>4. Los registros traen sesgos, y el sesgo se parece a una señal</h3>
+  <p>Las colectas se acumulan junto a las carreteras, cerca de las ciudades y en las áreas naturales protegidas. Un modelo ingenuo aprende ese patrón de muestreo en lugar del nicho. Por eso el Bloque 3 quita duplicados, centroides de país y coordenadas imposibles, el Bloque 9 puede dejar una sola presencia por celda, y la validación se hace por <b>bloques espaciales</b> y no al azar: con puntos cercanos, una validación al azar regala resultados excelentes que no se sostienen en un sitio nuevo.</p>
+
+  <h3>5. Extrapolar es distinto de interpolar</h3>
+  <p>Cuando el modelo se proyecta a otro tiempo o a otra región aparecen combinaciones de clima que nunca vio. Ahí la predicción es una extensión de la fórmula, no una estimación apoyada en datos. El mapa MESS del Bloque 9 marca esas zonas, y el manual insiste en mostrarlas siempre que se publique una proyección a futuro.</p>
+
+  <!-- I.4 -->
+  <h2 id="si-4"><span class="num">I.4</span>Datos que acepta</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Qué</th><th style="width:1.5in">Formato</th><th>Dónde entra y qué conviene saber</th></tr></thead>
+    <tbody>
+      <tr><td><b>Registros de presencia</b></td><td>descarga de GBIF</td><td>Bloque 1. Basta el nombre científico: la app resuelve el taxón y trae los registros con coordenadas, con barra de progreso, tope configurable y un filtro de países —México, Centroamérica y Sudamérica— que se aplica en la propia consulta.</td></tr>
+      <tr><td><b>Tus propios registros</b></td><td><code>.csv</code>, <code>.txt</code>, <code>.xlsx</code> o pegado</td><td>Bloque 1. Tres columnas bastan: especie, longitud y latitud. Acepta coma decimal, grados-minutos-segundos y archivos guardados en Windows; puedes sumarlos a los de GBIF o usarlos solos.</td></tr>
+      <tr><td><b>Capas climáticas</b></td><td><code>.tif</code> (GeoTIFF)</td><td>Bloque 5. Las 19 variables bioclimáticas y la altitud de WorldClim 2.1, en la resolución que descargues. La app lee solo la ventana que necesita, así que no carga el archivo completo a la memoria.</td></tr>
+      <tr><td><b>Clima de Köppen-Geiger</b></td><td><code>.tif</code></td><td>Bloque 5. Categórica: la app trae la tabla de claves y nombres de las clases.</td></tr>
+      <tr><td><b>Tipo de suelo</b></td><td>consulta en línea</td><td>Bloque 5, opcional. Pregunta punto por punto a un servicio público; es la única consulta que envía coordenadas.</td></tr>
+      <tr><td><b>Escenarios futuros</b></td><td><code>.tif</code></td><td>Bloque 9. Un archivo de 19 bandas o capas sueltas por variable, para cada modelo climático, trayectoria y periodo.</td></tr>
+      <tr><td><b>Capas mensuales</b></td><td><code>.tif</code></td><td>Bloque 10. Temperatura mínima, máxima y precipitación mes a mes, que es lo que piden los índices agroclimáticos.</td></tr>
+      <tr><td><b>Regiones propias</b></td><td><code>.geojson</code></td><td>Bloque 2. Municipios, cuencas, áreas protegidas: cualquier capa de polígonos sirve para filtrar y para recortar los mapas.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Para empezar no necesitas descargar nada</div>
+    <p>El programa trae dentro un ejemplo completo: 2,400 registros de GBIF y capas climáticas recortadas a todo México. Con eso puedes recorrer los diez bloques, probar cada botón y reproducir todas las figuras de este manual antes de trabajar con tus propios datos.</p>
+  </div>
+
+  <!-- I.5 -->
+  <h2 id="si-5"><span class="num">I.5</span>Qué necesitas y cómo abrirlo</h2>
+  <ol class="pasos">
+    <li><b>Un navegador de internet al día.</b> Cualquiera de los de uso común, en Windows, macOS o Linux. No se instala nada más.</li>
+    <li><b>Abre <code>index.html</code> con doble clic.</b> Así funciona todo, incluido el ejemplo incrustado. También puedes usar el servidor local que viene con el programa si prefieres abrirlo desde otra computadora de la misma red.</li>
+    <li><b>Conexión a internet</b> para tres cosas: consultar GBIF, dibujar el mapa base y descargar el motor de cálculo la primera vez que entras a un bloque que lo usa. El resto —la lectura de tus archivos, los cálculos y las figuras— funciona sin conexión.</li>
+    <li><b>Elige idioma y tema</b> en la barra superior: <span class="ui">ES</span> o <span class="ui">EN</span>, y claro u oscuro. La elección se recuerda y las figuras se redibujan solas.</li>
+  </ol>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>La primera vez que entras a un bloque de cálculo</div>
+    <p>Los bloques 7, 8, 9 y 10 usan un motor de Python que corre <b>dentro</b> del navegador. La primera vez tarda entre unos segundos y un par de minutos en descargarse, según tu conexión, y aparece un aviso de progreso. Después queda en la memoria del navegador y los análisis siguientes son inmediatos.</p>
+  </div>
+
+  <!-- I.6 -->
+  <h2 id="si-6"><span class="num">I.6</span>Recorrido por la interfaz</h2>
+  <p>La ventana tiene siempre las mismas tres partes:</p>
+  <ul>
+    <li><b>La barra superior</b>, con el nombre del programa, los botones <span class="ui">ES</span> · <span class="ui">EN</span>, el interruptor de tema y la <b>ruta de bloques</b>: <span class="ui">⌂ Inicio</span> y los diez pasos numerados. Se puede saltar de uno a otro en cualquier momento; lo que ya calculaste se conserva.</li>
+    <li><b>La portada</b> (<span class="ui">⌂ Inicio</span>), con el resumen del flujo, las tarjetas de los diez pasos, la galería de métodos, la teoría, las referencias, la forma de citar y un <b>laboratorio de especie virtual</b>: un paisaje inventado con un nicho que tú defines, presencias muestreadas con o sin sesgo y tres algoritmos que intentan recuperarlo. Es el mejor lugar para entender qué hace un modelo antes de usar datos reales.</li>
+    <li><b>El panel del bloque</b>, siempre con la misma estructura: arriba una caja que dice para qué sirve el paso y qué decides en él, luego los controles, después los resultados en tarjetas, tablas y figuras, y al final una <b>guía de interpretación</b> plegable. Junto a cada número hay un botón de ayuda que abre su ficha.</li>
+  </ul>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Las fichas de ayuda</div>
+    <p>Cada ficha dice cuatro cosas en este orden: <b>qué mide</b> ese número en palabras llanas, <b>cómo se lee</b>, <b>en qué escala</b> —con una barra de bandas de colores que marca dónde cae tu valor— y <b>el error más común</b> al usarlo, y cierra con la referencia de donde sale. Cuando la escala es una convención de lectura y no una ley estadística, la ficha lo dice; cuando no existe una escala aceptada, también lo dice en lugar de inventarla.</p>
+  </div>
+
+  <!-- I.7 -->
+  <h2 id="si-7"><span class="num">I.7</span>El ejemplo incluido: el piñonero</h2>
+  <p>Todos los ejemplos de este manual usan el mismo conjunto, que viene dentro del programa: los registros del <b>piñonero</b>, <i>Pinus cembroides</i> Zucc., un pino de semilla comestible de las sierras secas del norte y centro de México. Es un buen caso de estudio porque su distribución es amplia pero fragmentada, está ligada a un clima semiárido de montaña bien definido, y tiene subespecies y variedades descritas.</p>
+
+  <table class="compacta">
+    <thead><tr><th style="width:2.1in">Del conjunto de ejemplo</th><th>Qué contiene</th></tr></thead>
+    <tbody>
+      <tr><td><b>Registros</b></td><td>2,400 descargados de GBIF el 21 de septiembre de 2026, de los 5,329 que reportaba la consulta</td></tr>
+      <tr><td><b>Países</b></td><td>México 1,719 · Estados Unidos 670 · Nueva Zelanda 8 · Francia 2 · Austria 1</td></tr>
+      <tr><td><b>Nombres</b></td><td>7 formas: la especie (2,281) y seis subespecies y variedades (<i>orizabensis</i>, <i>cembroides</i>, <i>lagunae</i>)</td></tr>
+      <tr><td><b>Tipo de registro</b></td><td>observación humana 1,343 · ejemplar de herbario 967 · otros 90</td></tr>
+      <tr><td><b>Años</b></td><td>de 1982 a 2026</td></tr>
+      <tr><td><b>Capas</b></td><td>las 19 variables bioclimáticas, la altitud y el clima de Köppen-Geiger a 10 minutos de arco (≈ 18 km), recortadas a lon −122° a −86° y lat 13° a 40°: todo México y el suroeste de Estados Unidos</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Los once registros que valen una lección</div>
+    <p>Once de esos 2,400 registros están en Nueva Zelanda, Francia y Austria: son árboles <b>cultivados</b> en jardines botánicos y arboretos, no poblaciones naturales. GBIF los entrega sin distinguirlos, y si se dejan pasar el modelo intenta explicar el clima de Europa y de Oceanía con el nicho de una sierra mexicana. Los capítulos 2 y 3 muestran cómo se detectan y qué hacer con ellos. No son un defecto del ejemplo: son lo que llega en cualquier descarga real.</p>
+  </div>
+
+  <!-- I.8 -->
+  <h2 id="si-8"><span class="num">I.8</span>Flujo de trabajo recomendado</h2>
+  <p>El orden de los bloques es el orden en el que conviene trabajar, pero no es una camisa de fuerza: se puede volver atrás, cambiar un filtro y recalcular. Este es el camino corto para un estudio típico:</p>
+  <ol class="pasos">
+    <li><b>Trae los registros</b> (Bloque 1) y revisa cuántos son y de dónde vienen.</li>
+    <li><b>Filtra</b> (Bloque 2) por taxón y por país o región. Aquí se decide el área de estudio, que es una decisión ecológica, no de comodidad.</li>
+    <li><b>Depura</b> (Bloque 3) y mira la tabla de antes y después: cada regla te dice cuántos registros quita y por qué.</li>
+    <li><b>Mira el mapa</b> (Bloque 4). Un vistazo revela los errores que ninguna regla detecta: puntos en el mar, en el país equivocado o en un solo jardín botánico.</li>
+    <li><b>Extrae el ambiente</b> (Bloque 5) en cada punto y revisa cuántos quedaron sin dato.</li>
+    <li><b>Elige las variables</b> (Bloque 6). Quédate con las que aporten información distinta y con las que tengan sentido para tu especie, aunque estén correlacionadas.</li>
+    <li><b>Descríbelas</b> (Bloque 7): así sabrás en qué rango de temperatura y lluvia vive tu especie antes de modelar nada.</li>
+    <li><b>Explora la estructura</b> (Bloque 8): ordenación, grupos, área de distribución y amplitud de nicho.</li>
+    <li><b>Modela y valida</b> (Bloque 9). Empieza con dos o tres algoritmos y validación por bloques; deja el ensamble y el futuro para cuando el modelo base te convenza.</li>
+    <li><b>Si tu pregunta es agrícola</b>, sigue al Bloque 10 con las capas mensuales.</li>
+  </ol>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Guarda a medida que avanzas</div>
+    <p>Cada bloque permite descargar lo que produce: el CSV de los registros depurados, la tabla de puntos por variables, las métricas, los mapas y las figuras. Descargar el CSV depurado al terminar el Bloque 3 cuesta un clic y evita repetir la descarga de GBIF si cierras el navegador.</p>
+  </div>
+
+  <!-- I.9 -->
+  <h2 id="si-9"><span class="num">I.9</span>Cómo leer los números: escalas y umbrales</h2>
+  <p>Este manual, como la app, distingue tres clases de referencia numérica, y conviene no confundirlas al escribir los resultados:</p>
+  <table class="compacta">
+    <thead><tr><th style="width:1.45in">Clase</th><th style="width:1.9in">Ejemplos</th><th>Cómo tratarla</th></tr></thead>
+    <tbody>
+      <tr><td><b>Convención de lectura</b></td><td>|r| &gt; 0.7 es colinealidad alta; AUC &gt; 0.8 es un buen modelo; VIF &gt; 10 es problema</td><td>Son costumbres útiles, no leyes: se citan como tales y se acompañan del valor exacto.</td></tr>
+      <tr><td><b>Umbral publicado</b></td><td>EOO &lt; 20,000 km² y AOO &lt; 2,000 km² de las listas rojas; MESS &lt; 0 marca extrapolación</td><td>Vienen de un criterio formal; se citan con su fuente y con la advertencia de que un umbral solo no asigna una categoría.</td></tr>
+      <tr><td><b>Sin escala aceptada</b></td><td>curtosis, índice de Dunn, grados-día acumulados, riqueza observada</td><td>Se comparan entre sí —entre regiones, entre modelos, entre años—, nunca contra un número mágico.</td></tr>
+    </tbody>
+  </table>
+  <p>Cuando el manual dé una banda de valores, dirá a cuál de las tres clases pertenece. Y siempre que un número dependa del tamaño de muestra, del área de estudio o de la resolución de las capas —que son casi todos—, se dirá también de qué depende.</p>
+
+  <div class="caja regla">
+    <div class="caja-t"><span class="ico">✓</span>Tres preguntas antes de publicar un mapa</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:34%"><b>¿Qué área modelé?</b></td><td>Dilo en el texto y muéstralo en el mapa: el área de estudio es una hipótesis sobre a dónde ha podido llegar la especie.</td></tr>
+      <tr><td><b>¿Cómo validé?</b></td><td>Bloques espaciales, con AUC, TSS y Boyce, y el número de presencias que entraron.</td></tr>
+      <tr><td><b>¿Dónde extrapolé?</b></td><td>Acompaña toda proyección a futuro con su mapa MESS o, al menos, con el porcentaje del área en extrapolación.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">Las tres respuestas caben en dos renglones de la sección de métodos y evitan la mitad de las observaciones de los revisores.</p>
+  </div>
+</section>
+
+</body>
+</html>

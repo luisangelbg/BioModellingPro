@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 6 · Correlación y selección de variables</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 70%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 15%; margin-right: 15%; }
+  figure.matriz .marco { border: none; box-shadow: none; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b6" data-pestana="6" data-orden="7" style="--acento: var(--b6)">
+  <div class="cap-apertura">
+    <div class="cap-num">6</div>
+    <div class="cap-etiqueta">Bloque 6 · Menos variables, mejor modelo</div>
+    <h1>Correlación y selección de variables</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Las diecinueve variables bioclimáticas dicen muchas veces lo mismo. Este bloque muestra cuánto se repiten, calcula el VIF en vivo y propone un puñado de variables poco redundantes —sin quitarte las que tú consideres imprescindibles—.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>6.1</b>Qué es la colinealidad y qué rompe</li>
+      <li><b>6.2</b>La matriz de correlación</li>
+      <li><b>6.3</b>El factor de inflación de la varianza</li>
+      <li><b>6.4</b>La selección recomendada</li>
+      <li><b>6.5</b>Fijar las variables que importan</li>
+      <li><b>6.6</b>El visor de pares</li>
+      <li><b>6.7</b>¿Cuántas variables usar?</li>
+      <li><b>6.8</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 6.1 -->
+  <h2 id="b6-1"><span class="num">6.1</span>Qué es la colinealidad y qué rompe</h2>
+  <p class="lead">Dos variables son colineales cuando una se puede predecir bien a partir de la otra. En datos climáticos es la norma, no la excepción: donde hace más calor suele llover distinto, y donde sube la altitud baja la temperatura. El problema no es que exista, sino lo que provoca cuando se ignora.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:1.8in">Qué rompe</th><th>Cómo se nota</th></tr></thead>
+    <tbody>
+      <tr><td><b>La importancia de las variables</b></td><td>Si BIO5 y BIO10 miden casi lo mismo, el modelo reparte el crédito entre las dos y ninguna parece importante. Con una sola, esa variable aparece como determinante. La conclusión ecológica cambia sin que cambien los datos.</td></tr>
+      <tr><td><b>Los coeficientes</b></td><td>En modelos lineales —GLM, GAM— los coeficientes se vuelven inestables: cambian de signo y de magnitud al quitar un puñado de registros. Los modelos de árboles lo toleran mejor, pero su medida de importancia sigue sufriendo.</td></tr>
+      <tr><td><b>La proyección a otro clima</b></td><td>Es el daño más serio y el menos visible. Un modelo ajustado con dos variables correlacionadas aprende la relación <i>que existe hoy</i> entre ellas; si en el escenario futuro esa relación cambia, el modelo extrapola sobre combinaciones que nunca vio.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 6.2 -->
+  <h2 id="b6-2"><span class="num">6.2</span>La matriz de correlación</h2>
+  <p>La matriz muestra la correlación entre cada par de variables, calculada con los valores extraídos en tus registros —no con el clima de todo el país—: lo que importa es cómo se relacionan <b>donde vive tu especie</b>.</p>
+
+  <figure class="media matriz">
+    <div class="marco"><img src="../img/b6-matriz.png" alt="Matriz de correlación de las veinte variables con su dendrograma a la izquierda, colores azul para negativo y naranja para positivo, las variables seleccionadas en negrita y los alfileres sobre BIO1 y BIO12"></div>
+    <figcaption><b>Figura 6.1.</b> La matriz del ejemplo, exportada con el botón <span class="ui">⬇ PNG</span> de la propia tarjeta. El árbol de la izquierda agrupa las variables que se parecen: BIO6 y BIO11 (0.96), BIO14 y BIO17 (0.97), BIO13 y BIO16 (0.98), BIO8 y BIO10 (0.99). En negrita, las variables seleccionadas; con alfiler 📌, las fijadas.</figcaption>
+  </figure>
+
+  <ul>
+    <li><b>Pearson o Spearman.</b> Pearson mide relación lineal; Spearman mide si una crece cuando la otra crece, aunque la relación sea curva. Con variables climáticas suelen dar lo mismo; cuando difieren mucho, hay una relación no lineal que conviene mirar.</li>
+    <li><b>El orden no es alfabético.</b> Las filas y columnas se ordenan por agrupamiento jerárquico, así que los bloques de color que aparecen son grupos reales de variables intercambiables.</li>
+    <li><b>Haz clic en una celda</b> y se abre el par: dos histogramas y un diagrama de dispersión para decidir con cuál quedarte.</li>
+  </ul>
+
+  <!-- 6.3 -->
+  <h2 id="b6-3"><span class="num">6.3</span>El factor de inflación de la varianza</h2>
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Qué es el VIF</div>
+    <p>La correlación mira pares; el <b>VIF</b> mira conjuntos. Para cada variable se hace una regresión de esa variable contra <b>todas las demás</b> del conjunto y se calcula VIF = 1 / (1 − R²). Si las demás explican el 90 % de su variación, el VIF vale 10. Un VIF alto significa que esa variable es casi una combinación de las otras, aunque no tenga ninguna correlación pareja alta: ese es el caso que la matriz por sí sola no detecta.</p>
+    <p class="small" style="margin-top:0.06in">Los umbrales <b>5</b> y <b>10</b> son convenciones de lectura muy extendidas, no leyes: por debajo de 5 la colinealidad es baja; entre 5 y 10, moderada; arriba de 10, alta.</p>
+  </div>
+  <p>En la tabla de variables, el VIF y la correlación máxima se recalculan <b>con las variables que tienes marcadas</b> cada vez que marcas o desmarcas una. Así se ve el efecto de cada decisión al instante, y la columna <b>Estado</b> dice por qué se descartó cada variable: por una correlación pareja alta o por su VIF.</p>
+
+  <figure class="media">
+    <div class="marco"><img src="../img/b6-variables.png" alt="Tabla de variables con las columnas usar, fijar, código, nombre, VIF, correlación máxima y estado, donde se ve que BIO4 se quitó por r = 0.97 con BIO3 y BIO6 por VIF = 145.2"></div>
+    <figcaption><b>Figura 6.2.</b> La tabla de variables. BIO4 salió por su correlación de 0.97 con BIO3; BIO6 salió por un <b>VIF de 145.2</b>, aunque su correlación pareja más alta era apenas 0.67: es el caso que solo el VIF descubre.</figcaption>
+  </figure>
+
+  <!-- 6.4 -->
+  <h2 id="b6-4"><span class="num">6.4</span>La selección recomendada</h2>
+  <p>El botón <span class="ui">✨ Selección recomendada</span> aplica un procedimiento sencillo y transparente: quita primero las variables que superan el umbral de correlación —conservando de cada par la que aporta más información al resto— y después, sobre lo que queda, elimina una por una las que superan el umbral de VIF, recalculando cada vez. Las variables fijadas no se tocan nunca.</p>
+  <p>Los dos umbrales son tuyos: <b>|r|</b> viene en 0.8 y el <b>VIF</b> en 10, que son las convenciones más usadas en la literatura de modelado de nicho. Bajarlos deja menos variables y más independientes; subirlos, lo contrario.</p>
+
+  <!-- 6.5 -->
+  <h2 id="b6-5"><span class="num">6.5</span>Fijar las variables que importan</h2>
+  <p>Un procedimiento automático no sabe ecología. Si tu especie está limitada por la helada, BIO6 tiene que estar en el modelo aunque el algoritmo prefiera otra; si vas a discutir la temperatura media y la lluvia anual, BIO1 y BIO12 no pueden faltar. Para eso está el alfiler: <b>fijar</b> una variable la vuelve intocable.</p>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Con y sin alfileres</div>
+    <p>Con los 1,885 registros del piñonero y los umbrales de fábrica (|r| &gt; 0.8, VIF &gt; 10), la <b>selección automática</b> deja ocho variables: BIO2, BIO3, BIO9, BIO16, BIO17, BIO18, BIO19 y la altitud, con |r| máximo de <b>0.79</b> y VIF máximo de <b>6.1</b>. Ni BIO1 ni BIO12 sobreviven: el procedimiento prefirió a sus parientes.</p>
+    <p>Al pulsar <span class="ui">📌 Fijar BIO1 y BIO12 y recalcular</span>, la selección pasa a nueve variables —BIO1, BIO2, BIO3, BIO9, BIO12, BIO15, BIO17, BIO18 y BIO19— con |r| máximo de <b>0.66</b> y VIF máximo de <b>8.7</b>. Es decir: exigir las dos variables clásicas <b>bajó</b> la correlación máxima del conjunto, a cambio de una variable más y un VIF algo mayor. Un resultado mejor y además interpretable.</p>
+  </div>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Decide una vez, y que se note</div>
+    <p>La selección de este bloque es la que usan por omisión los bloques 7, 8 y 9: el botón <span class="ui">Las del paso 6</span> aparece en todos ellos. Si más adelante cambias de opinión, vuelve aquí y recalcula; no dejes dos selecciones distintas en el mismo trabajo.</p>
+  </div>
+
+  <!-- 6.6 -->
+  <h2 id="b6-6"><span class="num">6.6</span>El visor de pares</h2>
+  <p>La última tarjeta lista los pares que superan el umbral, del más correlacionado al menos, y permite abrir cualquiera para ver la nube de puntos.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b6-pares.png" alt="Tarjeta de pares muy correlacionados con la lista de pares y el visor con el diagrama de dispersión"></div>
+    <figcaption><b>Figura 6.3.</b> Los pares por encima del umbral. Ver la nube evita dos errores: descartar una variable por una correlación alta que en realidad produce un solo grupo de puntos extremos, y conservar dos variables cuya relación es una recta perfecta.</figcaption>
+  </figure>
+
+  <!-- 6.7 -->
+  <h2 id="b6-7"><span class="num">6.7</span>¿Cuántas variables usar?</h2>
+  <div class="caja regla">
+    <div class="caja-t"><span class="ico">✓</span>Tres criterios, en este orden</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:30%"><b>Que tengan sentido</b></td><td>Cada variable del modelo debería poder justificarse en una frase de la discusión: por qué esa y no otra limita a tu especie.</td></tr>
+      <tr><td><b>Que no se repitan</b></td><td>|r| por debajo de 0.8 entre todas y VIF por debajo de 10; si puedes bajar a 0.7 y 5 sin perder variables con sentido, mejor.</td></tr>
+      <tr><td><b>Que no sean demasiadas</b></td><td>Con pocas presencias, un modelo con muchas variables se aprende los datos de memoria. Una guía prudente es no pasar de una variable por cada diez presencias.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">Entre cinco y diez variables bien elegidas basta para casi cualquier estudio de nicho; diecinueve nunca hacen falta.</p>
+  </div>
+
+  <!-- 6.8 -->
+  <h2 id="b6-8"><span class="num">6.8</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>La matriz sale vacía</td><td>No hay tabla de variables: vuelve al Bloque 5 y extrae los valores ráster.</td></tr>
+      <tr><td>Un VIF enorme, de cientos</td><td>Es lo normal con las diecinueve bioclimáticas juntas; significa que esa variable es casi una combinación exacta de otras. Aplica la selección recomendada.</td></tr>
+      <tr><td>La selección deja fuera «mi» variable</td><td>Fíjala con el alfiler y recalcula. Es exactamente para eso.</td></tr>
+      <tr><td>Pearson y Spearman dan resultados muy distintos</td><td>La relación entre esas variables no es lineal. Ábrela en el visor de pares antes de decidir.</td></tr>
+      <tr><td>Quedan muy pocas variables</td><td>Sube un poco los umbrales, o fija las que necesites. Tres variables con sentido ecológico modelan mejor que diez redundantes.</td></tr>
+      <tr><td>Cambié la selección y los resultados de otro bloque no cambiaron</td><td>Los bloques 7, 8 y 9 toman la selección al entrar o al pulsar <span class="ui">Las del paso 6</span>. Vuelve a ese bloque y recarga la selección.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

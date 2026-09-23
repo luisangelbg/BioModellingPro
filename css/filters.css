@@ -1,0 +1,18 @@
+/* Step 2 · the state / region filter. */
+.region-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.region-btns button { font-size: .76rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--card-bg); color: var(--text-muted); cursor: pointer; }
+.region-btns button:hover { border-color: var(--primary); color: var(--primary); }
+.region-btns button.on { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.state-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 2px 14px; margin: 8px 0 4px; max-height: 340px; overflow: auto; }
+.state-item { display: flex; align-items: center; gap: 8px; font-size: .86rem; padding: 3px 4px; border-radius: 6px; cursor: pointer; }
+.state-item:hover { background: var(--bg-soft); }
+.state-item input { accent-color: var(--primary); }
+.state-item .st-n { flex: 1; }
+.state-item .st-c { font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: .8rem; }
+.state-item.none .st-n { font-style: italic; color: var(--text-muted); }
+.state-item.zero { opacity: .45; }
+.state-head { display: flex; gap: 10px; align-items: baseline; font-size: .82rem; color: var(--text-muted); }
+.state-head a { font-weight: 600; }
+#stateCard .bbox-row { align-items: flex-end; }
+#stateCard .bbox-row .checkbox-label { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 6px; }
+#stateCard .bbox-row > label > select { min-width: 240px; }

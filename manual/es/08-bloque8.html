@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 8 · Multivariado, ecología y diversidad</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 66%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 17%; margin-right: 17%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b8" data-pestana="8" data-orden="9" style="--acento: var(--b8)">
+  <div class="cap-apertura">
+    <div class="cap-num">8</div>
+    <div class="cap-etiqueta">Bloque 8 · La estructura de los datos</div>
+    <h1>Multivariado, ecología y diversidad</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Cuatro familias de métodos sobre la misma tabla: ordenación, agrupamiento, métricas del área de distribución y del nicho, y diversidad. Todo lo que se puede decir de una especie antes de ajustar un modelo de distribución.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>8.1</b>Qué hace este bloque</li>
+      <li><b>8.2</b>Análisis de componentes principales</li>
+      <li><b>8.3</b>Agrupamiento</li>
+      <li><b>8.4</b>Análisis de correspondencias</li>
+      <li><b>8.5</b>El área de distribución</li>
+      <li><b>8.6</b>Amplitud y solapamiento de nicho</li>
+      <li><b>8.7</b>Diversidad</li>
+      <li><b>8.8</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 8.1 -->
+  <h2 id="b8-1"><span class="num">8.1</span>Qué hace este bloque</h2>
+  <p class="lead">Hasta aquí cada variable se miró por separado. Este bloque las mira <b>juntas</b>: qué ejes de variación ambiental existen, si los registros forman grupos, qué tan grande es el área que ocupan y cuánta variedad hay dentro de ella. Todo se calcula sobre la tabla del Bloque 5, con las variables que eligió el Bloque 6, y empieza pulsando <span class="ui">Preparar datos →</span>, que estandariza cada variable a media cero y desviación uno —indispensable cuando se mezclan milímetros con grados y con metros—.</p>
+
+  <!-- 8.2 -->
+  <h2 id="b8-2"><span class="num">8.2</span>Análisis de componentes principales</h2>
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>La idea del ACP</div>
+    <p>Con ocho variables correlacionadas, los registros no llenan un espacio de ocho dimensiones: se apiñan cerca de una superficie de menos dimensiones. El ACP busca los ejes de esa superficie —combinaciones de las variables originales— ordenados por la cantidad de variación que capturan. El primero resume todo lo que se pueda con una sola cifra; el segundo, lo más que quede, y así.</p>
+  </div>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/b8-scree.png" alt="Gráfico de sedimentación con el valor propio de cada dimensión y el porcentaje de varianza"></div>
+    <figcaption><b>Figura 8.1.</b> El gráfico de sedimentación del ejemplo. Los cuatro primeros componentes superan el criterio de Kaiser (valor propio &gt; 1) y reúnen el 83 % de la variación; los dos primeros, el 52.5 %.</figcaption>
+  </figure>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/b8-circulo.png" alt="Círculo de correlación con las flechas de las ocho variables coloreadas por su calidad de representación"></div>
+    <figcaption><b>Figura 8.2.</b> El círculo de correlación. Las flechas largas —BIO16, la altitud, BIO3 y BIO18— son las variables bien representadas en el plano; el color es la calidad de representación (cos²). Dos flechas juntas indican variables que dicen lo mismo; opuestas, variables que se contraponen.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Qué significan los dos primeros ejes</div>
+    <p>En el ejemplo, la <b>dimensión 1</b> (29.9 % de la varianza) está construida sobre BIO16 —lluvia del trimestre más húmedo— con 27.4 % de contribución, la <b>altitud</b> con 25.5 %, la isotermalidad con 22.9 % y BIO18 con 17.4 %: es un eje de <i>humedad y altura</i>. La <b>dimensión 2</b> (22.5 %) la forman BIO9 (25.1 %) y BIO19 (25.0 %), temperatura y lluvia del trimestre más seco: un eje de <i>condiciones de la estación seca</i>. Entre los dos ordenan la mitad de la variación ambiental de la especie.</p>
+  </div>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/b8-individuos.png" alt="Mapa de individuos en el plano de las dos primeras dimensiones, con los registros coloreados"></div>
+    <figcaption><b>Figura 8.3.</b> Los 1,885 registros proyectados en ese plano. Cada punto es un sitio; la nube muestra si hay grupos, colas o registros alejados —que suelen ser los mismos que llamaron la atención en el Bloque 5—.</figcaption>
+  </figure>
+
+  <!-- 8.3 -->
+  <h2 id="b8-3"><span class="num">8.3</span>Agrupamiento</h2>
+  <p>La pregunta del agrupamiento es si los registros se reparten en conjuntos con ambiente distinto. La app la contesta en tres pasos, y conviene hacerlos en orden.</p>
+  <ol class="pasos">
+    <li><b>¿Hay tendencia a agruparse?</b> El estadístico de Hopkins compara la distribución de los datos con una distribución al azar. Por convención, un valor arriba de 0.75 indica tendencia clara a agruparse; alrededor de 0.5, ninguna.</li>
+    <li><b>¿Cuántos grupos?</b> Los métodos del codo, la silueta media y el estadístico gap proponen un número. Rara vez coinciden: se elige con criterio, mirando también si los grupos tienen sentido geográfico.</li>
+    <li><b>Ejecutar el agrupamiento</b> con el algoritmo elegido —jerárquico con distintos enlaces, k-medias, PAM, difuso, mezcla de gaussianas o DBSCAN— y validarlo.</li>
+  </ol>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b8-grupos.png" alt="Los registros en el plano de las dos primeras dimensiones del ACP, coloreados por el grupo asignado"></div>
+    <figcaption><b>Figura 8.4.</b> Los tres grupos del ejemplo sobre el plano del ACP. Un agrupamiento útil se ve así: grupos que ocupan zonas distintas del plano, aunque se toquen en los bordes.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.7in">Medida de validación</th><th>Cómo se lee</th></tr></thead>
+    <tbody>
+      <tr><td><b>Silueta media</b></td><td>De −1 a 1. Por convención: arriba de 0.7 estructura fuerte, de 0.5 a 0.7 razonable, de 0.25 a 0.5 débil, por debajo sin estructura real. En el ejemplo vale <b>0.422</b>: grupos débiles pero reconocibles, que es lo habitual con datos ambientales continuos.</td></tr>
+      <tr><td><b>Índice de Dunn</b></td><td>Cuanto mayor, mejor separados. No tiene escala aceptada: sirve para comparar particiones del mismo conjunto, no para juzgar una sola.</td></tr>
+      <tr><td><b>Correlación cofenética</b></td><td>Solo para el agrupamiento jerárquico: qué tan fielmente el dendrograma representa las distancias originales. Arriba de 0.8 se considera buena; en el ejemplo, 0.662.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Los grupos no son subespecies</div>
+    <p>Un grupo ambiental reúne sitios con clima parecido, no linajes. Puede coincidir con una subespecie —y entonces es un resultado interesante— o cruzarla por completo. Antes de darle nombre biológico a un grupo, mira dónde cae en el mapa y qué taxones contiene: la app permite colorear el mapa del Bloque 4 por grupo.</p>
+  </div>
+
+  <!-- 8.4 -->
+  <h2 id="b8-4"><span class="num">8.4</span>Análisis de correspondencias</h2>
+  <p>Mientras el ACP trabaja con variables continuas, el análisis de correspondencias trabaja con <b>tablas de conteos</b>: taxón × tipo de clima de Köppen, taxón × estado, grupo × clase de suelo. Responde a preguntas del tipo «¿qué subespecie está asociada a qué clima?», y las dibuja en un mapa donde la cercanía entre una fila y una columna significa asociación.</p>
+  <p>Con el ejemplo, la tabla taxón × Köppen confirma lo que ya sugería el Bloque 5: la especie en sentido amplio se concentra en el clima árido de estepa frío, mientras los infrataxones del centro-oriente aparecen asociados a los climas templados con invierno seco.</p>
+
+  <!-- 8.5 -->
+  <h2 id="b8-5"><span class="num">8.5</span>El área de distribución</h2>
+  <p>Tres medidas describen el área que ocupa la especie, y las tres se usan en evaluaciones de riesgo.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b8-eco.png" alt="Tarjetas de vecino más cercano, patrón espacial, Z y EOO, y las tablas de extensión de presencia y área de ocupación a varios tamaños de celda"></div>
+    <figcaption><b>Figura 8.5.</b> Las métricas del área en el ejemplo. La app calcula el área de ocupación a cuatro tamaños de celda y marca cuál es el de las listas rojas, porque el número <b>depende por completo</b> de la celda que se elija.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.55in">Métrica</th><th>Qué es y cómo se lee</th></tr></thead>
+    <tbody>
+      <tr><td><b>Extensión de la presencia (EOO)</b></td><td>El área del polígono convexo mínimo que envuelve todos los registros. Mide la <i>amplitud</i> geográfica, no el hábitat ocupado: incluye ciudades, mares y desiertos que hay entre las poblaciones. En el ejemplo, <b>2,797,094 km²</b>.</td></tr>
+      <tr><td><b>Área de ocupación (AOO)</b></td><td>La suma del área de las celdas que contienen al menos un registro. En el ejemplo: 1,258 km² con celdas de 1 km, <b>4,304 km² con celdas de 2 km</b> —el tamaño que usan las listas rojas—, 13,952 km² con 4 km y 59,200 km² con 10 km.</td></tr>
+      <tr><td><b>Vecino más cercano (R)</b></td><td>El índice de Clark y Evans: 1 significa distribución al azar, menos de 1 agregada, más de 1 regular. En el ejemplo vale <b>0.210</b> con Z = −65.7: fuertemente agregada.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Dos advertencias antes de citar estos números</div>
+    <p><b>El AOO depende del muestreo tanto como de la especie.</b> Una especie bien colectada tiene más celdas ocupadas que una igual de extendida pero poco colectada. Los umbrales de las listas rojas (AOO &lt; 2,000 km², EOO &lt; 20,000 km² para «vulnerable») están pensados para inventarios completos, y un umbral por sí solo <b>no asigna una categoría</b>: los criterios exigen además fragmentación, declive o fluctuación.</p>
+    <p><b>La agregación también mide esfuerzo.</b> Un R de 0.21 dice que los puntos están muy amontonados, pero parte de ese amontonamiento son colectas repetidas junto a carreteras y en sierras bien estudiadas. Depurar duplicados (Bloque 3) mejora la estimación; eliminarla del todo es imposible con datos de herbario.</p>
+  </div>
+
+  <!-- 8.6 -->
+  <h2 id="b8-6"><span class="num">8.6</span>Amplitud y solapamiento de nicho</h2>
+  <p>La <b>amplitud de nicho</b> de Levins mide, variable por variable, si la especie usa un rango estrecho o amplio de condiciones respecto al disponible; su versión estandarizada va de 0 a 1 y permite comparar variables entre sí. El <b>solapamiento</b> —D de Schoener e I de Hellinger, también de 0 a 1— compara el nicho de dos taxones o de dos grupos: cuánto comparten del espacio ambiental.</p>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/b8-nicho.png" alt="Figura del espacio ambiental con la densidad de los registros"></div>
+    <figcaption><b>Figura 8.6.</b> El nicho en el espacio ambiental. Cuando hay dos o más taxones con registros suficientes, la app calcula además el solapamiento entre sus nubes.</figcaption>
+  </figure>
+
+  <!-- 8.7 -->
+  <h2 id="b8-7"><span class="num">8.7</span>Diversidad</h2>
+  <p>La última sección aplica el instrumental clásico de diversidad de comunidades —Shannon, Simpson, números de Hill, rarefacción, diversidad beta— a la tabla de registros, tomando como «sitios» celdas de una rejilla, bandas de altitud, estados o los grupos del agrupamiento.</p>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Lee esto antes de interpretar nada</div>
+    <p>En una colección de registros de presencia, <b>el número de registros de un taxón mide esfuerzo de muestreo</b>, no abundancia. Una especie con 800 registros no es más abundante que una con 80: puede estar mejor colectada, ser más llamativa o vivir junto a una carretera. Los índices de diversidad se calcularon para comunidades muestreadas con esfuerzo comparable, y aquí se aplican a datos que no cumplen ese supuesto.</p>
+    <p>Sirven, con dos condiciones: que compares <b>sitios con esfuerzo parecido</b> —o que uses rarefacción para igualarlo—, y que digas en el texto qué estás midiendo. Con los datos del ejemplo, lo que se mide es la diversidad de <b>infrataxones</b> del piñonero, no la de una comunidad vegetal.</p>
+  </div>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El ejemplo, con 31 sitios</div>
+    <p>Con celdas de rejilla como sitios, el ejemplo da <b>31 sitios × 7 taxones</b> y 1,867 registros. La riqueza observada del conjunto es <b>7</b>, la estimada por Chao1 también <b>7.0</b> y la cobertura de muestra <b>99.95 %</b>: se colectó prácticamente todo lo que había que colectar, lo cual era previsible porque los «taxones» son los infrataxones descritos de una sola especie.</p>
+    <p>El índice de Shannon del conjunto es <b>0.231</b> y el de Simpson (1 − D) <b>0.083</b>: valores muy bajos, porque un taxón —la especie en sentido estricto, con 2,281 de los registros originales— domina por completo. En una comunidad vegetal real esos números indicarían un problema; aquí describen exactamente la situación.</p>
+  </div>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b8-rarefaccion.png" alt="Curvas de rarefacción por individuos de ocho sitios, con bandas de confianza y la parte extrapolada en línea de puntos"></div>
+    <figcaption><b>Figura 8.7.</b> Rarefacción por individuos. Cada curva dice cuántos taxones se habrían encontrado con <i>m</i> registros: así se comparan sitios con esfuerzo desigual. La parte punteada es extrapolación, y la banda, el intervalo de confianza. La curva negra es el conjunto completo.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b8-rangoabundancia.png" alt="Curva de rango-abundancia de los taxones, en escala logarítmica"></div>
+    <figcaption><b>Figura 8.8.</b> La curva de rango-abundancia. Una caída muy pronunciada, como esta, es la firma de un conjunto dominado por un solo taxón.</figcaption>
+  </figure>
+
+  <p>La app calcula además la <b>diversidad beta</b> entre sitios —Jaccard, Sørensen, Bray-Curtis y Morisita-Horn— con la partición en recambio y anidamiento, y ordena los sitios por composición con PCoA y NMDS. Todas las tablas y figuras se descargan en CSV y en imagen.</p>
+
+  <!-- 8.8 -->
+  <h2 id="b8-8"><span class="num">8.8</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>«Prepara los datos primero»</td><td>Los métodos de este bloque necesitan la matriz estandarizada. Pulsa <span class="ui">Preparar datos →</span> arriba del todo.</td></tr>
+      <tr><td>El ACP no separa nada</td><td>Si los dos primeros ejes reúnen poca varianza, las variables no están muy correlacionadas: es un resultado, no un error. Mira más dimensiones en la tabla de valores propios.</td></tr>
+      <tr><td>La silueta es baja en todos los <i>k</i></td><td>Los datos son un continuo, no grupos. Es frecuente con variables climáticas. Informa la silueta y no fuerces una partición.</td></tr>
+      <tr><td>El AOO cambia muchísimo con la celda</td><td>Es esperado y hay que decirlo: reporta siempre el tamaño de celda junto al número, y usa 2 km si vas a comparar con criterios de listas rojas.</td></tr>
+      <tr><td>Shannon sale casi cero</td><td>Un taxón domina. Con registros de una sola especie y sus infrataxones, eso es lo normal.</td></tr>
+      <tr><td>La rarefacción de un sitio es una línea plana</td><td>Ese sitio tiene un solo taxón: no hay nada que rarefactar.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

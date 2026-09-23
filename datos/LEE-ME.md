@@ -1,82 +1,73 @@
-# Datos para el Bloque B (variables ambientales)
+# Datos ráster / Raster data
 
-El Bloque A (búsqueda GBIF, filtros, depuración, mapa) **no necesita ninguna descarga**.
+## Ejemplo incluido / Bundled example
 
-## Ya incluido (datos de ejemplo)
+El ejemplo (*Pinus cembroides*) **no necesita esta carpeta**: sus registros van en `js/example-records.js` y sus
+capas (WorldClim a 10 arc-min y Köppen-Geiger recortados a lon −122° a −86°, lat 13° a 40°: todo México, la península
+de Yucatán incluida) en
+`js/example-rasters.js`. Por eso funciona con doble clic en `index.html`. En el paso 1 pulsa **«Usar registros de
+ejemplo»** y en el paso 5 **«Usar las capas de ejemplo»**.
 
-Esta carpeta **ya trae** un juego de datos de baja resolución para probar todo el flujo
-de inmediato, sin descargar nada:
+*The example needs nothing from this folder: its records are in `js/example-records.js` and its layers (WorldClim at
+10 arc-minutes and Köppen-Geiger, cropped to lon −122° to −86°, lat 13° to 40°, which covers the whole of Mexico) in
+`js/example-rasters.js`, so it works
+by double-clicking `index.html`.*
 
-- `worldclim/wc2.1_10m_bio_1.tif` … `bio_19.tif` + `wc2.1_10m_elev.tif`  (WorldClim 2.1 a
-  10 arc-min ≈ 18 km)
-- `koppen/Beck_KG_V1_present_0p0083.tif`  (Köppen-Geiger a 1 km, Beck et al. 2018)
+## Contenido de esta carpeta / What is here
 
-En el paso 5 pulsa **«Usar los datos de ejemplo incluidos»** (requiere abrir la app con
-`servidor.ps1`). Cuando tengas los de 30 arc-seg, ponlos en `worldclim/` y usa el botón
-de seleccionar carpeta en su lugar.
+- `worldclim/wc2.1_10m_bio_1.tif` … `bio_19.tif` y `wc2.1_10m_elev.tif` — WorldClim 2.1, 10 arc-min ≈ 18 km, mundo completo.
+- `koppen/Beck_KG_V1_present_0p0083.tif` — Köppen-Geiger a 1 km (Beck et al. 2018), mundo completo.
 
-## Para la versión final (30 arc-seg ≈ 1 km)
+Sirven para probar el selector de carpeta del paso 5 con archivos reales, o para estudios de baja resolución.
+*They let you try the folder picker of step 5 with real files, or run low-resolution studies.*
 
-## 1. WorldClim 2.1 — variables bioclimáticas y altitud
+## Para un estudio real (30 arc-seg ≈ 1 km) / For a real study
+
+### 1. WorldClim 2.1 — variables bioclimáticas y altitud
 
 Página oficial: https://www.worldclim.org/data/worldclim21.html
 
-Descarga (resolución 30 arc-segundos, ~1 km — es la que elegiste):
-
-- **Bioclim (19 capas):** https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_bio.zip
-  (varios GB — es normal que tarde)
+- **Bioclim (19 capas):** https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_bio.zip (varios GB)
 - **Altitud:** https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_30s_elev.zip
 
-Descomprime cada zip. Deberías obtener archivos como:
-`wc2.1_30s_bio_1.tif` … `wc2.1_30s_bio_19.tif` y `wc2.1_30s_elev.tif`.
+Descomprime cada zip (`wc2.1_30s_bio_1.tif` … `bio_19.tif`, `wc2.1_30s_elev.tif`) y en el paso 5 elige la carpeta o los
+archivos con los botones de selección. Puedes usar `2.5m`, `5m` o `10m` cambiando `30s` en la dirección.
+*Unzip each file and pick the folder or the files with the selection buttons of step 5. You can use `2.5m`, `5m` or
+`10m` by changing `30s` in the address.*
 
-Colócalos todos en:  `BioSDM/datos/worldclim/`
+### 2. Köppen-Geiger
 
-> Si el 30s resulta muy pesado o lento, puedes usar `2.5m`, `5m` o `10m`
-> (misma URL cambiando `30s` por `2.5m`, etc.). La app tiene un selector de resolución.
-
-## 2. Clima de Köppen-Geiger
-
-Beck et al. (2018), mapas a 1 km. Página del dataset (figshare):
+Beck et al. (2018), mapas a 1 km:
 https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959
 
-Descarga el archivo del **presente** (nombre tipo `Beck_KG_V1_present_0p0083.tif`,
-pesa pocos MB) y colócalo en:  `BioSDM/datos/koppen/`
+Descarga el archivo del **presente** (`Beck_KG_V1_present_0p0083.tif`). La leyenda (código → clase climática) viene en la app.
 
-La tabla de leyenda (código → clase climática, p. ej. 8 = "Csa: Mediterráneo cálido")
-ya viene incluida en la app.
+### 3. Suelo / Soil
 
-## 3. Tipo de suelo
+No hay que descargar nada: la app consulta la clasificación **WRB** de SoilGrids (ISRIC) por internet. Cada consulta
+tarda unos segundos, así que la app agrupa los puntos en celdas, guarda cada respuesta en la caché local del navegador
+(puedes parar y reanudar otro día) y el suelo es **opcional**.
+*Nothing to download: the app queries the SoilGrids WRB classification online, groups points into cells and caches each answer locally. Soil is optional.*
 
-No hace falta descargar nada: la app consulta la clasificación **WRB** de
-SoilGrids (ISRIC) por internet (`rest.isric.org/soilgrids/v2.0/classification/query`).
-Cada consulta tarda ~2–3 s en el servidor de ISRIC, así que para cientos de puntos
-**es lento** (puede ser 10–20 min). Por eso:
+### 4. Datos mensuales para el paso agroclimático / Monthly data for the agroclimatic step
 
-- La app **agrupa** los puntos en celdas (elige la rejilla; ~5 km por defecto).
-- Guarda cada respuesta en **caché local del navegador**: si paras y vuelves otro día,
-  reanuda sin repetir lo ya consultado.
-- El suelo es **opcional**; los bloques C y D funcionan sin él.
+El paso 10 (adaptación agroclimática) da todos sus índices cuando tiene los **datos mensuales**: temperatura mínima,
+máxima y precipitación de los 12 meses. De https://www.worldclim.org/data/worldclim21.html descarga, en la resolución
+que uses, los tres grupos: `wc2.1_<res>_tmin.zip`, `wc2.1_<res>_tmax.zip` y `wc2.1_<res>_prec.zip` (opcionales:
+`tavg`, `srad`, `wind`, `vapr`). Al descomprimir quedan 12 archivos por variable (`wc2.1_10m_tmin_01.tif` …
+`_12.tif`). Sin ellos el paso funciona con las 19 variables bioclimáticas, pero varios índices quedan como
+aproximaciones y otros se desactivan; la app lo indica.
 
-Puedes dejar la consulta corriendo en segundo plano mientras haces otra cosa.
+*Step 10 gives all its indices when it has the **monthly** layers: minimum and maximum temperature and precipitation for
+the 12 months (`wc2.1_<res>_tmin.zip`, `tmax`, `prec`; optionally `tavg`, `srad`, `wind`, `vapr`). Without them the step
+works from the 19 bioclimatic variables, but several indices become approximations and others are disabled; the app says so.*
 
-## 4. Escenarios climáticos futuros (opcional, para el paso 8)
+Para el futuro agroclimático, las proyecciones CMIP6 de WorldClim traen un archivo **de 12 bandas** por variable
+(una por mes), p. ej. `wc2.1_10m_tmin_ACCESS-CM2_ssp245_2041-2060.tif`. El paso 10 los lee tal cual.
 
-Para proyectar los modelos de distribución al futuro descarga de WorldClim (proyecciones CMIP6,
-https://www.worldclim.org/data/cmip6/cmip6climate.html) el archivo **de la misma resolución** que
-usas en el presente, p. ej. `wc2.1_10m_bioc_ACCESS-CM2_ssp245_2041-2060.tif`. Es **un solo archivo de
-19 bandas** (BIO1–BIO19). En el paso 8 → «Proyección a otro escenario» selecciónalo tal cual.
-La altitud no cambia: se conserva la del presente. Cuando uses 30 arc-seg el archivo futuro también
-debe ser de 30 arc-seg (misma malla) o, si no coincide, se re-muestrea por celda (más lento).
+### 5. Escenarios futuros (opcional, paso 9) / Future scenarios
 
-## Estructura final esperada
-
-```
-BioSDM/
-  datos/
-    worldclim/
-      wc2.1_30s_bio_1.tif  ...  wc2.1_30s_bio_19.tif
-      wc2.1_30s_elev.tif
-    koppen/
-      Beck_KG_V1_present_0p0083.tif
-```
+De WorldClim (proyecciones CMIP6, https://www.worldclim.org/data/cmip6/cmip6climate.html) descarga el archivo **de la
+misma resolución** que usas en el presente, p. ej. `wc2.1_10m_bioc_ACCESS-CM2_ssp245_2041-2060.tif` (un solo archivo de
+19 bandas). En el paso 9 → «Proyección a otro escenario» selecciónalo tal cual. La altitud no cambia.
+*Download the file of the same resolution as your present layers (one 19-band file) and select it in step 9 → «Projection to another scenario».*

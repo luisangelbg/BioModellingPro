@@ -1,13 +1,13 @@
-# Configuración local de Claude Code (rutas absolutas de esta máquina, no aplica a otros equipos)
+# Local Claude Code configuration (absolute paths of this machine)
 .claude/
 
-# Basura del sistema operativo
+# Operating-system files
 Thumbs.db
 desktop.ini
 .DS_Store
 
-# Por si algún día se prueba con datos WorldClim de 30 arc-seg localmente sin subirlos
+# Full-resolution WorldClim files, if tried locally without uploading them
 datos/worldclim_30s/
 
-# archivos temporales de prueba
+# Temporary test files
 _test/

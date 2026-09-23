@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 3 · Depuración de coordenadas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 72%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 14%; margin-right: 14%; }
+  table.reglas td:first-child { font-weight: 600; color: var(--negro); }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b3" data-pestana="3" data-orden="4" style="--acento: var(--b3)">
+  <div class="cap-apertura">
+    <div class="cap-num">3</div>
+    <div class="cap-etiqueta">Bloque 3 · La higiene de los datos</div>
+    <h1>Depuración de coordenadas</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Nueve reglas que buscan los errores típicos de una base de biodiversidad, con su conteo antes de aplicarlas y un reporte de antes y después. Ninguna borra nada sin que tú lo decidas.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>3.1</b>Por qué depurar</li>
+      <li><b>3.2</b>Las nueve reglas</li>
+      <li><b>3.3</b>Los tres parámetros</li>
+      <li><b>3.4</b>Reglas informativas</li>
+      <li><b>3.5</b>El reporte de antes y después</li>
+      <li><b>3.6</b>Lo que la depuración no hace</li>
+      <li><b>3.7</b>Qué descargar</li>
+      <li><b>3.8</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 3.1 -->
+  <h2 id="b3-1"><span class="num">3.1</span>Por qué depurar</h2>
+  <p class="lead">Las bases de biodiversidad acumulan dos siglos de trabajo hecho con medios muy distintos: etiquetas manuscritas, localidades escritas de memoria, georreferenciación posterior a partir de un texto, digitalización con prisa. Los errores que resultan no son aleatorios: se repiten con las mismas formas, y por eso se pueden buscar con reglas.</p>
+  <p>Lo que está en juego no es la estética del mapa. Un registro con la coordenada del centro del país mete en el modelo un clima que la especie nunca ocupó; cincuenta registros duplicados en el mismo árbol le dicen al algoritmo que ese clima es cincuenta veces más importante que los demás; un ejemplar cultivado en un jardín europeo ensancha el nicho hasta volverlo irreconocible.</p>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Los duplicados pesan</div>
+    <p>Un modelo de solo presencia aprende del contraste entre dónde <i>hay</i> registros y cómo es el ambiente en general. Si un sitio aparece cincuenta veces —porque cincuenta personas fotografiaron el mismo árbol junto al mirador— el modelo entiende que ese ambiente es cincuenta veces más frecuente de lo que es. Quitar duplicados no es limpieza cosmética: es evitar que el esfuerzo de muestreo se disfrace de preferencia ecológica.</p>
+  </div>
+
+  <!-- 3.2 -->
+  <h2 id="b3-2"><span class="num">3.2</span>Las nueve reglas</h2>
+  <p>Cada regla se activa o se desactiva por separado y muestra <b>cuántos registros marcaría</b> antes de que apliques nada. Ese conteo en vivo es la parte útil: ver que una regla marca 400 registros te obliga a entender por qué antes de borrarlos.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b3-reglas.png" alt="Las nueve reglas de depuración con sus casillas, su descripción y el número de registros que marca cada una, más los tres parámetros y el botón de aplicar"></div>
+    <figcaption><b>Figura 3.1.</b> Las nueve reglas con los conteos del ejemplo. Las tres marcadas como <span class="ui">informativa</span> vienen apagadas: señalan registros sospechosos sin eliminarlos.</figcaption>
+  </figure>
+
+  <table class="compacta reglas">
+    <thead><tr><th style="width:1.75in">Regla</th><th>Qué busca y cuándo desactivarla</th></tr></thead>
+    <tbody>
+      <tr><td>Coordenadas ausentes o fuera de rango</td><td>Latitud o longitud vacía, con texto, o imposible (|lat| &gt; 90, |lon| &gt; 180). No hay razón para desactivarla.</td></tr>
+      <tr><td>Coordenada (0, 0)</td><td>El «punto nulo» en el golfo de Guinea, que aparece cuando un programa escribe ceros en lugar de dejar el campo vacío.</td></tr>
+      <tr><td>Latitud ≈ longitud</td><td>Los dos valores casi idénticos y lejos de cero: el patrón que deja copiar una celda sobre la otra. Como puede ocurrir de verdad en una franja diagonal del planeta, la app la deja como informativa.</td></tr>
+      <tr><td>Issues geoespaciales de GBIF</td><td>Las banderas del propio GBIF: país que no concuerda con la coordenada, coordenada presuntamente intercambiada, y otras. Informativa, porque algunas banderas son inofensivas.</td></tr>
+      <tr><td>Duplicados exactos de coordenada</td><td>Registros con la misma latitud y longitud, hasta el último decimal. Conserva el primero. Es la regla que más registros suele quitar.</td></tr>
+      <tr><td>Duplicados por redondeo</td><td>Registros que coinciden al redondear a N decimales: el mismo árbol registrado con precisiones distintas. Con 4 decimales, «el mismo sitio» son unos 11 m.</td></tr>
+      <tr><td>Baja precisión</td><td>Incertidumbre declarada mayor al umbral, o coordenadas con dos decimales o menos —que ya son más de un kilómetro—. Informativa porque su umbral depende de la resolución de tus capas.</td></tr>
+      <tr><td>Centroide de país</td><td>Puntos a menos de unos 10 km del centro geográfico del país indicado: la marca clásica del registro georreferenciado «a nivel país».</td></tr>
+      <tr><td>Valores atípicos espaciales</td><td>Registros cuya distancia al centro de la nube de puntos supera k veces el rango intercuartílico, <b>calculado por taxón</b>. Detecta lo que está lejos de donde está todo lo demás.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3 -->
+  <h2 id="b3-3"><span class="num">3.3</span>Los tres parámetros</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">Parámetro</th><th>Qué cambia</th></tr></thead>
+    <tbody>
+      <tr><td><b>Decimales</b> para duplicados por redondeo<br><span class="small">por omisión 4</span></td><td>Define qué tan cerca es «el mismo sitio»: 4 decimales ≈ 11 m, 3 ≈ 110 m, 2 ≈ 1.1 km. Con capas de 1 km tiene sentido bajar a 2; con capas de 18 km, como las del ejemplo, el adelgazado por celda del Bloque 9 hace mejor ese trabajo.</td></tr>
+      <tr><td><b>Umbral de incertidumbre</b><br><span class="small">por omisión 10,000 m</span></td><td>A partir de qué incertidumbre declarada un registro se considera de baja precisión. Una regla sensata: que el umbral no sea mayor que el tamaño de celda de tus capas.</td></tr>
+      <tr><td><b>Factor k</b> de atípicos<br><span class="small">por omisión 3</span></td><td>Cuántos rangos intercuartílicos de distancia se toleran. Bajarlo a 1.5 marca mucho más —y empieza a marcar poblaciones reales—; subirlo a 5 deja pasar casi todo.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.4 -->
+  <h2 id="b3-4"><span class="num">3.4</span>Reglas informativas: marcar sin borrar</h2>
+  <p>Tres reglas vienen apagadas a propósito. No es que importen menos: es que su decisión depende de tu estudio. Un registro con 5 km de incertidumbre es basura para un modelo a 1 km y perfectamente utilizable para uno a 18 km. La app te dice cuántos son y tú decides.</p>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Nunca borres sin mirar</div>
+    <p>Un valor atípico espacial puede ser un error… o la población disyunta más interesante de tu estudio. Antes de aplicar la regla, pasa al mapa del Bloque 4 y mira dónde están los puntos marcados. Si son poblaciones reales, desactiva la regla y quita a mano los registros que sí sean errores. El manual insiste: las reglas proponen, el investigador dispone.</p>
+  </div>
+
+  <!-- 3.5 -->
+  <h2 id="b3-5"><span class="num">3.5</span>El reporte de antes y después</h2>
+  <p>Al pulsar <span class="ui">Aplicar depuración →</span> aparece el reporte: cuántos entraron, cuántos quedaron, cuántos se fueron y por cuál regla.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b3-reporte.png" alt="Reporte de depuración con las tarjetas de entraron 2,400, depurados 1,885, descartados 515 y 78.5 % conservado, y la tabla de reglas con los registros descartados por cada una"></div>
+    <figcaption><b>Figura 3.2.</b> El reporte del ejemplo. La tabla es la que hay que copiar a la sección de métodos: dice exactamente qué se aplicó y qué costó cada regla.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El ejemplo, regla por regla</div>
+    <p>Con las reglas de fábrica, los 2,400 registros del piñonero quedan en <b>1,885</b> (78.5 % conservado). Los 515 que salen son: <b>407</b> duplicados exactos de coordenada, <b>97</b> duplicados por redondeo a cuatro decimales y <b>11</b> valores atípicos espaciales. Las demás reglas no marcaron nada: no hay coordenadas imposibles, ni (0, 0), ni centroides de país.</p>
+    <p>Las reglas informativas señalaron además <b>103</b> registros de baja precisión, que se conservaron. A 18 km de celda no estorban; con capas de 1 km convendría revisarlos.</p>
+  </div>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Los once atípicos, uno por uno</div>
+    <p>Vale la pena ver quiénes son los 11 registros que quitó la regla de atípicos, porque explican para qué sirve:</p>
+    <ul>
+      <li><b>Nueve son árboles cultivados fuera de América</b>: seis en Nueva Zelanda, dos en Francia y uno en Austria. La regla los encontró sin saber nada de países ni de cultivos: simplemente están lejísimos del resto de la nube.</li>
+      <li><b>Uno está en (23.000, −102.000)</b>, grados exactos, en pleno Zacatecas. Es un registro de <i>Pinus cembroides</i> subsp. <i>orizabensis</i>, cuyos otros 65 registros están en Puebla (38), Veracruz (19), Tlaxcala (5), San Luis Potosí (3) y Querétaro (1). Una coordenada de grados redondos, a cientos de kilómetros de su población, es un marcador de posición que alguien nunca corrigió.</li>
+      <li><b>El último</b> es otro <i>orizabensis</i>, en el límite de Guanajuato y Querétaro, también fuera del área del subtaxón.</li>
+    </ul>
+    <p>Que la regla trabaje <b>por taxón</b> es lo que permite el segundo hallazgo: (23, −102) está dentro del rango de la especie, pero muy lejos del de su subespecie.</p>
+  </div>
+
+  <!-- 3.6 -->
+  <h2 id="b3-6"><span class="num">3.6</span>Lo que la depuración no hace</h2>
+  <ul>
+    <li><b>No revisa identificaciones.</b> Si alguien confundió dos pinos, el registro tiene una coordenada perfecta y un nombre equivocado, y ninguna regla geográfica lo detecta. Eso solo se arregla revisando ejemplares o confiando en fuentes.</li>
+    <li><b>No corrige el sesgo de muestreo.</b> Quitar duplicados exactos ayuda, pero la acumulación de registros junto a las carreteras sigue ahí. El adelgazado a una presencia por celda se hace en el Bloque 9, y ahí se explica.</li>
+    <li><b>No juzga la antigüedad.</b> Si te interesa el clima reciente, filtra por año en el Bloque 2.</li>
+    <li><b>No decide por ti.</b> Todo lo que hace queda registrado en la tabla del reporte, y el conjunto crudo sigue disponible para descargar.</li>
+  </ul>
+
+  <!-- 3.7 -->
+  <h2 id="b3-7"><span class="num">3.7</span>Qué descargar</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.8in">Archivo</th><th>Para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">⬇ CSV crudo</span></td><td>Todo lo descargado, sin filtrar ni depurar. Es tu respaldo: guárdalo junto con la fecha de la consulta.</td></tr>
+      <tr><td><span class="ui">⬇ CSV depurado</span></td><td>El conjunto con el que trabajarán los bloques siguientes. Es lo que se anexa como material suplementario de un artículo.</td></tr>
+      <tr><td><span class="ui">⬇ GeoJSON depurado</span></td><td>Los mismos puntos como capa geográfica, para abrirlos en un programa de mapas.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.8 -->
+  <h2 id="b3-8"><span class="num">3.8</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>Se va más de la mitad de los registros</td><td>Casi siempre son duplicados exactos, y casi siempre está bien. Revisa la tabla del reporte: si el grueso salió por duplicados, tu conjunto tenía muchas observaciones del mismo sitio.</td></tr>
+      <tr><td>La regla de atípicos marca poblaciones que sabes reales</td><td>Sube el factor k, o desactívala y quita a mano lo que sí sea error. Con especies de distribución disyunta —las de sierras aisladas— conviene revisarla siempre.</td></tr>
+      <tr><td>Todos los conteos son cero</td><td>Tus datos ya venían limpios, o estás depurando un conjunto propio pequeño. No es un error.</td></tr>
+      <tr><td>Quedan menos registros de los que necesitas</td><td>Vuelve al Bloque 2 y amplía el área o el periodo antes de bajar la exigencia de la depuración.</td></tr>
+      <tr><td>Quiero saber cuáles se fueron</td><td>Descarga el CSV crudo y el depurado y compáralos por el identificador del registro: la diferencia son los descartados.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Para la sección de métodos</div>
+    <p>Una frase basta, y con estos datos se escribe sola: «De los 2,400 registros descargados de GBIF se eliminaron 407 duplicados exactos de coordenada, 97 duplicados a cuatro decimales y 11 valores atípicos espaciales (k = 3, por taxón), para un conjunto final de 1,885 registros».</p>
+  </div>
+</section>
+
+</body>
+</html>

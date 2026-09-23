@@ -1,0 +1,86 @@
+/* BioModelling Pro — interpretation help: the little question-mark badge, its popover and the
+   reading scales. Every colour is a token of the main stylesheet, so light and dark themes follow
+   on their own and nothing here needs to be redrawn when the theme changes. */
+
+/* ---------- the badge ---------- */
+.help-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; min-width: 16px; padding: 0; margin: 0 0 0 5px;
+  border: 1px solid var(--border-strong); border-radius: 50%;
+  background: var(--bg-soft); color: var(--text-muted);
+  font: 600 10.5px/1 system-ui, sans-serif; cursor: pointer;
+  vertical-align: middle; transition: background-color .15s, color .15s, border-color .15s;
+}
+.help-badge:hover, .help-badge:focus-visible { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+.help-badge:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.help-badge[aria-expanded="true"] { background: var(--primary); color: var(--card-bg); border-color: var(--primary); }
+th .help-badge, .stat-label .help-badge { margin-left: 4px; }
+.stat-tile .stat-label { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+
+/* ---------- the popover ---------- */
+.help-pop {
+  position: fixed; z-index: 1200; width: min(360px, calc(100vw - 24px)); max-height: min(70vh, 560px);
+  overflow: auto; overscroll-behavior: contain;
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: 12px;
+  box-shadow: var(--shadow); padding: 14px 16px 12px;
+  font-size: .87rem; line-height: 1.5;
+}
+.help-pop:focus { outline: none; }
+.help-pop h4 { margin: 0 24px 6px 0; font-size: .98rem; letter-spacing: -.2px; }
+.help-pop p { margin: 6px 0; }
+.help-pop .help-close {
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; padding: 0;
+  border: 0; border-radius: 6px; background: transparent; color: var(--text-muted);
+  font-size: 15px; line-height: 1; cursor: pointer;
+}
+.help-pop .help-close:hover { background: var(--bg-soft); color: var(--text); }
+.help-pop .help-lead { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--text-muted); margin: 10px 0 2px; }
+.help-pop .help-formula { font-family: var(--mono); font-size: .8rem; background: var(--bg-soft); border-radius: 7px; padding: 5px 8px; margin: 6px 0; overflow-x: auto; }
+.help-pop .help-care { border-left: 3px solid var(--warning); padding-left: 9px; margin: 8px 0 4px; color: var(--text); }
+.help-pop .help-ref { color: var(--text-muted); font-size: .8rem; margin: 8px 0 0; }
+.help-pop .help-conv { color: var(--text-muted); font-size: .78rem; margin: 4px 0 0; font-style: italic; }
+
+/* on a narrow screen the popover becomes a sheet at the bottom */
+@media (max-width: 560px) {
+  .help-pop { left: 8px !important; right: 8px; top: auto !important; bottom: 8px; width: auto; max-height: 72vh; }
+}
+
+/* ---------- the scale ---------- */
+.help-scale { margin: 6px 0 2px; }
+.help-bands { display: flex; width: 100%; border-radius: 7px; overflow: hidden; border: 1px solid var(--border); }
+.help-band { min-width: 0; padding: 4px 5px; font-size: .68rem; line-height: 1.25; text-align: center; color: var(--text); border-right: 1px solid var(--card-bg); }
+.help-band:last-child { border-right: 0; }
+.help-band b { display: block; font-weight: 700; font-size: .7rem; }
+.help-band span { display: block; opacity: .85; }
+.help-t-good { background: color-mix(in srgb, var(--success) 26%, var(--card-bg)); }
+.help-t-ok { background: color-mix(in srgb, var(--primary) 20%, var(--card-bg)); }
+.help-t-warn { background: color-mix(in srgb, var(--warning) 26%, var(--card-bg)); }
+.help-t-bad { background: color-mix(in srgb, var(--danger) 24%, var(--card-bg)); }
+.help-t-neutral { background: var(--bg-soft); }
+.help-marks { margin: 6px 0 0; padding-left: 16px; font-size: .82rem; }
+.help-marks li { margin: 2px 0; }
+.help-marks code { background: var(--bg-soft); }
+
+/* ---------- the "interpretation guide" block ---------- */
+.help-guide .acc-body { padding-bottom: 6px; }
+.help-entry { border-top: 1px solid var(--border); padding: 10px 0 8px; }
+.help-entry:first-child { border-top: 0; padding-top: 2px; }
+.help-entry h4 { margin: 0 0 3px; font-size: .95rem; }
+.help-entry p { margin: 4px 0; font-size: .89rem; }
+.help-entry .help-lead { font-size: .66rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--text-muted); margin: 8px 0 2px; }
+.help-entry .help-formula { font-family: var(--mono); font-size: .79rem; background: var(--bg-soft); border-radius: 7px; padding: 4px 8px; margin: 5px 0; overflow-x: auto; }
+.help-entry .help-care { border-left: 3px solid var(--warning); padding-left: 9px; margin: 6px 0 2px; }
+.help-entry .help-ref { color: var(--text-muted); font-size: .8rem; margin: 6px 0 0; }
+.help-entry .help-conv { color: var(--text-muted); font-size: .78rem; margin: 3px 0 0; font-style: italic; }
+.help-guide-grid { columns: 1; }
+
+/* ---------- the plain-language box at the top of a step ---------- */
+.help-intro {
+  background: var(--bg-soft); border: 1px solid var(--border); border-left: 3px solid var(--primary);
+  border-radius: 10px; padding: 12px 16px; margin: 0 0 18px; font-size: .92rem;
+}
+.help-intro p { margin: 0 0 6px; }
+.help-intro p:last-child { margin-bottom: 0; }
+.help-intro .help-intro-q { color: var(--text-muted); font-size: .86rem; }
+.help-intro .help-intro-q b { color: var(--text); }

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 10 · Adaptación agroclimática</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 66%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 17%; margin-right: 17%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+  table.idx td:first-child { font-weight: 600; color: var(--negro); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b10" data-pestana="10" data-orden="11" style="--acento: var(--b10)">
+  <div class="cap-apertura">
+    <div class="cap-num">10</div>
+    <div class="cap-etiqueta">Bloque 10 · Del nicho a la parcela</div>
+    <h1>Adaptación agroclimática de cultivos</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Los mismos datos climáticos, leídos con las preguntas de la agronomía: grados-día, heladas, horas frío, balance hídrico y duración del periodo de crecimiento, y con ellos la aptitud de un cultivo, su calendario de siembra y el factor que lo limita en cada celda.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>10.1</b>Este bloque no modela tu especie</li>
+      <li><b>10.2</b>Las capas mensuales</li>
+      <li><b>10.3</b>Los índices agroclimáticos</li>
+      <li><b>10.4</b>Aptitud de un cultivo</li>
+      <li><b>10.5</b>El factor limitante</li>
+      <li><b>10.6</b>El catálogo de cultivos</li>
+      <li><b>10.7</b>Comparar cultivos y análogos</li>
+      <li><b>10.8</b>Agroclima futuro</li>
+      <li><b>10.9</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 10.1 -->
+  <h2 id="b10-1"><span class="num">10.1</span>Este bloque no modela tu especie</h2>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Lo primero, para evitar una confusión muy común</div>
+    <p>Los nueve bloques anteriores hablan de <b>tu especie</b>. Este no. El Bloque 10 toma el mismo territorio y el mismo clima y responde una pregunta distinta: <b>¿qué cultivos podrían crecer aquí?</b> Si estás estudiando un pino y ves aparecer el maíz, no es un error: el maíz es simplemente el primer cultivo del catálogo. Elige el que te interese —hay más de sesenta— o escribe los requerimientos del tuyo.</p>
+    <p>Los dos usos naturales de este bloque son: evaluar el potencial agrícola de la región que ya cargaste, y comparar el nicho de una especie silvestre con la aptitud de un cultivo emparentado.</p>
+  </div>
+
+  <!-- 10.2 -->
+  <h2 id="b10-2"><span class="num">10.2</span>Las capas mensuales</h2>
+  <p>Los índices agroclimáticos se calculan <b>mes a mes</b>: necesitan temperatura mínima, máxima y precipitación de los doce meses —36 archivos de WorldClim, o archivos de doce bandas—. Se cargan igual que en el Bloque 5: por carpeta o por archivos.</p>
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Si no tienes capas mensuales</div>
+    <p>El botón <span class="ui">🌡 Usar las capas del paso 5</span> reconstruye un ciclo mensual aproximado a partir de las bioclimáticas que ya cargaste —temperatura media y extremos, estacionalidad, lluvia anual y por trimestres— y calcula con él un juego reducido de índices. La app marca esos índices como <b>aproximados</b> y explica el supuesto: el pico térmico se coloca en julio en el hemisferio norte. Sirve para explorar y para aprender; para un informe técnico, carga las capas mensuales de verdad.</p>
+  </div>
+
+  <!-- 10.3 -->
+  <h2 id="b10-3"><span class="num">10.3</span>Los índices agroclimáticos</h2>
+  <p>Con la malla leída, <span class="ui">Calcular índices →</span> produce 21 capas. Estas son las que más se usan:</p>
+  <table class="compacta idx">
+    <thead><tr><th style="width:1.85in">Índice</th><th>Qué mide y para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td>Grados-día (GDD)</td><td>La suma del calor disponible por encima de una temperatura base. Es la moneda con la que se compara si un ciclo de cultivo «cabe» en un sitio. No tiene escala universal: cada cultivar tiene su requerimiento.</td></tr>
+      <tr><td>Días y meses con helada</td><td>Cuántas veces la mínima baja de 0 °C. Determina qué cultivos son imposibles sin protección.</td></tr>
+      <tr><td>Periodo libre de heladas</td><td>Los días seguidos sin helada: la ventana real de siembra en zonas templadas.</td></tr>
+      <tr><td>Horas frío</td><td>Horas acumuladas en el rango frío del invierno. Los frutales caducifolios las necesitan para brotar; el requerimiento depende del cultivar, así que las cifras son indicativas.</td></tr>
+      <tr><td>Días de estrés por calor</td><td>Días por encima de umbrales críticos, que en muchos cultivos coinciden con la floración.</td></tr>
+      <tr><td>Evapotranspiración de referencia</td><td>Cuánta agua puede evaporar la atmósfera. Con la lluvia da el balance hídrico.</td></tr>
+      <tr><td>Déficit y excedente hídrico</td><td>Cuánta agua falta o sobra, mes a mes: la base de cualquier plan de riego.</td></tr>
+      <tr><td>Duración del periodo de crecimiento</td><td>Los días en que hay a la vez temperatura y humedad suficientes. Es el índice que mejor resume la aptitud agrícola general de una zona.</td></tr>
+      <tr><td>Índice de aridez y su clase</td><td>La razón entre lluvia y evapotranspiración, con las clases del Programa de las Naciones Unidas para el Medio Ambiente (hiperárido, árido, semiárido, subhúmedo seco, húmedo).</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b10-indice.png" alt="Mapa de la duración del periodo de crecimiento en México, recortado al país, con su leyenda en días"></div>
+    <figcaption><b>Figura 10.1.</b> La duración del periodo de crecimiento en todo México, calculada con las capas del ejemplo. Se reconoce de un vistazo el contraste entre el norte árido y el sureste húmedo. Cada índice se exporta como imagen, como GeoTIFF georreferenciado o como malla ASCII.</figcaption>
+  </figure>
+
+  <!-- 10.4 -->
+  <h2 id="b10-4"><span class="num">10.4</span>Aptitud de un cultivo</h2>
+  <p>El modelo de aptitud es una <b>envolvente</b>: para cada celda y para <b>cada posible mes de siembra</b>, compara lo que el cultivo necesita —temperatura óptima y límites letales, agua, horas frío, altitud— con lo que el sitio ofrece durante todo el ciclo, y se queda con el mejor mes.</p>
+
+  <figure class="media limpia">
+    <div class="marco"><img src="../img/b10-resumen.png" alt="Tarjetas de resumen de la aptitud: cultivo, ciclo usado, superficie apta, porcentaje de la región, aptitud media, mejor mes de siembra y limitante principal"></div>
+    <figcaption><b>Figura 10.2.</b> El resumen de la aptitud del maíz sobre México, con los índices aproximados derivados de las capas bioclimáticas del ejemplo.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b10-aptitud.png" alt="Mapa de aptitud continua del maíz en México"></div>
+    <figcaption><b>Figura 10.3.</b> La aptitud continua, de 0 a 1. Las zonas más aptas dibujan el centro y el sureste del país, y el norte árido queda con valores bajos.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El maíz en México, con los datos del ejemplo</div>
+    <p>Ciclo de 125 días, <b>1,524,020 km²</b> con aptitud ≥ 0.5 —el <b>48.2 %</b> de la región—, aptitud media de <b>0.470</b>, mejor mes de siembra <b>marzo</b> y limitante principal <b>agua insuficiente</b>. Son cifras calculadas con el ciclo mensual reconstruido, así que valen como ejercicio, no como recomendación técnica: con capas mensuales reales cambiarían, y el mes óptimo depende además del cultivar y del manejo.</p>
+  </div>
+
+  <!-- 10.5 -->
+  <h2 id="b10-5"><span class="num">10.5</span>El factor limitante</h2>
+  <p>Saber que una celda tiene aptitud 0.3 no dice qué hacer; saber <i>por qué</i>, sí. El mapa de factor limitante pinta, en cada celda, cuál de las condiciones es la que más restringe al cultivo en su mejor mes de siembra.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b10-limitante.png" alt="Mapa del factor limitante del maíz en México, con las clases sin limitante, temperatura baja, agua insuficiente y helada letal"></div>
+    <figcaption><b>Figura 10.4.</b> El factor limitante del maíz. El ocre del altiplano y del norte es <b>agua insuficiente</b>; el azul de las sierras altas y del norte de Chihuahua, <b>helada letal</b> o <b>temperatura baja</b>; el verde de la vertiente del Pacífico y del sureste, <b>sin limitante</b>. Cada color sugiere una decisión distinta: riego, fecha de siembra, o cambio de cultivar.</figcaption>
+  </figure>
+
+  <!-- 10.6 -->
+  <h2 id="b10-6"><span class="num">10.6</span>El catálogo de cultivos</h2>
+  <p>La app trae un catálogo de <b>más de sesenta cultivos</b> con sus rangos de referencia: temperatura mínima, óptima y máxima, límites letales, duración del ciclo, requerimiento de agua y de horas frío, y rango de altitud. Todo es editable: se pueden cambiar los valores de un cultivo, guardar el catálogo como archivo y volver a cargarlo en otra sesión o en otra computadora.</p>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Los valores del catálogo son indicativos</div>
+    <p>Son rangos publicados para la especie <i>en conjunto</i>, no para un cultivar concreto. Un maíz criollo de altura y un híbrido comercial de trópico bajo tienen requerimientos distintos, y el catálogo no puede saber cuál usas. Antes de tomar una decisión real, sustituye los valores por los de tu material: para eso el catálogo es editable, y la app exporta los parámetros que usó junto con los resultados.</p>
+  </div>
+
+  <!-- 10.7 -->
+  <h2 id="b10-7"><span class="num">10.7</span>Comparar cultivos y análogos</h2>
+  <ul>
+    <li><b>Comparación entre cultivos.</b> Calcula la aptitud de varios a la vez y dibuja el mapa del <b>mejor cultivo por celda</b>, más una tabla con la superficie apta de cada uno. Es la vista que responde «¿qué conviene sembrar aquí?».</li>
+    <li><b>Análogos climáticos.</b> Dado un sitio, busca las celdas con clima más parecido. Sirve para trasladar experiencia: si una variedad funciona en tal municipio, ¿dónde más debería funcionar?</li>
+  </ul>
+
+  <!-- 10.8 -->
+  <h2 id="b10-8"><span class="num">10.8</span>Agroclima futuro</h2>
+  <p>Con capas mensuales de un escenario futuro, el bloque repite todo el cálculo y entrega la <b>diferencia</b>: cuánto cambia cada índice, cuánta superficie apta se gana o se pierde, cómo se desplaza el calendario de siembra y qué factor pasa a ser limitante. Es la pregunta que más interesa a quien planea: no «cómo será el clima», sino «qué tendré que cambiar».</p>
+  <p>Valen las mismas advertencias del capítulo 9: los escenarios son proyecciones con incertidumbre, conviene usar más de un modelo climático y mirar dónde el clima futuro se sale del rango conocido.</p>
+
+  <!-- 10.9 -->
+  <h2 id="b10-9"><span class="num">10.9</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>Aparece el maíz aunque estudias otra especie</td><td>Es el primer cultivo del catálogo, no una predicción sobre tu especie (sección 10.1). Elige otro en la lista.</td></tr>
+      <tr><td>Los índices salen marcados como «aproximados»</td><td>Se derivaron de las capas bioclimáticas porque no hay capas mensuales. Para un informe técnico, carga las 36 capas mensuales.</td></tr>
+      <tr><td>El mapa no cubre todo el país</td><td>Igual que en el Bloque 9: revisa la extensión elegida y vuelve a leer la malla climática. La app dice qué recuadro usó.</td></tr>
+      <tr><td>Las horas frío salen en cero en todo el mapa</td><td>Con el ciclo mensual reconstruido, las horas frío son el índice más frágil. Necesitan capas mensuales reales.</td></tr>
+      <tr><td>La superficie apta cambia mucho al tocar un parámetro</td><td>Es lo esperado en un modelo de envolvente: el resultado es tan bueno como los rangos del catálogo. Documenta los que usaste.</td></tr>
+      <tr><td>El pH del suelo se reporta pero no se aplica</td><td>La app lo advierte: no hay capa de pH, así que ese requerimiento queda fuera del cálculo.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

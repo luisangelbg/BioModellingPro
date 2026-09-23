@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 4 · El mapa de registros</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 74%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 13%; margin-right: 13%; }
+  .pest { font-family: var(--sans); font-size: 0.82em; font-weight: 500; color: var(--b4); border: 1px solid #e7d3ae; background: #fdf7ec; border-radius: 4px; padding: 0.02em 0.42em; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b4" data-pestana="4" data-orden="5" style="--acento: var(--b4)">
+  <div class="cap-apertura">
+    <div class="cap-num">4</div>
+    <div class="cap-etiqueta">Bloque 4 · Ver para creer</div>
+    <h1>El mapa de registros y el estudio de mapas</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">El primer mapa sirve para dos cosas distintas: revisar los datos con los ojos, y producir la figura que acabará en el artículo. El estudio de mapas hace las dos, y exporta a la resolución y al formato que pida la revista.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>4.1</b>El mapa como control de calidad</li>
+      <li><b>4.2</b>Lo que muestra el mapa</li>
+      <li><b>4.3</b>El estudio de mapas</li>
+      <li><b>4.4</b>Exportar para publicar</li>
+      <li><b>4.5</b>La vista previa y el recorte</li>
+      <li><b>4.6</b>Qué necesita un mapa publicable</li>
+      <li><b>4.7</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 4.1 -->
+  <h2 id="b4-1"><span class="num">4.1</span>El mapa como control de calidad</h2>
+  <p class="lead">Ninguna regla automática ve lo que ve un ojo entrenado en treinta segundos de mapa. Antes de extraer una sola variable ambiental, conviene mirar los puntos y hacerse cinco preguntas.</p>
+  <ol class="pasos">
+    <li><b>¿Hay puntos en el mar?</b> Una coordenada en el océano, a pocos kilómetros de la costa, casi siempre es un registro costero mal georreferenciado; lejos de la costa, es un error de signo o de transcripción.</li>
+    <li><b>¿La distribución tiene la forma que esperas?</b> El piñonero debe dibujar las dos Sierras Madre. Si aparece una nube uniforme sobre el altiplano, algo está mal.</li>
+    <li><b>¿Hay alineaciones sospechosas?</b> Puntos en fila sobre una carretera son registros de camino: legítimos, pero muestran dónde se colecta, no dónde vive la especie.</li>
+    <li><b>¿Hay un punto solitario muy lejos?</b> Un jardín botánico, un ejemplar cultivado, o —a veces— el hallazgo más interesante del estudio.</li>
+    <li><b>¿Los subtaxones están donde deben?</b> Colorear por taxón revela de un vistazo una subespecie en el lugar equivocado.</li>
+  </ol>
+
+  <figure>
+    <div class="marco"><img src="../img/b4-mapa.png" alt="Mapa de los 1,885 registros depurados del piñonero sobre el norte de México y el suroeste de Estados Unidos, coloreados por taxón, con leyenda, escala, rosa de los vientos y retícula de coordenadas"></div>
+    <figcaption><b>Figura 4.1.</b> Los 1,885 registros depurados del ejemplo, exportados con el estudio de mapas. Se ven las dos Sierras Madre, la sierra de La Laguna en Baja California Sur y la población del centro; los colores separan la especie de sus subespecies y variedades. Esta imagen salió tal cual de la app, sin retoques.</figcaption>
+  </figure>
+
+  <!-- 4.2 -->
+  <h2 id="b4-2"><span class="num">4.2</span>Lo que muestra el mapa</h2>
+  <p>El mapa dibuja los registros que sobrevivieron al Bloque 3, coloreados por el criterio que elijas: por taxón, por estado, o por el grupo que asignen después los análisis del Bloque 8. Sobre él se pueden encender los elementos cartográficos —leyenda, escala, rosa de los vientos, retícula— y el contorno de la región que hayas elegido en el Bloque 2.</p>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>El mapa base viene de internet</div>
+    <p>Las teselas del fondo se descargan de un servicio en línea. Sin conexión, el mapa muestra los puntos sobre un fondo liso —que sigue siendo perfectamente utilizable— y la escala y las coordenadas siguen funcionando. Si una capa base no responde, la app cambia sola a otra.</p>
+  </div>
+
+  <!-- 4.3 -->
+  <h2 id="b4-3"><span class="num">4.3</span>El estudio de mapas</h2>
+  <p>Debajo del mapa está el <b>estudio de mapa</b>, plegado hasta que lo necesitas. Sus siete pestañas cubren todo lo que distingue un mapa de pantalla de una figura publicable.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b4-estudio.png" alt="Panel del estudio de mapa abierto en la pestaña Mapa base, con el selector de capa, la opacidad y los controles de escala de grises, brillo, contraste y saturación"></div>
+    <figcaption><b>Figura 4.2.</b> El estudio abierto en <span class="pest">Mapa base</span>. Catorce fondos distintos, y cuatro controles para <i>atenuarlo</i>: en un mapa científico el fondo debe ayudar a ubicarse, no competir con los datos.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Pestaña</th><th>Qué controla</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pest">Mapa base</span></td><td>El fondo: grises, calles, topográfico, relieve, satélite o ninguno; su opacidad y su atenuación en gris, brillo, contraste y saturación. El botón <span class="ui">Aspecto apagado</span> deja el fondo discreto de un solo clic.</td></tr>
+      <tr><td><span class="pest">Textos y fuentes</span></td><td>Título, subtítulo y crédito, y la tipografía de <b>cada elemento por separado</b>: el título, los rótulos de la leyenda, los números de la escala, las coordenadas de la retícula y la letra del norte, cada uno con su tamaño, negrita, cursiva y color.</td></tr>
+      <tr><td><span class="pest">Elementos</span></td><td>Qué se dibuja: leyenda (dentro o fuera del mapa, en una o varias columnas), barra de escala, rosa de los vientos, retícula de coordenadas y marco.</td></tr>
+      <tr><td><span class="pest">Puntos</span></td><td>Forma, tamaño, borde y transparencia de los símbolos, y el mapa de calor cuando los puntos se amontonan.</td></tr>
+      <tr><td><span class="pest">Colores</span></td><td>La paleta de los taxones o de los grupos, y las rampas de color para los mapas continuos del Bloque 9.</td></tr>
+      <tr><td><span class="pest">Estilos</span></td><td>Presets listos y la posibilidad de guardar tu estilo como archivo para reutilizarlo en otra figura o en otro estudio.</td></tr>
+      <tr><td><span class="pest">Exportar</span></td><td>Encuadre, tamaño, resolución, formato, recorte y vista previa: la sección 4.4.</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <div class="marco"><img src="../img/b4-elementos.png" alt="Pestaña Elementos del estudio, con las opciones de rosa de los vientos, barra de escala, retícula y leyenda"></div>
+    <figcaption><b>Figura 4.3.</b> La pestaña <span class="pest">Elementos</span>: cada pieza cartográfica se enciende, se coloca y se dimensiona por separado. La rosa de los vientos y la barra de escala tienen varios formatos.</figcaption>
+  </figure>
+
+  <!-- 4.4 -->
+  <h2 id="b4-4"><span class="num">4.4</span>Exportar para publicar</h2>
+  <p>La pestaña <span class="pest">Exportar</span> responde a las tres preguntas de cualquier revista: <b>qué se ve</b>, <b>de qué tamaño</b> y <b>en qué formato</b>.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b4-exportar.png" alt="Pestaña Exportar del estudio con el encuadre, el margen, el ajuste fino del acercamiento y el inicio de la sección de recorte al área de estudio"></div>
+    <figcaption><b>Figura 4.4.</b> El encuadre decide qué parte del mundo entra en la figura. <span class="ui">Como se ve en pantalla</span> exporta exactamente lo que ves; los demás encuadres vuelven a componer el mapa sobre la extensión elegida.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Control</th><th>Opciones y para qué</th></tr></thead>
+    <tbody>
+      <tr><td><b>Encuadre</b></td><td><span class="ui">Como se ve en pantalla</span>, <span class="ui">Ajustar a los datos</span>, <span class="ui">Ajustar a los estados o regiones elegidos</span>, <span class="ui">México completo</span> y <span class="ui">Extensión manual</span> con las cuatro coordenadas. Con el margen y el ajuste fino se afina el resultado sin tocar el mapa de la pantalla.</td></tr>
+      <tr><td><b>Tamaño</b></td><td>Como se ve, A4 horizontal o vertical, una o dos columnas de revista (85 y 180 mm), diapositiva 16:9, cuadrado o un tamaño escrito a mano en milímetros.</td></tr>
+      <tr><td><b>Resolución</b></td><td>Un multiplicador para el tamaño de pantalla, o 150, 300 y 600 dpi cuando el tamaño está en milímetros. La mayoría de las revistas pide 300 dpi para figuras de medio tono y 600 para líneas.</td></tr>
+      <tr><td><b>Formato</b></td><td><b>PNG</b> (sin pérdida, admite fondo transparente), <b>JPEG</b>, <b>WebP</b>, <b>TIFF</b>, <b>GeoTIFF</b> georreferenciado y <b>SVG</b> —vectorial, con los datos y los textos, pero sin el mapa base—.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Qué formato pedir para qué</div>
+    <p><b>PNG</b> para un documento o una presentación. <b>TIFF</b> cuando la revista lo exija o cuando vayas a seguir editando el mapa en un programa de diseño. <b>GeoTIFF</b> si quieres abrir la imagen en un programa de mapas y que caiga en su lugar sobre el mundo: lleva dentro las coordenadas y el sistema de referencia. <b>SVG</b> cuando quieras cambiar después los textos o los colores sin perder nitidez; como no incluye el mapa base, sirve sobre todo para figuras de puntos sobre fondo liso.</p>
+  </div>
+
+  <!-- 4.5 -->
+  <h2 id="b4-5"><span class="num">4.5</span>La vista previa y el recorte</h2>
+  <p>Dos funciones evitan el vaivén de exportar, mirar el archivo, corregir y volver a exportar.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b4-vistaprevia.png" alt="Ventana de vista previa de la exportación con la imagen compuesta a la izquierda y, a la derecha, el tamaño en píxeles y milímetros, la resolución, la extensión, la escala aproximada, el formato y los controles de encuadre"></div>
+    <figcaption><b>Figura 4.5.</b> La vista previa muestra <b>la imagen que se va a guardar</b>, no una aproximación, junto con su tamaño en píxeles y en milímetros, su resolución, su extensión geográfica y su escala aproximada. Los controles de la derecha cambian la imagen sin cerrar la ventana.</figcaption>
+  </figure>
+
+  <p>El <b>recorte al área de estudio</b> deja fuera de la imagen todo lo que no sea el país o las regiones elegidas en el Bloque 2: las teselas del fondo, las superficies de idoneidad y los puntos de fuera desaparecen, y queda solo la silueta del territorio, con su contorno dibujado y el exterior transparente o del color que elijas. Es la forma de entregar un mapa de México —o de un estado— sin que se asome el país vecino.</p>
+
+  <div class="caja dato">
+    <div class="dato-cifra">1:16M</div>
+    <div class="dato-txt"><div class="caja-t">Dato clave</div>La vista previa calcula la <b>escala aproximada</b> de la figura a partir de su ancho en milímetros y de la extensión que abarca. Es el número que pide el pie de figura de un mapa, y el que casi nadie recuerda calcular.</div>
+  </div>
+
+  <!-- 4.6 -->
+  <h2 id="b4-6"><span class="num">4.6</span>Qué necesita un mapa publicable</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Elemento</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><td><b>Barra de escala</b></td><td>Sin ella no se juzga ninguna distancia. Mejor una barra que un texto «1:16 000 000»: la barra sigue siendo válida si la figura se reduce.</td></tr>
+      <tr><td><b>Indicador de norte</b></td><td>Imprescindible cuando el mapa no está orientado con el norte arriba, y buena costumbre siempre.</td></tr>
+      <tr><td><b>Coordenadas</b></td><td>La retícula con sus grados permite situar cualquier punto y comparar con otros mapas.</td></tr>
+      <tr><td><b>Leyenda</b></td><td>Qué significa cada color y cada símbolo, con los nombres científicos en cursiva.</td></tr>
+      <tr><td><b>Crédito del mapa base</b></td><td>Los proveedores de teselas exigen su atribución; la app la escribe sola en la esquina y se exporta con la imagen. En el pie de figura va además la fuente de los registros, cuántos son y de qué fecha.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 4.7 -->
+  <h2 id="b4-7"><span class="num">4.7</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>El mapa aparece con el mundo entero</td><td>Se dibujó antes de que su espacio tuviera tamaño. Pulsa <span class="ui">Ajustar el mapa a los datos</span>, en la esquina del estudio.</td></tr>
+      <tr><td>El fondo sale gris, sin detalle o con una marca de agua</td><td>No hay conexión, el proveedor no respondió, o pone su marca según sus condiciones de uso. Cambia de capa base —los grises son la más fiable— o usa <span class="ui">Ninguno</span>: para una figura de puntos, el fondo liso suele bastar.</td></tr>
+      <tr><td>La imagen no coincide con la pantalla</td><td>El encuadre no es <span class="ui">Como se ve en pantalla</span>. Abre la vista previa, o usa <span class="ui">Llevar el mapa de la pantalla a este encuadre</span>.</td></tr>
+      <tr><td>Las letras salen diminutas en la figura</td><td>Al exportar a un tamaño de papel, el texto se dimensiona con la figura. Sube el tamaño de letra de cada elemento en <span class="pest">Textos y fuentes</span> y vuelve a ver la vista previa.</td></tr>
+      <tr><td>Los puntos se amontonan y no se distingue nada</td><td>Baja el tamaño del símbolo, súbele transparencia, o cambia a mapa de calor en la pestaña <span class="pest">Puntos</span>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

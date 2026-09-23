@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 9 · Modelado de la distribución</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 62%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 19%; margin-right: 19%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+  table.alg td:first-child { font-weight: 600; color: var(--negro); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b9" data-pestana="9" data-orden="10" style="--acento: var(--b9)">
+  <div class="cap-apertura">
+    <div class="cap-num">9</div>
+    <div class="cap-etiqueta">Bloque 9 · El modelo</div>
+    <h1>Modelado de la distribución y proyección al futuro</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Diez algoritmos y un ensamble, validación por bloques espaciales, umbrales, importancia de variables, curvas de respuesta, mapas y proyección a escenarios de clima futuro con su mapa de extrapolación.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>9.1</b>Qué ajusta este bloque</li>
+      <li><b>9.2</b>Preparar los datos</li>
+      <li><b>9.3</b>Los diez algoritmos</li>
+      <li><b>9.4</b>La validación</li>
+      <li><b>9.5</b>Leer las métricas</li>
+      <li><b>9.6</b>Importancia y curvas de respuesta</li>
+      <li><b>9.7</b>Los mapas y el umbral</li>
+      <li><b>9.8</b>El ensamble</li>
+      <li><b>9.9</b>Proyección al futuro</li>
+      <li><b>9.10</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 9.1 -->
+  <h2 id="b9-1"><span class="num">9.1</span>Qué ajusta este bloque</h2>
+  <p class="lead">Un modelo de distribución aprende a distinguir el ambiente de los sitios donde la especie fue registrada del ambiente <b>disponible</b> en la región, y después aplica lo aprendido a cada celda del mapa. El resultado es una superficie continua de <b>idoneidad</b>: qué tan parecido es el clima de cada celda al de los sitios ocupados.</p>
+  <p>La palabra clave es <i>disponible</i>. Como no hay ausencias verdaderas (sección 1.1), el contraste se hace contra una muestra del ambiente de toda el área de estudio, los <b>puntos de fondo</b>. Por eso el área que se elige determina contra qué se compara la especie, y por eso el Bloque 2 importaba tanto.</p>
+
+  <!-- 9.2 -->
+  <h2 id="b9-2"><span class="num">9.2</span>Preparar los datos</h2>
+  <p>El botón <span class="ui">Preparar datos del modelo →</span> hace cuatro cosas y las informa:</p>
+  <ol class="pasos">
+    <li><b>Recorta a la extensión elegida.</b> Por omisión es el país de los registros —o los estados del Bloque 2, si los elegiste a propósito—. Los registros de fuera no entran, y la app dice cuántos son.</li>
+    <li><b>Lee las capas sobre una malla.</b> La malla hereda la resolución de tus capas; si el número de celdas es enorme, la app agrega bloques de celdas para que el cálculo sea posible en el navegador.</li>
+    <li><b>Adelgaza las presencias.</b> Con la casilla <span class="ui">Conservar una sola presencia por celda</span> —activada de fábrica— cincuenta registros del mismo árbol cuentan una vez. Es la defensa más eficaz contra el sesgo de muestreo.</li>
+    <li><b>Toma los puntos de fondo</b> repartidos por el área de estudio, con una semilla fija para que el resultado sea reproducible.</li>
+  </ol>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El ejemplo, preparado</div>
+    <p>Con el piñonero y las capas de ejemplo: extensión <b>País de los registros (MX)</b>, recuadro de −118.6° a −86.4° y de 14.4° a 32.8°, malla de <b>194 × 111</b> celdas de <b>18.6 km</b>, 8 predictoras. De los 1,885 registros depurados, <b>14 quedan fuera</b> de la extensión —los de Estados Unidos por encima del paralelo 32.8°— y de los 1,871 restantes, 1,468 caen en una celda ya ocupada o sin dato: quedan <b>403 presencias</b> contra <b>7,751 puntos de fondo</b>.</p>
+    <p>Que 1,871 registros se conviertan en 403 presencias asusta la primera vez. No se han perdido datos: se ha quitado la repetición. Con celdas de 18.6 km, 403 es el número de <i>celdas distintas</i> donde se ha registrado la especie, y eso es lo que el modelo puede aprender.</p>
+  </div>
+
+  <!-- 9.3 -->
+  <h2 id="b9-3"><span class="num">9.3</span>Los diez algoritmos</h2>
+  <table class="compacta alg">
+    <thead><tr><th style="width:1.7in">Algoritmo</th><th>Qué hace y cuándo conviene</th></tr></thead>
+    <tbody>
+      <tr><td>Tipo MaxEnt</td><td>Regresión logística penalizada (L1) sobre términos lineales, cuadráticos, de producto y bisagra, con salida cloglog. Es equivalente al modelado de máxima entropía y es el punto de partida razonable en casi cualquier estudio.</td></tr>
+      <tr><td>GLM</td><td>Modelo lineal generalizado con términos lineales y cuadráticos. Transparente, interpretable, y el más sensible a la colinealidad.</td></tr>
+      <tr><td>GAM</td><td>Aditivo generalizado con splines: curvas suaves sin imponer su forma.</td></tr>
+      <tr><td>Bosque aleatorio</td><td>Muchos árboles con submuestreo balanceado. Flexible y robusto; su validación usa predicciones fuera de bolsa para no inflar el ajuste.</td></tr>
+      <tr><td>Árboles potenciados (BRT)</td><td>Árboles añadidos uno a uno corrigiendo el error anterior. Muy preciso y el más propenso a sobreajustar.</td></tr>
+      <tr><td>Máquina de vectores de soporte</td><td>Frontera no lineal con núcleo radial.</td></tr>
+      <tr><td>Red neuronal</td><td>Cinco redes pequeñas promediadas.</td></tr>
+      <tr><td>Bioclim</td><td>Envolvente climática clásica: percentiles de cada variable. Sencillo y útil con muy pocas presencias.</td></tr>
+      <tr><td>Domain</td><td>Distancia de Gower al registro más parecido.</td></tr>
+      <tr><td>Mahalanobis</td><td>Distancia al centroide ambiental considerando la covarianza.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 9.4 -->
+  <h2 id="b9-4"><span class="num">9.4</span>La validación</h2>
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Por qué bloques espaciales y no al azar</div>
+    <p>Si se parten los registros al azar, los puntos de prueba quedan a pocos kilómetros de los de entrenamiento: el modelo los acierta porque están en el mismo cerro, no porque haya aprendido nada general. El resultado es un AUC alto y engañoso. La validación por <b>bloques espaciales</b> divide el área en bloques y deja fuera bloques enteros, así que el modelo debe predecir en zonas que no vio. Los valores bajan, y eso es lo correcto.</p>
+  </div>
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Métrica</th><th>Qué mide y cómo se lee</th></tr></thead>
+    <tbody>
+      <tr><td><b>AUC</b></td><td>Probabilidad de que un sitio de presencia reciba más idoneidad que uno de fondo tomado al azar. 0.5 es azar. Bandas de lectura habituales: 0.7–0.8 aceptable, 0.8–0.9 bueno, más de 0.9 excelente. Son convenciones, y con datos de solo presencia el AUC depende del área de estudio: no se comparan valores entre estudios distintos.</td></tr>
+      <tr><td><b>TSS</b></td><td>Sensibilidad + especificidad − 1, en el umbral que lo maximiza. De −1 a 1; por convención, arriba de 0.6 se considera bueno. Es más estable que el kappa y no depende de la prevalencia.</td></tr>
+      <tr><td><b>Índice de Boyce</b></td><td>Mide si las clases de idoneidad más altas contienen proporcionalmente más presencias: es la métrica pensada para datos de solo presencia. Va de −1 a 1; arriba de 0.8 indica un modelo muy consistente.</td></tr>
+      <tr><td><b>Omisión (P10)</b></td><td>Qué fracción de las presencias de prueba queda por debajo del umbral del percentil 10. Idealmente cercana a 0.1.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 9.5 -->
+  <h2 id="b9-5"><span class="num">9.5</span>Leer las métricas</h2>
+  <figure class="media">
+    <div class="marco"><img src="../img/b9-metricas.png" alt="Tabla de desempeño con AUC de prueba y de entrenamiento, TSS, sensibilidad, especificidad, Boyce, omisión y umbral para los cuatro modelos"></div>
+    <figcaption><b>Figura 9.1.</b> Los cuatro modelos del ejemplo, validados con bloques espaciales. La columna <b>AUC entren.</b> no es un resultado: está para compararla con la de prueba.</figcaption>
+  </figure>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/b9-roc.png" alt="Curvas ROC de los cuatro modelos con su AUC"></div>
+    <figcaption><b>Figura 9.2.</b> Las curvas ROC. Cuanto más se pega la curva a la esquina superior izquierda, mejor separa el modelo; la diagonal es el azar.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Qué dicen estos números</div>
+    <ul>
+      <li><b>Los cuatro modelos valen prácticamente lo mismo</b> en AUC de prueba: MaxEnt 0.837, GLM 0.840, bosque aleatorio 0.835 y BRT 0.831, todos con desviaciones de ±0.02. Cuando cuatro algoritmos distintos coinciden así, la señal está en los datos, no en el método.</li>
+      <li><b>El BRT es el que más sobreajusta</b>: su AUC de entrenamiento es 0.929 frente a 0.831 de prueba, una diferencia de casi 0.10. El GLM, el más rígido, tiene la diferencia más pequeña (0.885 contra 0.840).</li>
+      <li><b>El índice de Boyce separa lo que el AUC no</b>: el bosque aleatorio llega a 0.958 y el BRT se queda en 0.871. Con AUC casi idénticos, el bosque ordena mejor las clases de idoneidad.</li>
+      <li><b>El TSS anda entre 0.51 y 0.54</b>, por debajo del 0.6 que se suele pedir: un recordatorio de que con 403 presencias y celdas de 18.6 km el modelo es útil, no perfecto.</li>
+    </ul>
+  </div>
+
+  <!-- 9.6 -->
+  <h2 id="b9-6"><span class="num">9.6</span>Importancia y curvas de respuesta</h2>
+  <p>Dos preguntas distintas: <b>cuánto</b> aporta cada variable y <b>cómo</b> responde la especie a ella.</p>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/b9-importancia.png" alt="Gráfico de importancia de las variables por permutación"></div>
+    <figcaption><b>Figura 9.3.</b> Importancia por permutación, medida <b>sobre los datos de prueba</b>: se barajan los valores de una variable y se mide cuánto cae el desempeño. Si una variable no aporta, barajarla no cambia nada.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b9-respuesta.png" alt="Curvas de respuesta de las variables, con la idoneidad predicha frente al valor de cada variable"></div>
+    <figcaption><b>Figura 9.4.</b> Las curvas de respuesta: cómo cambia la idoneidad al mover una variable dejando las demás en su valor medio. Una curva con forma de campana indica un óptimo; una monótona, un límite.</figcaption>
+  </figure>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Importancia no es causa</div>
+    <p>Que BIO16 salga como la variable más importante no significa que la lluvia del trimestre húmedo <i>cause</i> la distribución: puede ser una variable que acompaña a la verdadera causa —la altitud, el tipo de suelo, la historia—. Y si dos variables están correlacionadas, el modelo reparte la importancia entre ellas de forma arbitraria; por eso el Bloque 6 va antes que este.</p>
+  </div>
+
+  <!-- 9.7 -->
+  <h2 id="b9-7"><span class="num">9.7</span>Los mapas y el umbral</h2>
+  <p>La app dibuja tres mapas por modelo: la <b>idoneidad continua</b>, la <b>presencia/ausencia</b> tras aplicar un umbral, y la <b>incertidumbre</b> entre modelos cuando hay varios.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/b9-mapa.png" alt="Mapa de idoneidad del modelo de árboles potenciados sobre todo México, recortado al país, con las presencias y la leyenda de la escala de idoneidad"></div>
+    <figcaption><b>Figura 9.5.</b> La idoneidad del modelo de árboles potenciados sobre todo el país, recortada a México con el estudio de mapas. Los puntos son las presencias usadas. Se reconocen las dos Sierras Madre, el Eje Neovolcánico y la sierra de La Laguna, y el mapa señala zonas idóneas donde no hay registros: candidatas a explorar.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">Umbral</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><b>Máximo TSS</b></td><td>El que maximiza sensibilidad + especificidad. Es el de uso más común y el que la app propone.</td></tr>
+      <tr><td><b>Percentil 10 (P10)</b></td><td>Deja fuera el 10 % de las presencias con menor idoneidad. Útil cuando se sospecha que hay registros mal georreferenciados.</td></tr>
+      <tr><td><b>Presencia mínima</b></td><td>Conserva todas las presencias. El más permisivo y el más sensible a un solo error.</td></tr>
+      <tr><td><b>Sensibilidad = especificidad</b></td><td>Equilibra los dos tipos de error.</td></tr>
+    </tbody>
+  </table>
+  <p>Con el umbral aplicado, la app calcula el <b>área idónea en kilómetros cuadrados</b>: en el ejemplo, el modelo tipo MaxEnt con umbral de máximo TSS (0.384) señala <b>471,566 km²</b> de territorio mexicano con clima apto para el piñonero. Ese número cambia con el umbral, así que hay que reportar cuál se usó.</p>
+
+  <!-- 9.8 -->
+  <h2 id="b9-8"><span class="num">9.8</span>El ensamble</h2>
+  <p>Cuando varios algoritmos coinciden, su promedio suele predecir mejor que cualquiera por separado, y su desacuerdo es una medida honesta de incertidumbre. El ensamble combina los modelos por <b>media</b>, <b>mediana</b> o <b>comité de votos</b>, y los pondera por AUC, TSS, Boyce o por igual. Junto al mapa promedio, la app dibuja el <b>mapa de acuerdo</b>: dónde los modelos dicen lo mismo y dónde no.</p>
+
+  <!-- 9.9 -->
+  <h2 id="b9-9"><span class="num">9.9</span>Proyección al futuro</h2>
+  <p>La última sección aplica el modelo ya ajustado a capas de clima futuro. Se añaden escenarios a una lista —cada uno con su modelo climático, su trayectoria y su periodo— y se proyectan todos de una vez.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">Qué entrega</th><th>Para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td><b>Mapa por escenario</b></td><td>La idoneidad futura, con el mismo umbral que el presente.</td></tr>
+      <tr><td><b>Ganancia y pérdida</b></td><td>Cuánta área se gana, cuánta se pierde y cuánta se mantiene, en km² y en porcentaje.</td></tr>
+      <tr><td><b>Desplazamiento del área</b></td><td>Cuánto se mueve el centro de la distribución, en qué dirección y cuánto sube en altitud.</td></tr>
+      <tr><td><b>Supuestos de dispersión</b></td><td>Dispersión ilimitada, nula o limitada a una distancia: tres respuestas distintas a «¿podrá llegar?».</td></tr>
+      <tr><td><b>Refugios</b></td><td>Las zonas idóneas hoy y en todos los escenarios futuros: lo primero que hay que conservar.</td></tr>
+      <tr><td><b>Ensamble entre escenarios</b></td><td>Promedio y acuerdo entre modelos climáticos, que es donde está la mayor incertidumbre.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Nunca publiques una proyección sin su MESS</div>
+    <p>El mapa <b>MESS</b> marca las celdas donde el clima futuro queda <i>fuera</i> del rango que el modelo vio al entrenarse. Ahí la predicción no es una estimación: es la fórmula extendida a ciegas. La app raya esas zonas en los mapas de futuro y permite exportar el MESS aparte. Sin esa capa, un mapa de idoneidad para 2070 promete una precisión que no tiene.</p>
+  </div>
+
+  <!-- 9.10 -->
+  <h2 id="b9-10"><span class="num">9.10</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>El mapa no cubre todo el país</td><td>La malla se preparó con otra extensión. Cambia la extensión y vuelve a pulsar <span class="ui">Preparar datos del modelo →</span>: la app avisa cuando la malla preparada ya no coincide con la extensión elegida.</td></tr>
+      <tr><td>AUC de 0.99</td><td>Sospecha antes de celebrar: suele venir de validación al azar en lugar de bloques, de un área de estudio enorme, o de presencias duplicadas.</td></tr>
+      <tr><td>Muy pocas presencias tras preparar, o un modelo que tarda demasiado</td><td>Lo primero es el adelgazado por celda: si te deja por debajo de quince presencias, usa capas de mayor resolución o amplía el área. Lo segundo es normal en el bosque aleatorio y los árboles potenciados, los más costosos: empieza con MaxEnt y GLM.</td></tr>
+      <tr><td>Hay zonas idóneas donde no hay registros</td><td>Puede ser una predicción interesante —hábitat no explorado— o extrapolación: míralo con el MESS y con lo que sepas de la especie.</td></tr>
+      <tr><td>El mapa de futuro es casi todo idóneo</td><td>Revisa que las capas futuras tengan la misma resolución y las mismas variables que las del presente, y mira el MESS.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

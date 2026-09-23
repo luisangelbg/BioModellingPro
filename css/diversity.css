@@ -1,0 +1,65 @@
+/* Step 8 · diversity indices — styles owned by the diversity module.
+   Only classes that start with div- (plus the module's own ids) are defined here, so nothing
+   collides with the shared style sheet. Every colour comes from the theme variables, so the
+   block follows the light and dark themes without a second rule set. */
+
+#divGroup .div-caveat { margin: 12px 0 16px; line-height: 1.45; }
+
+/* progress bar of the long jobs */
+.div-progress { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 0.84rem; color: var(--text-muted); }
+.div-progress-bar { flex: 1; height: 7px; background: var(--bg-soft); border-radius: 5px; overflow: hidden; border: 1px solid var(--border); }
+.div-progress-bar > div { height: 100%; width: 0; background: var(--primary); transition: width .2s ease; }
+
+/* community matrix: sticky header and first column, so it stays readable while scrolling */
+.div-matrix { max-height: 460px; }
+table.div-mtx { border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; font-size: 0.82rem; }
+table.div-mtx th, table.div-mtx td { padding: 5px 9px; white-space: nowrap; border-bottom: 1px solid var(--border); text-align: right; }
+table.div-mtx thead th { position: sticky; top: 0; z-index: 3; background: var(--bg-soft); text-align: right; font-size: 0.78rem; font-weight: 600; }
+table.div-mtx thead th:first-child, table.div-mtx tbody th { position: sticky; left: 0; z-index: 2; background: var(--bg-soft); text-align: left; font-weight: 600; }
+table.div-mtx thead th:first-child { z-index: 4; }
+table.div-mtx td.z { color: var(--text-muted); opacity: .5; }
+table.div-mtx td.tot { font-weight: 700; }
+table.div-mtx tr.grand th, table.div-mtx tr.grand td { border-top: 2px solid var(--border-strong); font-weight: 700; }
+
+/* a wide table (the full alpha table) may scroll sideways without squeezing the numbers */
+.div-wide table { font-variant-numeric: tabular-nums; }
+.div-wide table th, .div-wide table td { white-space: nowrap; }
+
+/* small summary tables written by the module itself */
+.div-small-wrap { overflow-x: auto; max-width: 100%; }
+table.div-small { border-collapse: collapse; margin: 8px 0 4px; font-size: 0.86rem; }
+table.div-small th, table.div-small td { padding: 6px 12px; border: 1px solid var(--border); }
+table.div-small th { background: var(--bg-soft); font-weight: 600; text-align: left; }
+table.div-small td { font-variant-numeric: tabular-nums; }
+
+/* figures: the download row sits under the drawing, discreet until hovered */
+.div-fig { margin: 8px 0 18px; }
+.div-fig .fig-box svg { display: inline-block; }
+.div-figbar { margin: 2px 0 0; justify-content: flex-end; opacity: .62; transition: opacity .15s ease; }
+.div-fig:hover .div-figbar, .div-figbar:focus-within { opacity: 1; }
+
+/* the two site pickers of the contribution table */
+.div-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 12px 0; }
+.div-group-pick { display: flex; flex-direction: column; gap: 5px; font-size: 0.86rem; color: var(--text-muted); }
+.div-group-pick select { width: 100%; font-size: 0.86rem; padding: 4px; border: 1px solid var(--border-strong); border-radius: 8px;
+  background: var(--card-bg); color: var(--text); }
+
+/* methods paragraph and reference list */
+.div-methods p { line-height: 1.55; margin: 0 0 10px; text-align: justify; }
+ul.div-refs { margin: 4px 0 0; padding-left: 20px; color: var(--text-muted); font-size: 0.84rem; }
+ul.div-refs li { margin-bottom: 3px; }
+
+/* phone width: the option rows stack and the tables keep their own scroll */
+@media (max-width: 640px) {
+  #divGroup .inline-label { display: flex; width: 100%; margin: 4px 0; justify-content: space-between; }
+  #divGroup .inline-label select, #divGroup .inline-label input { max-width: 58%; }
+  #divGroup .results-header { align-items: stretch; }
+  #divGroup .results-header .btn { width: 100%; }
+  .div-figbar { justify-content: flex-start; opacity: 1; }
+  table.div-mtx { font-size: 0.76rem; }
+  table.div-small th, table.div-small td { padding: 4px 7px; }
+}
+
+@media print {
+  .div-figbar, .div-progress { display: none !important; }
+}

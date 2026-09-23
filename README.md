@@ -1,116 +1,128 @@
-# BioSDM
+# BioModelling Pro
 
-Herramienta web para análisis biogeográfico y multivariado de especies vegetales:
-descarga y depuración de registros de **GBIF**, extracción de variables **bioclimáticas,
-de suelo y de clima**, estadística, y métodos de aprendizaje automático (**PCA,
-clustering, análisis de correspondencias**) y de **ecología** — todo dentro del navegador,
-sin instalar nada ni enviar datos a ningún servidor propio.
+**Biogeography and species distribution modelling, in your browser.** Download presence records
+from GBIF, clean them, extract bioclimatic, climate and soil variables, explore them with statistics
+and multivariate methods, and model the species distribution with ten algorithms and an ensemble —
+with maps, validation, thresholds, variable importance and projections to climate scenarios.
+Nothing to install, no account, no server of our own: your files and analyses stay on your computer.
 
-## Usar en línea
+The interface is **bilingual (Spanish / English)** and has **light and dark themes**. Both switches are in the
+top bar; the choice is remembered.
 
-👉 **https://luisangelbg.github.io/BioSDM/** *(activo una vez habilitado GitHub Pages en el repositorio — ver más abajo)*
+## Use it online
 
-Solo necesitas un navegador moderno (Chrome o Edge recomendados) y conexión a internet.
-Funciona igual en computadora, tablet o cualquier dispositivo con esos navegadores.
+👉 **https://luisangelbg.github.io/BioModellingPro/** *(active once GitHub Pages is enabled on the repository)*
 
-## Usar en local
+You only need a modern browser (Chrome or Edge recommended) and an internet connection for GBIF, the base
+maps and the Python engine.
 
-Descarga o clona este repositorio y abre `index.html`:
+## Use it locally
 
-- **Con doble clic** funciona el Bloque A (búsqueda GBIF, filtros, depuración, mapa).
-- Para los **datos de ejemplo** del paso 5, la extracción de variables ambientales, y los
-  bloques con Python (**estadística, PCA, clustering, ecología**), necesitas abrir la
-  carpeta con un servidor local — incluido `servidor.ps1` (Windows/PowerShell):
+Download or clone the repository and **double-click `index.html`**. Everything works from `file://`,
+including the bundled example (*Pinus cembroides*: 2,400 GBIF records and cropped WorldClim / Köppen-Geiger
+layers). To serve the folder on your network, run `Open BioModelling Pro.bat` (Windows) or
+`server.ps1` and open `http://localhost:9400`.
 
-  ```
-  clic derecho en servidor.ps1 → Ejecutar con PowerShell
-  ```
+## The workflow, in ten steps
 
-  y luego abre `http://localhost:8765` en el navegador.
+| # | Step | What it does |
+|---|------|--------------|
+| 1 | **GBIF or your own data** | Resolves the scientific name and downloads every record with coordinates —optionally restricted to the countries you tick, with one-click shortcuts for Mexico, Central America and South America— or loads your own file (CSV, TXT or Excel with species, longitude and latitude; DMS accepted), alone or added to the GBIF records. A bundled example is available. |
+| 2 | **Filter** | By taxon, country, year, record type, a bounding box you can draw, and **state or region**: the 32 states of Mexico come bundled and the state of each record is assigned from its coordinates (which completes the records GBIF delivers without one), with shortcuts by group of states; you can also load your own region layer (municipalities, watersheds, protected areas) as GeoJSON. |
+| 3 | **Clean** | Nine coordinate-quality rules (duplicates, impossible values, country centroids, low precision, outliers…) with a before/after report. |
+| 4 | **Map** | Publication-ready map: base layers, legend, north arrow, scale bar, graticule, PNG export. |
+| 5 | **Variables** | 19 bioclimatic variables and elevation (WorldClim 2.1), Köppen-Geiger climate and WRB soil type (SoilGrids) at every point; thematic map. |
+| 6 | **Correlation** | Interactive Pearson / Spearman correlation matrix with dendrogram, live VIF of the variables you tick, a recommended low-collinearity selection that respects the variables you pin (for example BIO1 and BIO12) and a pair viewer. Your choice becomes the default of the next steps. |
+| 7 | **Statistics** | Descriptive statistics, histograms, box plots and normality tests with suggested transformations. |
+| 8 | **ML, ecology and diversity** | PCA, clustering (hierarchical, k-means, PAM, fuzzy, Gaussian mixture, DBSCAN), correspondence analysis, metrics of range area, spatial pattern, niche breadth and overlap, and species diversity: richness and its estimators, Shannon, Simpson, Hill numbers, evenness, rarefaction at equal effort and coverage, and beta diversity with its turnover / nestedness partition and ordination of sites. |
+| 9 | **SDM modelling** | Ten algorithms plus an ensemble, spatial cross-validation, thresholds, variable importance, response curves, maps, and a future-projection workbench (many scenarios, model ensemble and agreement, range-shift metrics, dispersal assumptions, refugia). |
+| 10 | **Agroclimatic adaptation** | Agroclimatic indices (growing degree days, frost, chilling hours, reference evapotranspiration, water balance, length of growing period, aridity), crop suitability with its optimal planting calendar and limiting factor, crop comparison, climatic analogues, and the change in suitability under future climate. |
 
-## El flujo, en 8 pasos
+In steps 7, 8, 9 and 10 you can still change which variables enter the analysis — even collinear ones that step 6 flagged, when you
+consider them ecologically important.
 
-1. **Buscar en GBIF** — resuelve el nombre científico y descarga los registros de presencia.
-2. **Filtrar** — por rango taxonómico, país, año, tipo de registro, recorte geográfico.
-3. **Depurar** — 9 reglas de limpieza de coordenadas (duplicados, centroides de país, baja
-   precisión, outliers espaciales…) con reporte antes/después.
-4. **Mapa** — de los registros depurados, con leyenda, escala, rosa de los vientos y retícula.
-5. **Variables ambientales** — extrae 19 variables Bioclim + altitud (WorldClim 2.1), clima
-   de Köppen-Geiger y tipo de suelo (SoilGrids) en cada punto; mapa temático.
-6. **Estadística** — descriptiva, histogramas/boxplots/violín/Q-Q, pruebas de normalidad,
-   correlación (Pearson/Spearman) y colinealidad (VIF), con recomendación de qué variables
-   conservar.
-7. **ML + Ecología** — PCA, clustering (jerárquico, k-means, PAM, difuso, mezcla gaussiana,
-   DBSCAN), análisis de correspondencias (AC/ACM/AFM) y métricas ecológicas (área de
-   distribución, patrón espacial, amplitud y solapamiento de nicho).
+The home page includes a **virtual-species lab**: a synthetic landscape with a niche you know, sampled presences
+(with or without sampling bias) and three real algorithms whose estimate is compared with the truth.
 
-8. **Modelado de distribución de especies (SDM)** — ajusta y valida modelos de idoneidad
-   del hábitat, los combina en un ensamble y proyecta mapas (ver abajo).
+### Interpretation help
 
-En los pasos 7 y 8 puedes elegir libremente qué variables entran al análisis — incluso
-variables colineales que el paso 6 marcó para descartar, si consideras que son
-ecológicamente relevantes.
+Every number in steps 6 to 10 carries a help button. It opens a card that says, in plain words, what the value
+measures, how to read it, **on which scale** (a bar of coloured bands shows where the value falls: |r|, VIF, AUC, TSS,
+Boyce, silhouette, Hopkins, Shannon, the red-list area thresholds, the land suitability classes…), the mistake most
+often made with it, and the reference it comes from. When the scale is a reading convention rather than a statistical
+law the card says so, and when no accepted scale exists it says that too. Each step ends with a collapsible
+**interpretation guide** holding all of its cards, and opens with a box explaining what the step is for and what you
+decide in it.
 
-### Paso 8 · Modelado de distribución de especies
+### Map export
 
-- **Algoritmos (10):** MaxEnt, GLM, GAM, Random Forest, BRT (boosting), SVM, red neuronal,
-  Bioclim, Domain y Mahalanobis, más un **ensamble** (media ponderada, mediana o comité de votos,
-  con pesos por AUC, TSS o Boyce).
-- **MaxEnt** se implementa al estilo del paquete R *maxnet* (Phillips et al. 2017): regresión
-  logística penalizada L1 sobre características lineales, cuadráticas, de producto y de bisagra,
-  con las constantes de regularización de maxnet y salida *cloglog*. Es estadísticamente
-  equivalente a MaxEnt (Renner & Warton 2013), pero **no idéntica** al programa Java (que no puede
-  ejecutarse en un navegador). Incluye exploración de clases de características y regularización
-  con validación cruzada y AICc (estilo ENMeval).
-- **Datos:** presencias (una por celda), fondo muestreado en el área accesible (radio en km
-  alrededor de los registros), predictoras elegibles (por defecto las no colineales del paso 6).
-- **Validación:** bloques espaciales (ENMeval), pliegues aleatorios o retención 70/30. Métricas:
-  AUC, TSS, índice continuo de Boyce, sensibilidad/especificidad y omisión; umbrales (máx. TSS,
-  percentil 10, mínima presencia, sens = espec). Random Forest y Domain usan predicciones
-  *out-of-bag* / «dejando uno fuera» para no sobreestimar el ajuste de entrenamiento.
-- **Variables:** importancia por permutación (en los datos de prueba) y curvas de respuesta.
-- **Mapas:** idoneidad continua, presencia/ausencia por umbral e incertidumbre entre modelos,
-  con área idónea en km². Exportación a PNG, malla ASCII y GeoTIFF (Float32, EPSG:4326).
-- **Proyección a otros escenarios** (p. ej. WorldClim futuro CMIP6, archivo de 19 bandas o
-  capas `bio_N` sueltas): mapas de ganancia/pérdida de área idónea y mapa de extrapolación
-  **MESS** (Elith et al. 2010) que señala dónde el clima no tiene análogo en el área de calibración.
+The maps of steps 4, 5 and 9 are edited in a studio with tabs (base layers, text and fonts per element, legend, scale
+bar, north arrow, graticule, colours, saved styles). On export you can see a **preview** of the exact image that will
+be written, **clip the map to the country** or to the states chosen in step 2 (everything outside becomes transparent,
+with the outline of the country drawn), choose the framing and the paper size with its resolution, and save as PNG,
+JPEG, WebP, SVG, **TIFF** and georeferenced **GeoTIFF** for further editing in QGIS, ArcGIS or Illustrator.
 
-Referencias: Phillips et al. 2017 *Ecography* (maxnet); Renner & Warton 2013 *Biometrics*
-(equivalencia MaxEnt–proceso de Poisson); Elith et al. 2011 *Divers Distrib*; Muscarella et al. 2014
-*Methods Ecol Evol* (ENMeval); Valavi et al. 2021 *Ecography* (Random Forest con submuestreo) y
-2022 *Ecol Monogr* (comparación de métodos con solo presencias); Allouche et al. 2006 *J Appl Ecol*
-(TSS); Hirzel et al. 2006 *Ecol Modell* (Boyce); Elith et al. 2010 *Methods Ecol Evol* (MESS).
+### Step 9 · Species distribution modelling
 
-## Datos y créditos
+- **Algorithms (10):** MaxEnt-style penalised logistic model (cloglog output), GLM, GAM, random forest, boosted
+  regression trees, support vector machine, neural network, Bioclim envelope, Domain and Mahalanobis distance, plus an
+  **ensemble** (weighted mean, median or vote committee; weights by AUC, TSS or Boyce).
+- **MaxEnt-style model:** L1-penalised logistic regression on linear, quadratic, product and hinge features, with
+  cloglog output. It is statistically equivalent to maximum-entropy modelling (Renner & Warton 2013).
+- **Data:** one presence per cell, background sampled from the accessible area, predictors you choose. The map extent can be the box of the records plus a margin, a whole country or region (for example all of Mexico, Yucatán peninsula included) or custom coordinates; the model is projected over all of it.
+- **Validation:** spatial blocks, random folds or a 70/30 hold-out; AUC, TSS, continuous Boyce index, sensitivity,
+  specificity and omission; thresholds (max TSS, 10th percentile, minimum presence, sensitivity = specificity).
+  Random forest and Domain use out-of-bag / leave-one-out predictions so the training fit is not overstated.
+- **Variables:** permutation importance on the test data and response curves.
+- **Maps:** continuous suitability, threshold presence/absence and between-model uncertainty, with suitable area in km²;
+  export to PNG, ASCII grid and GeoTIFF (Float32, EPSG:4326).
+- **Projection to other scenarios** (e.g. WorldClim CMIP6 future, one 19-band file or separate `bio_N` layers):
+  gain/loss of suitable area and an extrapolation map (**MESS**, Elith et al. 2010).
 
-Esta herramienta consulta o usa datos de:
+## Data and credits
 
-- **[GBIF](https://www.gbif.org)** — registros de ocurrencia de especies (API pública).
-- **[WorldClim 2.1](https://www.worldclim.org)** (Fick & Hijmans, 2017) — variables
-  bioclimáticas y altitud.
-- **Köppen-Geiger** (Beck et al., 2018, *Scientific Data*) — clasificación climática,
-  CC BY 4.0.
-- **[SoilGrids](https://soilgrids.org)** (ISRIC) — clasificación de suelo WRB.
+- **[GBIF](https://www.gbif.org)** — species occurrence records (public API).
+- **[WorldClim 2.1](https://www.worldclim.org)** (Fick & Hijmans 2017) — bioclimatic variables and elevation.
+- **Köppen-Geiger** (Beck et al. 2018, *Scientific Data*, CC BY 4.0) — climate classification.
+- **[SoilGrids](https://soilgrids.org)** (ISRIC; Poggio et al. 2021) — WRB soil classification.
 
-El repositorio incluye una muestra de estos rásters a baja resolución (WorldClim a
-10 arc-min y Köppen a 1 km, carpeta `datos/`) para poder probar el flujo completo de
-inmediato. Para un análisis real, sustitúyelos por WorldClim a 30 arc-seg siguiendo
-las instrucciones de [`datos/LEE-ME.md`](datos/LEE-ME.md).
+The bundled example layers are a crop of WorldClim 10 arc-minutes and of the Köppen-Geiger map (longitude −122° to −86°,
+latitude 13° to 40°, covering the whole of Mexico), embedded in `js/example-rasters.js`, so the example needs no download. For a real study load the full files;
+see [`datos/LEE-ME.md`](datos/LEE-ME.md). The `datos/` folder also holds the world-wide 10 arc-minute files to try the
+folder picker.
 
-## Privacidad y arquitectura
+Third-party libraries and their licences: [`vendor/THIRD-PARTY-NOTICES.txt`](vendor/THIRD-PARTY-NOTICES.txt).
 
-Todo el procesamiento ocurre **en tu navegador**: los archivos GeoTIFF se leen
-localmente y la estadística/ML corre en Python vía [Pyodide](https://pyodide.org)
-(WebAssembly). Las únicas llamadas de red son a las APIs públicas de GBIF y SoilGrids,
-y a CDNs para cargar las librerías (Leaflet, geotiff.js, Pyodide). No hay backend propio
-ni base de datos: nada de lo que hagas se guarda ni se comparte más allá de tu equipo.
+## Privacy and architecture
 
-## Estructura
+All processing happens **in your browser**: GeoTIFF files are read locally, and the statistics, machine learning and
+modelling run in Python compiled to WebAssembly. The only network calls are to the public GBIF and SoilGrids APIs, to
+the map-tile servers and to a public content-delivery network that provides the Python engine. There is no back end and
+no database; nothing is stored or shared beyond your computer (only your language, theme and a soil-query cache are kept
+in the browser).
+
+## Repository layout
 
 ```
-index.html          shell de la aplicación (7 pasos)
-css/style.css        estilos
-js/                  lógica de cada bloque (ver comentarios en cada archivo)
-datos/               datos ráster de ejemplo + instrucciones para los definitivos
-servidor.ps1         servidor estático local (PowerShell), necesario para los bloques con Python
+index.html                 the application (home + 10 steps)
+css/style.css              styles, light and dark themes
+js/                        one file per block (i18n, state, ui, maps, GBIF, filters, cleaning, rasters, statistics,
+                           ML, ecology, SDM, export) and the home page (art, home, lab)
+js/example-records.js      bundled GBIF example (Pinus cembroides)
+js/example-rasters.js      bundled example layers (cropped WorldClim and Köppen-Geiger)
+vendor/                    Leaflet, geotiff.js, html2canvas and their licences
+datos/                     world-wide 10 arc-minute layers and instructions for full-resolution data
+server.ps1, *.bat          optional local web server (Windows)
 ```
+
+## How to cite
+
+Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &
+Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
+(Version 1.0.0) [Computer software]. https://github.com/luisangelbg/BioModellingPro
+
+See [`CITATION.cff`](CITATION.cff). Please also cite the data sources and the methods you use.
+
+## Licence
+
+GNU General Public License v3.0 or later. See [`LICENSE`](LICENSE).

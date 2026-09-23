@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Capítulo 2 · Filtros</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 72%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 14%; margin-right: 14%; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b2" data-pestana="2" data-orden="3" style="--acento: var(--b2)">
+  <div class="cap-apertura">
+    <div class="cap-num">2</div>
+    <div class="cap-etiqueta">Bloque 2 · Qué entra y qué se queda fuera</div>
+    <h1>Filtros: taxón, país, años, recuadro y estados</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Aquí se decide el área de estudio y qué registros la representan. Es el bloque que más influye en el resultado final del modelo, y el que menos tiempo suele dedicársele.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>2.1</b>Filtrar es decidir el área de estudio</li>
+      <li><b>2.2</b>Las cuatro facetas</li>
+      <li><b>2.3</b>Filtro por estado o región</li>
+      <li><b>2.4</b>Recorte geográfico</li>
+      <li><b>2.5</b>El resultado</li>
+      <li><b>2.6</b>Cómo elegir el área de estudio</li>
+      <li><b>2.7</b>Problemas frecuentes</li>
+    </ul>
+  </div>
+
+  <!-- 2.1 -->
+  <h2 id="b2-1"><span class="num">2.1</span>Filtrar es decidir el área de estudio</h2>
+  <p class="lead">Un filtro parece un detalle de comodidad —quitar lo que estorba— pero en modelado de nicho es una decisión de fondo. Los registros que dejes dentro definen qué ambientes cuentan como «ocupados», y el territorio que abarquen definirá de dónde sale el ambiente «disponible» con el que se comparan. Cambiar el área de estudio cambia el modelo, aunque los algoritmos y las variables sean los mismos.</p>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>El área accesible</div>
+    <p>En la introducción vimos el diagrama BAM: la <b>M</b> es la parte del mundo que la especie ha podido alcanzar en su historia. Un modelo debería aprender comparando los sitios ocupados contra esa M, no contra un continente entero. Si el área es demasiado grande, el modelo tiene una tarea trivial —distinguir la sierra mexicana de la selva amazónica— y sus medidas de calidad salen infladas. Si es demasiado pequeña, el modelo nunca ve las condiciones que la especie rechaza y no aprende nada. La M razonable suele ser la región biogeográfica donde la especie vive, más un margen.</p>
+  </div>
+
+  <!-- 2.2 -->
+  <h2 id="b2-2"><span class="num">2.2</span>Las cuatro facetas</h2>
+  <p>La primera tarjeta muestra cuatro grupos de casillas con el conteo de registros de cada categoría. Los cambios se aplican al instante: cada clic recalcula el número de la tarjeta de resultado.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b2-facetas.png" alt="Las cuatro facetas: rango taxonómico con SPECIES, SUBSPECIES y VARIETY; país con México, Estados Unidos, Nueva Zelanda, Francia y Austria; tipo de registro con seis categorías; y el rango de años"></div>
+    <figcaption><b>Figura 2.1.</b> Las facetas del ejemplo, con la casilla de México como único país activo. Cada renglón trae su conteo, que se calcula sobre los <b>registros descargados</b>, no sobre los que sobreviven a los otros filtros: así sabes siempre cuánto hay de cada cosa en el conjunto original.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Faceta</th><th>Para qué sirve de verdad</th></tr></thead>
+    <tbody>
+      <tr><td><b>Rango taxonómico</b></td><td>Separar la especie de sus subespecies y variedades. Si vas a modelar la especie completa, déjalos todos; si tu pregunta es sobre un subtaxón, quédate solo con él —y revisa que tenga registros suficientes (sección 1.7)—. También sirve para comparar: modelar por separado cada subespecie y ver si ocupan ambientes distintos.</td></tr>
+      <tr><td><b>País</b></td><td>La forma más rápida de quitar ejemplares cultivados en otros continentes y de acotar el estudio a un país. Si ya sabías de antemano con qué países ibas a trabajar, conviene filtrarlos en la propia descarga (sección 1.4): aquí se filtra lo que llegó, allá se evita traerlo. Cuidado: si tu especie cruza una frontera —como el piñonero entre México y Estados Unidos— quitar el país vecino recorta el nicho de verdad, no solo el mapa.</td></tr>
+      <tr><td><b>Tipo de registro</b></td><td><code>LIVING_SPECIMEN</code> son plantas vivas en colecciones: jardines botánicos y arboretos. Casi siempre hay que quitarlos. <code>PRESERVED_SPECIMEN</code> son ejemplares de herbario, con identificación revisable pero a veces georreferenciación gruesa; <code>HUMAN_OBSERVATION</code> son observaciones, con coordenada precisa pero identificación variable.</td></tr>
+      <tr><td><b>Año</b></td><td>Descartar registros antiguos cuyo sitio pudo cambiar de uso, o quedarse con un periodo que corresponda al clima de tus capas. Si usas WorldClim 2.1, el clima representa 1970–2000: mezclarlo con registros de 1900 es comparar cosas distintas.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2.3 -->
+  <h2 id="b2-3"><span class="num">2.3</span>Filtro por estado o región</h2>
+  <p>Muchos estudios no son nacionales sino regionales: una sierra, un estado, una cuenca. El programa trae incluidos los <b>32 estados de México</b> con sus límites, y puede asignarle a cada registro el estado que le toca.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b2-estados.png" alt="Tarjeta del filtro por estado con el modo de asignación, los atajos por grupo de estados, la lista de los 32 estados con su conteo, la línea de resumen de asignación y el aviso de desacuerdos"></div>
+    <figcaption><b>Figura 2.2.</b> El filtro por estado con el grupo <span class="ui">Noreste</span> activo: Coahuila, Nuevo León y Tamaulipas. Los estados sin registros salen en gris, y el último renglón reúne los registros a los que no se les pudo asignar ninguno.</figcaption>
+  </figure>
+
+  <h3>De dónde sale el estado de cada registro</h3>
+  <p>GBIF entrega un campo de texto con el estado, pero muchos registros llegan sin él y otros lo traen mal escrito. Por eso hay tres modos:</p>
+  <table class="compacta">
+    <thead><tr><th style="width:2.2in">Modo</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">por coordenadas cuando falta el texto</span><br><span class="small">(recomendado)</span></td><td>Usa el texto del registro cuando lo trae, normalizando grafías y abreviaturas («Edo. de México», «Mexico», «Michoacan» → el mismo estado), y cuando no lo trae decide por la coordenada. Es el que más registros aprovecha.</td></tr>
+      <tr><td><span class="ui">siempre por coordenadas</span></td><td>Ignora el texto y usa solo la prueba de punto en polígono. Útil cuando sospechas que el campo de texto es poco confiable.</td></tr>
+      <tr><td><span class="ui">solo con el texto del registro</span></td><td>Se queda con lo que dice el publicador. Sirve para auditar los datos, no para modelar.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>El ejemplo, estado por estado</div>
+    <p>Con los 2,400 registros del piñonero: <b>1,697</b> recibieron su estado del texto del registro, <b>22</b> lo recibieron de sus coordenadas —son registros mexicanos que GBIF entregó sin estado— y <b>681</b> quedaron sin asignar, que son exactamente los 670 de Estados Unidos y los 11 de Europa y Nueva Zelanda: no hay ningún registro mexicano sin estado.</p>
+    <p>Los estados con más registros son Coahuila (246), Durango (208), Baja California Sur (200), Chihuahua (156), Nuevo León (142) y Zacatecas (130): la Sierra Madre Occidental, la Oriental y la sierra de La Laguna, que es donde vive el piñonero.</p>
+  </div>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Cuando el texto y la coordenada no coinciden</div>
+    <p>En el ejemplo hay <b>54 registros</b> donde el estado escrito no es el estado en el que cae la coordenada. Las causas son tres: nombres mal escritos o de municipios tomados por estados, registros justo en el límite entre dos estados —donde un error de 200 m cambia la respuesta— y coordenadas francamente equivocadas. La app lo avisa y no decide por ti: en el modo recomendado manda el texto, en el modo por coordenadas manda la coordenada, y los registros mal georreferenciados se atacan en el Bloque 3.</p>
+  </div>
+
+  <h3>Atajos y opciones</h3>
+  <ul>
+    <li><b>Los botones de grupo</b> —<span class="ui">Noroeste</span>, <span class="ui">Noreste</span>, <span class="ui">Occidente y Bajío</span>, <span class="ui">Centro</span>, <span class="ui">Pacífico Sur</span>, <span class="ui">Golfo</span>, <span class="ui">Península de Yucatán</span>— marcan de golpe los estados de esa región. Funcionan como interruptor: si el grupo ya estaba completo, un segundo clic lo quita.</li>
+    <li><span class="ui">todos</span> · <span class="ui">ninguno</span> · <span class="ui">solo con registros</span> son los atajos de la lista. El último deja marcados nada más los estados que tienen al menos un registro, que es el punto de partida cómodo.</li>
+    <li><span class="ui">Usar la selección como recuadro</span> convierte los estados elegidos en el rectángulo del recorte geográfico de la sección 2.4, y ese mismo recuadro se propone después como extensión del mapa en el Bloque 9.</li>
+    <li><span class="ui">Dibujar el contorno en los mapas</span> traza el límite de lo que elegiste sobre los mapas de los bloques 4 y 9, para que se vea de qué región se está hablando.</li>
+    <li><span class="ui">Cargar mi capa (GeoJSON)</span> sustituye los estados por tus propios polígonos: municipios, cuencas, áreas naturales protegidas, unidades de manejo, ejidos. La app toma el nombre de cada polígono de sus propiedades y arma la lista igual que con los estados.</li>
+  </ul>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>De dónde salen los límites</div>
+    <p>Los 32 estados vienen de Natural Earth a escala 1:10 millones, que es de dominio público, simplificados para que pesen poco. Son exactos para clasificar registros y para dibujar contornos en un mapa de página, pero <b>no</b> son un límite oficial: no los uses para medir superficies ni para resolver un litigio de linderos.</p>
+  </div>
+
+  <!-- 2.4 -->
+  <h2 id="b2-4"><span class="num">2.4</span>Recorte geográfico</h2>
+  <p>Cuando la región que te interesa no coincide con ningún estado —una franja altitudinal, una zona de estudio rectangular, el área de un proyecto— está el recorte por coordenadas.</p>
+
+  <figure class="chica">
+    <div class="marco"><img src="../img/b2-recuadro.png" alt="Campos de latitud mínima y máxima, longitud mínima y máxima, con los botones de aplicar y quitar"></div>
+    <figcaption><b>Figura 2.3.</b> Los cuatro números del recuadro, ya llenos con la envolvente de los tres estados del Noreste. Debajo de ellos, la tarjeta trae un mini mapa donde el rectángulo se puede dibujar con el ratón: <span class="ui">Dibujar recuadro</span>, arrastrar de esquina a esquina y <span class="ui">Aplicar</span>.</figcaption>
+  </figure>
+
+  <p>El recuadro y el filtro por estados se pueden usar juntos: el recuadro recorta y la selección de estados afina. Si vas a modelar, conviene que el recuadro sea un poco más grande que la distribución conocida, para que el modelo vea también condiciones que la especie <i>no</i> ocupa.</p>
+
+  <!-- 2.5 -->
+  <h2 id="b2-5"><span class="num">2.5</span>El resultado</h2>
+  <p>La última tarjeta dice cuántos registros sobrevivieron y muestra la tabla con la columna <b>Estado</b> ya rellenada. Ese conjunto es el que pasa al Bloque 3.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/b2-resultado.png" alt="Tarjeta de resultado con 425 registros y la tabla filtrada, con la columna de estado"></div>
+    <figcaption><b>Figura 2.4.</b> El ejemplo reducido a un estudio regional: de 2,400 registros a 425. La columna <b>Estado</b> aparece aunque GBIF no la trajera, porque la asignó la coordenada.</figcaption>
+  </figure>
+
+  <div class="caja dato">
+    <div class="dato-cifra">425</div>
+    <div class="dato-txt"><div class="caja-t">El recorrido del ejemplo</div>2,400 registros descargados → <b>1,719</b> al dejar solo México → <b>425</b> al quedarse con Coahuila, Nuevo León y Tamaulipas. Cada paso es una decisión que debe quedar escrita en la sección de métodos.</div>
+  </div>
+
+  <!-- 2.6 -->
+  <h2 id="b2-6"><span class="num">2.6</span>Cómo elegir el área de estudio</h2>
+  <p>No hay una regla única, pero sí un orden de preguntas que funciona:</p>
+  <ol class="pasos">
+    <li><b>¿Cuál es la pregunta?</b> Un estudio nacional de una especie pide todo el país; una evaluación de una unidad de manejo pide esa unidad más su entorno; una comparación entre subespecies pide el área de las dos.</li>
+    <li><b>¿Hasta dónde ha podido llegar la especie?</b> Ese es el criterio biológico: la región biogeográfica que ocupa, no el rectángulo que cabe en la pantalla. Las barreras —un desierto, un mar, una cordillera— son buenos límites.</li>
+    <li><b>¿Está representado el contraste?</b> Dentro del área debe haber sitios con condiciones parecidas a las que ocupa la especie y también sitios claramente distintos. Un área que solo contiene su hábitat impide que el modelo aprenda qué rechaza.</li>
+    <li><b>¿Puedo justificarlo en una frase?</b> Si la respuesta es «porque así se veía bien», conviene volver al punto 2.</li>
+  </ol>
+
+  <!-- 2.7 -->
+  <h2 id="b2-7"><span class="num">2.7</span>Problemas frecuentes</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.1in">Lo que ves</th><th>Qué pasó y qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>El conteo no baja al marcar una casilla</td><td>Los conteos de las facetas son del conjunto descargado. Si ya habías filtrado por otra faceta, el número de la tarjeta de resultado sí baja, pero el de la casilla no cambia.</td></tr>
+      <tr><td>Muchos registros «sin estado asignado»</td><td>Normal si tu descarga incluye otros países: ningún estado mexicano les corresponde. Si son mexicanos, revisa el modo de asignación: en <span class="ui">solo con el texto</span> quedan fuera todos los que GBIF entregó sin ese campo.</td></tr>
+      <tr><td>Un estado con registros que no esperabas</td><td>Puede ser una población real poco conocida, un ejemplar cultivado o una coordenada equivocada. Míralo en el mapa del Bloque 4 antes de decidir.</td></tr>
+      <tr><td>El recuadro deja fuera registros que querías</td><td>Recuerda que la longitud es negativa en América: un recuadro de −104 a −97 no incluye −110. El botón <span class="ui">Usar la selección como recuadro</span> evita escribir los números a mano.</td></tr>
+      <tr><td>Tu GeoJSON se carga pero la lista sale vacía</td><td>Los polígonos no traen un nombre reconocible en sus propiedades, o el archivo está en una proyección distinta de latitud-longitud. Guárdalo en coordenadas geográficas (EPSG:4326).</td></tr>
+      <tr><td>Quedan menos de quince registros</td><td>El área es demasiado pequeña para modelar. Amplíala, o baja el objetivo a describir el ambiente de los puntos (bloques 5 y 7) sin ajustar un modelo.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

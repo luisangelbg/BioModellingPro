@@ -1,4 +1,4 @@
-/* Exportación de datos (Bloque A: CSV crudo, CSV depurado, GeoJSON depurado). */
+/* Data export (step 1–3 tables): raw CSV, cleaned CSV and cleaned GeoJSON. Column names follow Darwin Core. */
 
 const EXPORT_COLUMNS = [
   { key: 'key', label: 'gbif_key' },
@@ -23,28 +23,29 @@ const EXPORT_COLUMNS = [
   { key: 'institutionCode', label: 'institutionCode' },
   { key: 'datasetName', label: 'datasetName' },
   { key: 'issues', label: 'gbif_issues' },
-  { key: '_drop', label: 'motivo_descarte', get: r => r._drop || '' },
+  { key: 'source', label: 'source', get: r => r.source || 'GBIF' },
+  { key: '_drop', label: 'discard_reason', get: r => r._drop || '' },
 ];
 
 function safeName(suffix) {
-  return (state.query || 'especie').trim().replace(/\s+/g, '_') + '_' + suffix;
+  return slugName(state.query) + '_' + suffix;
 }
 
 el('dlRawCsv').addEventListener('click', () => {
   const rows = state.cleanReport ? state.cleanReport.all : state.filtered;
-  downloadBlob(toCSV(EXPORT_COLUMNS, rows), safeName('registros_crudos.csv'), 'text/csv;charset=utf-8');
+  downloadBlob(toCSV(EXPORT_COLUMNS, rows), safeName('raw_records.csv'), 'text/csv;charset=utf-8');
 });
 
 el('dlCleanCsv').addEventListener('click', () => {
   downloadBlob(toCSV(EXPORT_COLUMNS.filter(c => c.key !== '_drop'), state.clean),
-    safeName('registros_depurados.csv'), 'text/csv;charset=utf-8');
+    safeName('cleaned_records.csv'), 'text/csv;charset=utf-8');
 });
 
 el('dlCleanGeojson').addEventListener('click', () => {
   const fc = {
     type: 'FeatureCollection',
     metadata: {
-      generator: 'BioSDM', query: state.query,
+      generator: 'BioModelling Pro', query: state.query,
       acceptedName: state.match && state.match.scientificName,
       taxonKey: state.match && state.match.usageKey,
       records: state.clean.length, generated: new Date().toISOString(),
@@ -56,7 +57,7 @@ el('dlCleanGeojson').addEventListener('click', () => {
         .reduce((o, c) => (o[c.label] = c.get ? c.get(r) : r[c.key], o), {}),
     })),
   };
-  downloadBlob(JSON.stringify(fc, null, 1), safeName('registros_depurados.geojson'), 'application/geo+json');
+  downloadBlob(JSON.stringify(fc, null, 1), safeName('cleaned_records.geojson'), 'application/geo+json');
 });
 
 window.EXPORT_COLUMNS = EXPORT_COLUMNS;
