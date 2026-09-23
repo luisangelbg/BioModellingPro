@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0 — 2026-09-23
+
+- **No WorldClim data travels with the program any more.** We asked WorldClim for permission to redistribute the
+  small cropped subset that the bundled example used, and they refused, so `js/example-rasters.js` (3.7 MB) was
+  removed. Nothing of the analysis changed: the layers are now downloaded once — `datos/LEE-ME.md` says how — and
+  step 5 reads them with the folder picker, the file picker, or from the program's own `datos/` folder. The
+  Köppen-Geiger map stays bundled, because CC BY 4.0 allows it, so it is one download less.
+- The third button of step 5 is now **«Use the layers in `datos/`»**: it reads that folder, which needs the local
+  server, and when the folder has nothing it explains where to get the layers instead of failing.
+- The example **records** still travel with the program, so step 1 keeps working from a double click.
+- `NOTICE.md`, the README, the Spanish readme, `datos/LEE-ME.md` and the manual (sections I.5, 5.2, 9.2 and
+  appendix F) say all of this.
+
 ## 1.0.2 — 2026-09-22
 
 Documentation and licensing hygiene. Nothing changed in the analysis.

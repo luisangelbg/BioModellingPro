@@ -95,8 +95,12 @@ el('envFilesBtn').addEventListener('click', () => el('envFiles').click());
 el('envFolder').addEventListener('change', e => { handleEnvFiles(e.target.files, 'folder'); e.target.value = ''; });
 el('envFiles').addEventListener('change', e => { handleEnvFiles(e.target.files, 'files'); e.target.value = ''; });
 
-/* Bundled example layers. When js/example-rasters.js is present they are rebuilt from embedded data, so the
-   example works when index.html is opened with a double click; otherwise they are fetched from datos/. */
+/* Example layers, read from the datos/ folder of the program: Köppen-Geiger travels with it, and the WorldClim
+   layers are downloaded once by whoever uses it (datos/LEE-ME.md says how), because WorldClim does not allow them
+   to be redistributed. Reading that folder needs the local server: from file:// the browser refuses to fetch it,
+   and the folder and file pickers are the way in.
+   The first branch is an escape hatch: whoever wants the double-click example back can build their own
+   js/example-rasters.js from the layers they downloaded and load it from index.html. Nothing ships with one. */
 function base64ToFile(b64, name) {
   const bin = atob(b64), u8 = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
@@ -119,19 +123,22 @@ async function loadExampleRasters() {
   if (!Object.keys(found).length) throw bilingualError('no se encontraron los archivos de ejemplo', 'the example files were not found');
   state.env.files = found;
 }
+/* what to say when datos/ has nothing to give: it is the usual case the first time, and it is not a failure */
+function comoConseguirLasCapas() {
+  return L2('No hay capas en la carpeta <span class="ruta">datos/</span> del programa. Las de WorldClim no se distribuyen con él porque su licencia no lo permite: descárgalas una vez de <b>worldclim.org</b> —10 arc-min basta para aprender— y déjalas en <span class="ruta">datos/worldclim/</span>; las instrucciones están en <span class="ruta">datos/LEE-ME.md</span>. Si ya las tienes en cualquier otra carpeta, los dos botones de la izquierda las cargan directamente y son la vía cuando abres el programa con doble clic.',
+    'There are no layers in the program’s <span class="ruta">datos/</span> folder. The WorldClim ones are not distributed with it because their licence does not allow it: download them once from <b>worldclim.org</b> — 10 arc-minutes is enough to learn — and drop them in <span class="ruta">datos/worldclim/</span>; the instructions are in <span class="ruta">datos/LEE-ME.md</span>. If you already have them anywhere else, the two buttons on the left load them straight away, and they are the way in when you open the program with a double click.');
+}
 el('envUseSample').addEventListener('click', async () => {
-  showSpinner(T('Cargando capas de ejemplo…', 'Loading example layers…'));
+  showSpinner(T('Cargando las capas de datos/…', 'Loading the layers in datos/…'));
   try {
     await loadExampleRasters();
     renderEnvFileReport();
     setPickStatus('sample', [], state.env.files);
-    const bb = window.EXAMPLE_RASTERS && window.EXAMPLE_RASTERS.bbox;
-    const area = bb ? L2(` recortadas a lon ${bb[0]}° a ${bb[2]}°, lat ${bb[1]}° a ${bb[3]}°`, ` cropped to lon ${bb[0]}° to ${bb[2]}°, lat ${bb[1]}° to ${bb[3]}°`) : '';
-    showMessage('envMessages', 'info', L2('Capas de ejemplo cargadas: WorldClim a 10 arc-min (≈ 18 km) y Köppen-Geiger agregado a la misma malla (clase más frecuente por celda)', 'Example layers loaded: WorldClim at 10 arc-minutes (≈ 18 km) and Köppen-Geiger aggregated to the same grid (most frequent class per cell)') +
-      area + L2('. Los registros fuera de esa ventana quedan sin dato y se descartan. Para tu propio estudio carga los archivos completos.',
-        '. Records outside that window get no data and are dropped. For your own study load the full files.'));
+    const n = Object.keys(state.env.files).length;
+    showMessage('envMessages', 'info', L2(`${n} capas cargadas desde la carpeta <span class="ruta">datos/</span> del programa. Los registros que caigan fuera de su cobertura quedan sin dato y se descartan.`,
+      `${n} layers loaded from the program’s <span class="ruta">datos/</span> folder. Records falling outside their coverage get no data and are dropped.`));
   } catch (e) {
-    showMessage('envMessages', 'error', L2('No se pudieron cargar las capas de ejemplo: ', 'Could not load the example layers: ') + errHTML(e));
+    showMessage('envMessages', 'warning', comoConseguirLasCapas());
   } finally { hideSpinner(); }
 });
 window.loadExampleRasters = loadExampleRasters;
@@ -558,7 +565,7 @@ function setPickStatus(source, files, found) {
   const n = Object.keys(found).length, tif = files.filter(f => /\.tiff?$/i.test(f.name)).length;
   const dir = source === 'folder' && files[0] && files[0].webkitRelativePath ? files[0].webkitRelativePath.split('/')[0] : '';
   box.className = 'pick-status' + (n ? ' ok' : '');
-  box.textContent = source === 'sample' ? T(`${n} capas de ejemplo cargadas`, `${n} example layers loaded`)
+  box.textContent = source === 'sample' ? T(`${n} capas cargadas de datos/`, `${n} layers loaded from datos/`)
     : n ? T(`${dir ? '«' + dir + '»: ' : ''}${tif} archivos .tif, ${n} capas reconocidas`, `${dir ? '“' + dir + '”: ' : ''}${tif} .tif files, ${n} layers recognised`)
         : T(`${files.length} archivos leídos, ninguno reconocido como WorldClim o Köppen`, `${files.length} files read, none recognised as WorldClim or Köppen`);
 }

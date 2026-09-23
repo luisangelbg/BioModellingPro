@@ -11,9 +11,9 @@ barra superior y la elección se recuerda.
 
 ## Cómo abrir
 
-- **Doble clic en `index.html`.** Funciona todo, incluido el ejemplo incluido (*Pinus cembroides*: 2 400
-  registros de GBIF y capas de WorldClim y Köppen-Geiger recortadas). Necesitas internet para GBIF, los mapas base y
-  el motor de Python (estadística, ML y modelado).
+- **Doble clic en `index.html`.** Funciona todo, incluidos los registros del ejemplo (*Pinus cembroides*, 2 400
+  registros de GBIF). Las capas de clima se descargan una vez (ver `datos/LEE-ME.md`) y se cargan desde donde las
+  tengas. Necesitas internet para GBIF, los mapas base y el motor de Python (estadística, ML y modelado).
 - **En línea:** https://luisangelbg.github.io/BioModellingPro/
 - **Servidor local opcional** (por ejemplo, para abrirlo desde una tablet en la misma red): doble clic en
   `Open BioModelling Pro.bat`, o clic derecho en `server.ps1` → *Ejecutar con PowerShell*, y abre
@@ -67,8 +67,9 @@ en QGIS, ArcGIS o Illustrator.
 
 ## Datos
 
-Ver [`datos/LEE-ME.md`](datos/LEE-ME.md). Las capas de ejemplo van incrustadas en `js/example-rasters.js`; para un
-estudio real carga los archivos completos de WorldClim (30 arc-seg a 10 arc-min) y de Köppen-Geiger.
+Ver [`datos/LEE-ME.md`](datos/LEE-ME.md). Los **registros** del ejemplo vienen con el programa; las **capas de clima
+no**: WorldClim no permite redistribuirlas, así que se descargan una vez (10 arc-min para aprender, 30 arc-seg para un
+estudio real) y el paso 5 las lee de donde las tengas. Köppen-Geiger sí viene incluido.
 
 > Nota: GBIF entrega primero los registros más recientes. Si limitas la descarga, obtendrás sobre todo registros de
 > años recientes. Para un muestreo completo, sube el límite por encima del total que reporta GBIF.
@@ -77,7 +78,7 @@ estudio real carga los archivos completos de WorldClim (30 arc-seg a 10 arc-min)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(versión 1.0.2) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+(versión 1.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 Ese DOI es el **DOI de concepto**: siempre lleva a la versión más reciente. La versión 1.0.0 tiene además el suyo,
 [10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), por si necesitas señalar exactamente el código
@@ -89,10 +90,9 @@ El programa es software libre con **licencia GPL v3 o posterior** (archivo `LICE
 código fuente escrito por las personas autoras.
 
 Las bibliotecas que el programa usa y los datos que trae de ejemplo son de otras personas y conservan sus propias
-condiciones. Una conviene conocerla antes de redistribuir el programa: **WorldClim no permite redistribuir sus
-capas sin permiso previo**, por eso las capas globales no están en el repositorio y por eso el recorte del ejemplo
-es separable (si borras `js/example-rasters.js` el programa sigue funcionando completo; solo dejas de tener el
-botón «Usar las capas de ejemplo» del paso 5).
+condiciones. **WorldClim no permite redistribuir sus capas sin permiso previo**; lo pedimos para el recorte del
+ejemplo y lo negaron, así que desde la versión 1.1.0 el programa no lleva ni un byte de WorldClim y las capas se
+descargan una vez (`datos/LEE-ME.md`).
 
 `NOTICE.md` dice, fuente por fuente, qué es propio y qué es de terceros; `vendor/THIRD-PARTY-NOTICES.txt` trae las
 licencias completas de las bibliotecas, y `datos/GBIF-FUENTES.md`, las 70 instituciones que publicaron los

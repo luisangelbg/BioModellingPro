@@ -3,7 +3,7 @@
   "@type": "SoftwareSourceCode",
   "name": "BioModelling Pro",
   "description": "A self-contained, browser-based platform for biogeography and species distribution modelling. It downloads presence records from GBIF, filters and cleans them with nine coordinate-quality rules, extracts bioclimatic variables, elevation, Koeppen-Geiger climate and soil type, explores them with descriptive statistics, normality tests, correlation and collinearity diagnostics, PCA, clustering, correspondence analysis and ecological metrics, fits ten species distribution algorithms (a MaxEnt-style penalised logistic model, GLM, GAM, random forest, boosted regression trees, support vector machine, neural network, Bioclim, Domain, Mahalanobis) and an ensemble, validates them with spatial blocks, AUC, TSS and the Boyce index, and projects them to future climate scenarios with extrapolation maps. Bilingual (Spanish and English) with light and dark themes; includes a virtual-species laboratory.",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "identifier": "https://doi.org/10.5281/zenodo.22907825",
   "dateCreated": "2026-09-01",
   "datePublished": "2026-09-22",

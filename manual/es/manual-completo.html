@@ -136,7 +136,7 @@
   txt(68, 152, 'BioModelling', { size: 78, peso: 600, color: TINTA });
   txt(68, 226, 'Pro', { size: 78, peso: 600, color: INK });
   el('rect', { x: 196, y: 196, width: 586, height: 1.2, fill: '#c9d6cf' });
-  txt(782, 192, 'versión 1.0.2', { sans: true, size: 11, peso: 400, color: GRIS, ancla: 'end' });
+  txt(782, 192, 'versión 1.1.0', { sans: true, size: 11, peso: 400, color: GRIS, ancla: 'end' });
   txt(68, 268, 'Biogeografía y modelado de la distribución de especies', { size: 25, peso: 500, color: TINTA });
   txt(68, 294, 'Biogeography and species distribution modelling', { size: 18, peso: 400, cursiva: true, color: GRIS });
 
@@ -521,17 +521,17 @@
         <div><b>Héctor Tecumshé Mojica-Zárate</b><span class="orc">ORCID 0000-0002-9067-3983</span></div>
       </div>
     </dd>
-    <dt>Programa</dt><dd>BioModelling Pro, versión 1.0.2 (septiembre de 2026)</dd>
-    <dt>Manual</dt><dd>Primera edición en español, 2026. Describe la versión 1.0.2 del programa.</dd>
+    <dt>Programa</dt><dd>BioModelling Pro, versión 1.1.0 (septiembre de 2026)</dd>
+    <dt>Manual</dt><dd>Primera edición en español, 2026. Describe la versión 1.1.0 del programa.</dd>
     <dt>Licencia del programa</dt><dd>Licencia Pública General de GNU, versión 3 o posterior (GPL-3.0-or-later).</dd>
     <dt>Derechos del manual</dt><dd>© 2026 las personas autoras. Todos los derechos reservados.</dd>
     <dt>Idioma de la interfaz</dt><dd>Español o inglés, con los botones <span class="ui">ES</span> · <span class="ui">EN</span> de la barra superior. En este manual los nombres de botones y menús se escriben como aparecen en pantalla <b>en español</b>, por ejemplo <span class="ui">Ejecutar modelos →</span>.</dd>
   </dl>
 
   <h4>Cómo citar el programa</h4>
-  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro: biogeografía y modelado de la distribución de especies en el navegador</i> (versión 1.0.2) [Programa de cómputo]. Zenodo. https://doi.org/10.5281/zenodo.22907825</div>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro: biogeografía y modelado de la distribución de especies en el navegador</i> (versión 1.1.0) [Programa de cómputo]. Zenodo. https://doi.org/10.5281/zenodo.22907825</div>
   <h4>Cómo citar este manual</h4>
-  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro. Manual de usuario</i> (1.ª ed.). Distribuido con BioModelling Pro, versión 1.0.2.</div>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y Mojica-Zárate, H. T. (2026). <i>BioModelling Pro. Manual de usuario</i> (1.ª ed.). Distribuido con BioModelling Pro, versión 1.1.0.</div>
   <p class="small">Ese DOI es el <b>de concepto</b>: lleva siempre a la versión más reciente, y cada versión tiene además el suyo. La cita está también en la sección <span class="ui">Cómo citar</span> de la app, con su versión en BibTeX.</p>
 
   <div class="caja nota">
@@ -868,7 +868,7 @@
   <h2 id="si-5"><span class="num">I.5</span>Qué necesitas y cómo abrirlo</h2>
   <ol class="pasos">
     <li><b>Un navegador de internet al día.</b> Cualquiera de los de uso común, en Windows, macOS o Linux. No se instala nada más.</li>
-    <li><b>Abre <code>index.html</code> con doble clic.</b> Así funciona todo, incluido el ejemplo incrustado. También puedes usar el servidor local que viene con el programa si prefieres abrirlo desde otra computadora de la misma red.</li>
+    <li><b>Abre <code>index.html</code> con doble clic.</b> Así funcionan los registros de ejemplo y todo lo que se hace con ellos. Las capas de clima se descargan una vez (sección I.4) y se cargan con los dos primeros botones del Bloque 5, que también funcionan con doble clic. También puedes usar el servidor local que viene con el programa si prefieres abrirlo desde otra computadora de la misma red.</li>
     <li><b>Conexión a internet</b> para tres cosas: consultar GBIF, dibujar el mapa base y descargar el motor de cálculo la primera vez que entras a un bloque que lo usa. El resto —la lectura de tus archivos, los cálculos y las figuras— funciona sin conexión.</li>
     <li><b>Elige idioma y tema</b> en la barra superior: <span class="ui">ES</span> o <span class="ui">EN</span>, y claro u oscuro. La elección se recuerda y las figuras se redibujan solas.</li>
   </ol>
@@ -1653,10 +1653,10 @@
 
   <!-- 5.2 -->
   <h2 id="b5-2"><span class="num">5.2</span>Tres formas de cargar las capas</h2>
-  <p>La app no descarga capas por ti: los archivos de clima pesan cientos de megabytes y se distribuyen con sus propias condiciones. Lo que hace es <b>leerlos de tu disco</b> sin subirlos a ningún lado.</p>
+  <p>La app no descarga capas ni las trae dentro: las de WorldClim <b>no se pueden redistribuir sin permiso</b>, y se pidió y lo negaron. Se descargan una vez (<code>datos/LEE-ME.md</code>) y la app las <b>lee de tu disco</b>. Köppen-Geiger sí viene incluido.</p>
 
-  <figure>
-    <div class="marco"><img src="../img/b5-capas.png" alt="Tarjeta de carga de capas ráster con los tres botones: elegir carpeta, elegir archivos y usar las capas de ejemplo, cada uno con su explicación y su estado"></div>
+  <figure class="media">
+    <div class="marco"><img src="../img/b5-capas.png" alt="Tarjeta de carga de capas ráster con los tres botones: elegir carpeta, elegir archivos y usar las capas de la carpeta datos, cada uno con su explicación y su estado"></div>
     <figcaption><b>Figura 5.1.</b> Las tres formas de cargar las capas, cada una con su propio botón y su propio aviso de estado, para que nunca haya duda de cuál se usó.</figcaption>
   </figure>
 
@@ -1665,7 +1665,7 @@
     <tbody>
       <tr><td><span class="ui">📁 Elegir carpeta…</span></td><td>Tienes descomprimida la carpeta de WorldClim. Eliges la carpeta completa y la app toma de ella solo los archivos que reconoce. Es lo más cómodo para un estudio real.</td></tr>
       <tr><td><span class="ui">📄 Elegir archivos…</span></td><td>Tus capas están repartidas o quieres cargar solo algunas. Se seleccionan varias a la vez con Ctrl o Mayús.</td></tr>
-      <tr><td><span class="ui">🧪 Usar las capas de ejemplo</span></td><td>Para aprender o para probar: las capas incluidas en el programa, a 10 minutos de arco, recortadas a México y el suroeste de Estados Unidos. No requieren descargar nada.</td></tr>
+      <tr><td><span class="ui">🧪 Usar las capas de <code>datos/</code></span></td><td>Lee la carpeta <code>datos/</code> del programa, que es donde conviene dejar las capas al descargarlas. Necesita el servidor local.</td></tr>
     </tbody>
   </table>
 
@@ -1748,7 +1748,7 @@
       <tr><td>30 segundos</td><td>≈ 1 km</td><td>Estudios locales o de montaña, donde el relieve cambia el clima en pocos kilómetros. Los archivos son enormes: conviene recortarlos antes.</td></tr>
       <tr><td>2.5 minutos</td><td>≈ 4.6 km</td><td>El punto medio razonable para un estudio estatal o regional.</td></tr>
       <tr><td>5 minutos</td><td>≈ 9 km</td><td>Estudios nacionales con registros de precisión desigual.</td></tr>
-      <tr><td>10 minutos</td><td>≈ 18 km</td><td>Estudios continentales, exploración rápida y ejemplos de enseñanza —es la resolución de las capas incluidas—.</td></tr>
+      <tr><td>10 minutos</td><td>≈ 18 km</td><td>Estudios continentales y enseñanza: es la de los ejemplos de este manual.</td></tr>
     </tbody>
   </table>
   <p>La regla práctica: <b>la celda no debería ser más fina que la precisión de tus coordenadas</b>. Con registros georreferenciados a 5 km, una capa de 1 km da una falsa sensación de detalle.</p>
@@ -2245,7 +2245,7 @@
 
   <div class="caja ejemplo">
     <div class="caja-t"><span class="ico">▸</span>El ejemplo, preparado</div>
-    <p>Con el piñonero y las capas de ejemplo: extensión <b>País de los registros (MX)</b>, recuadro de −118.6° a −86.4° y de 14.4° a 32.8°, malla de <b>194 × 111</b> celdas de <b>18.6 km</b>, 8 predictoras. De los 1,885 registros depurados, <b>14 quedan fuera</b> de la extensión —los de Estados Unidos por encima del paralelo 32.8°— y de los 1,871 restantes, 1,468 caen en una celda ya ocupada o sin dato: quedan <b>403 presencias</b> contra <b>7,751 puntos de fondo</b>.</p>
+    <p>Con el piñonero y las capas de WorldClim a 10 arc-min: extensión <b>País de los registros (MX)</b>, recuadro de −118.6° a −86.4° y de 14.4° a 32.8°, malla de <b>194 × 111</b> celdas de <b>18.6 km</b>, 8 predictoras. De los 1,885 registros depurados, <b>14 quedan fuera</b> de la extensión —los de Estados Unidos por encima del paralelo 32.8°— y de los 1,871 restantes, 1,468 caen en una celda ya ocupada o sin dato: quedan <b>403 presencias</b> contra <b>7,751 puntos de fondo</b>.</p>
     <p>Que 1,871 registros se conviertan en 403 presencias asusta la primera vez. No se han perdido datos: se ha quitado la repetición. Con celdas de 18.6 km, 403 es el número de <i>celdas distintas</i> donde se ha registrado la especie, y eso es lo que el modelo puede aprender.</p>
   </div>
 
@@ -2759,7 +2759,7 @@
     <thead><tr><th style="width:1.6in">Fuente</th><th>Qué es y en qué condiciones</th></tr></thead>
     <tbody>
       <tr><td><b>GBIF</b></td><td>Los registros del ejemplo (2400 de <i>Pinus cembroides</i>, descargados el 21 de septiembre de 2026). Cada registro conserva la licencia de la institución que lo publicó: CC0, CC BY o CC BY-NC. Las 70 instituciones y los 91 conjuntos de datos están en <code>datos/GBIF-FUENTES.md</code>.</td></tr>
-      <tr><td><b>WorldClim 2.1</b></td><td>Las bioclimáticas y la altitud. Uso académico y no comercial libre, pero <b>no se pueden redistribuir sin permiso previo</b>: por eso las capas globales no vienen con el programa y hay que descargarlas. El recorte del ejemplo (<code>js/example-rasters.js</code>) está ahí para enseñar y es separable: si lo borras, el programa sigue completo.</td></tr>
+      <tr><td><b>WorldClim 2.1</b></td><td>Las bioclimáticas y la altitud. Uso académico y no comercial libre, pero <b>no se pueden redistribuir sin permiso previo</b>. Se pidió permiso para traer un recorte del ejemplo y se negó, así que desde la versión 1.1.0 <b>el programa no lleva ninguna capa de WorldClim</b>: se descargan una vez con las instrucciones de <code>datos/LEE-ME.md</code>.</td></tr>
       <tr><td><b>Köppen-Geiger</b></td><td>El mapa de clases climáticas a 1 km de Beck y colaboradores (2018). CC BY 4.0: se redistribuye citándolo, y por eso sí viaja con el programa.</td></tr>
       <tr><td><b>SoilGrids (ISRIC)</b></td><td>El tipo de suelo del Bloque 5, consultado en línea punto por punto. CC BY 4.0.</td></tr>
     </tbody>

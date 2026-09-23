@@ -35,7 +35,7 @@ authors:
   - given-names: "Héctor Tecumshé"
     family-names: "Mojica-Zárate"
     orcid: "https://orcid.org/0000-0002-9067-3983"
-version: "1.0.2"
+version: "1.1.0"
 date-released: "2026-09-22"
 doi: "10.5281/zenodo.22907825"
 identifiers:

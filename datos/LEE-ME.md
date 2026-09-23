@@ -1,17 +1,24 @@
 # Datos ráster / Raster data
 
-## Ejemplo incluido / Bundled example
+## Lo primero: las capas de clima se descargan una vez / Read this first
 
-El ejemplo (*Pinus cembroides*) **no necesita esta carpeta**: sus registros van en `js/example-records.js` y sus
-capas (WorldClim a 10 arc-min y Köppen-Geiger recortados a lon −122° a −86°, lat 13° a 40°: todo México, la península
-de Yucatán incluida) en
-`js/example-rasters.js`. Por eso funciona con doble clic en `index.html`. En el paso 1 pulsa **«Usar registros de
-ejemplo»** y en el paso 5 **«Usar las capas de ejemplo»**.
+Los **registros** del ejemplo (*Pinus cembroides*) sí vienen con el programa, en `js/example-records.js`: en el paso 1
+pulsa **«Usar registros de ejemplo»** y funciona con doble clic, sin descargar nada.
 
-*The example needs nothing from this folder: its records are in `js/example-records.js` and its layers (WorldClim at
-10 arc-minutes and Köppen-Geiger, cropped to lon −122° to −86°, lat 13° to 40°, which covers the whole of Mexico) in
-`js/example-rasters.js`, so it works
-by double-clicking `index.html`.*
+Las **capas de clima no**. Desde la versión 1.1.0 el programa no trae ninguna capa de WorldClim: pedimos permiso para
+distribuir el recorte del ejemplo y **WorldClim lo negó**. Así que la primera vez hay que descargarlas, con las
+instrucciones de abajo, y después se cargan de cualquiera de estas tres formas en el paso 5:
+
+- **Elegir carpeta** o **elegir archivos**: leen las capas de donde las tengas. Funcionan con doble clic.
+- **Usar las capas de `datos/`**: lee esta carpeta, y para eso hace falta el servidor local
+  (`Open BioModelling Pro.bat`).
+
+**Köppen-Geiger sí viene incluido** en `koppen/`, porque su licencia lo permite: es una descarga menos.
+
+*The example records ship with the program, so step 1 works from a double click. The climate layers do not: from
+version 1.1.0 no WorldClim data travels with BioModelling Pro — we asked for permission to distribute the example
+subset and WorldClim refused — so you download them once with the instructions below and load them with either of the
+two pickers of step 5, or from this folder with the local server. Köppen-Geiger is bundled.*
 
 ## Contenido de esta carpeta / What is here
 
@@ -22,13 +29,13 @@ by double-clicking `index.html`.*
   las capas no se distribuyen aquí: descárgalas con las instrucciones de abajo y déjalas en esa carpeta. El
   programa las lee igual y el repositorio la ignora.
 
-Sirven para probar el selector de carpeta del paso 5 con archivos reales, o para estudios de baja resolución; el
-ejemplo incrustado no las necesita.
+Sirven para probar el selector de carpeta del paso 5 con archivos reales, o para estudios de baja resolución.
+
 
 *`koppen/` ships with the program because CC BY 4.0 allows it. `worldclim/` is not in the repository on purpose:
 WorldClim allows academic and non-commercial use but not redistribution without prior permission, so you download
 the layers yourself with the instructions below and drop them in that folder. They let you try the folder picker
-of step 5 with real files; the bundled example does not need them.*
+of step 5 with real files.*
 
 ## Para un estudio real (30 arc-seg ≈ 1 km) / For a real study
 

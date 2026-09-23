@@ -20,9 +20,11 @@ maps and the Python engine.
 
 ## Use it locally
 
-Download or clone the repository and **double-click `index.html`**. Everything works from `file://`,
-including the bundled example (*Pinus cembroides*: 2,400 GBIF records and cropped WorldClim / Köppen-Geiger
-layers). To serve the folder on your network, run `Open BioModelling Pro.bat` (Windows) or
+Download or clone the repository and **double-click `index.html`**. Everything works from `file://`, including
+the example records (*Pinus cembroides*, 2,400 records from GBIF). The **climate layers you download once**:
+WorldClim does not allow them to be redistributed, so they do not travel with the program —
+[`datos/LEE-ME.md`](datos/LEE-ME.md) says where to get them and step 5 reads them from wherever you keep them.
+Köppen-Geiger is bundled. To serve the folder on your network, run `Open BioModelling Pro.bat` (Windows) or
 `server.ps1` and open `http://localhost:9400`.
 
 ## The workflow, in ten steps
@@ -88,10 +90,11 @@ JPEG, WebP, SVG, **TIFF** and georeferenced **GeoTIFF** for further editing in Q
 - **Köppen-Geiger** (Beck et al. 2018, *Scientific Data*, CC BY 4.0) — climate classification.
 - **[SoilGrids](https://soilgrids.org)** (ISRIC; Poggio et al. 2021) — WRB soil classification.
 
-The bundled example layers are a crop of WorldClim 10 arc-minutes and of the Köppen-Geiger map (longitude −122° to −86°,
-latitude 13° to 40°, covering the whole of Mexico), embedded in `js/example-rasters.js`, so the example needs no
-download. For a real study load the full files; [`datos/LEE-ME.md`](datos/LEE-ME.md) says where to get them — WorldClim
-does not allow its layers to be redistributed, so they are not in this repository and you download them yourself.
+**No WorldClim data travels with the program.** We asked for permission to bundle a small cropped subset for the
+example and WorldClim refused, so since version 1.1.0 there is none: you download the layers once
+([`datos/LEE-ME.md`](datos/LEE-ME.md) says how — 10 arc-minutes to learn, 30 arc-seconds for a real study) and step 5
+reads them with the folder picker, the file picker, or from the program's own `datos/` folder. Köppen-Geiger is
+bundled, because CC BY 4.0 allows it.
 
 Who is behind the records of the example: [`datos/GBIF-FUENTES.md`](datos/GBIF-FUENTES.md), 70 institutions and 91
 datasets. What is ours and what is not, source by source: [`NOTICE.md`](NOTICE.md). Third-party libraries and their
@@ -112,8 +115,7 @@ index.html                 the application (home + 10 steps)
 css/style.css              styles, light and dark themes
 js/                        one file per block (i18n, state, ui, maps, GBIF, filters, cleaning, rasters, statistics,
                            ML, ecology, SDM, export) and the home page (art, home, lab)
-js/example-records.js      bundled GBIF example (Pinus cembroides)
-js/example-rasters.js      bundled example layers (cropped WorldClim and Köppen-Geiger)
+js/example-records.js      the bundled GBIF example (Pinus cembroides); no climate layers are bundled
 vendor/                    Leaflet, geotiff.js, html2canvas and their licences
 datos/                     the Köppen-Geiger layer, where to download the climate layers, and who published
                            the records of the example
@@ -126,7 +128,7 @@ server.ps1, *.bat          optional local web server (Windows)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(Version 1.0.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+(Version 1.1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 That DOI is the **concept DOI**: it always resolves to the latest version. Version 1.0.0 also has its own,
 [10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), if you need to point at exactly the code you used.
@@ -141,6 +143,6 @@ That licence covers the source code written by the authors.
 The libraries the program bundles or loads, and the data it ships as an example, belong to other people and keep
 their own terms — and one of them has a restriction worth knowing before you redistribute the program:
 **WorldClim does not allow redistribution of its layers without prior permission**, which is why the global layers
-are not in this repository and why the bundled example subset is separable. [`NOTICE.md`](NOTICE.md) says exactly
+are not in this repository and neither is any subset of them. [`NOTICE.md`](NOTICE.md) says exactly
 what is whose, source by source, and [`datos/GBIF-FUENTES.md`](datos/GBIF-FUENTES.md) lists the 70 institutions
 whose records make up the example.

@@ -77,10 +77,10 @@
 
   <!-- 5.2 -->
   <h2 id="b5-2"><span class="num">5.2</span>Tres formas de cargar las capas</h2>
-  <p>La app no descarga capas por ti: los archivos de clima pesan cientos de megabytes y se distribuyen con sus propias condiciones. Lo que hace es <b>leerlos de tu disco</b> sin subirlos a ningún lado.</p>
+  <p>La app no descarga capas ni las trae dentro: las de WorldClim <b>no se pueden redistribuir sin permiso</b>, y se pidió y lo negaron. Se descargan una vez (<code>datos/LEE-ME.md</code>) y la app las <b>lee de tu disco</b>. Köppen-Geiger sí viene incluido.</p>
 
-  <figure>
-    <div class="marco"><img src="../img/b5-capas.png" alt="Tarjeta de carga de capas ráster con los tres botones: elegir carpeta, elegir archivos y usar las capas de ejemplo, cada uno con su explicación y su estado"></div>
+  <figure class="media">
+    <div class="marco"><img src="../img/b5-capas.png" alt="Tarjeta de carga de capas ráster con los tres botones: elegir carpeta, elegir archivos y usar las capas de la carpeta datos, cada uno con su explicación y su estado"></div>
     <figcaption><b>Figura 5.1.</b> Las tres formas de cargar las capas, cada una con su propio botón y su propio aviso de estado, para que nunca haya duda de cuál se usó.</figcaption>
   </figure>
 
@@ -89,7 +89,7 @@
     <tbody>
       <tr><td><span class="ui">📁 Elegir carpeta…</span></td><td>Tienes descomprimida la carpeta de WorldClim. Eliges la carpeta completa y la app toma de ella solo los archivos que reconoce. Es lo más cómodo para un estudio real.</td></tr>
       <tr><td><span class="ui">📄 Elegir archivos…</span></td><td>Tus capas están repartidas o quieres cargar solo algunas. Se seleccionan varias a la vez con Ctrl o Mayús.</td></tr>
-      <tr><td><span class="ui">🧪 Usar las capas de ejemplo</span></td><td>Para aprender o para probar: las capas incluidas en el programa, a 10 minutos de arco, recortadas a México y el suroeste de Estados Unidos. No requieren descargar nada.</td></tr>
+      <tr><td><span class="ui">🧪 Usar las capas de <code>datos/</code></span></td><td>Lee la carpeta <code>datos/</code> del programa, que es donde conviene dejar las capas al descargarlas. Necesita el servidor local.</td></tr>
     </tbody>
   </table>
 
@@ -172,7 +172,7 @@
       <tr><td>30 segundos</td><td>≈ 1 km</td><td>Estudios locales o de montaña, donde el relieve cambia el clima en pocos kilómetros. Los archivos son enormes: conviene recortarlos antes.</td></tr>
       <tr><td>2.5 minutos</td><td>≈ 4.6 km</td><td>El punto medio razonable para un estudio estatal o regional.</td></tr>
       <tr><td>5 minutos</td><td>≈ 9 km</td><td>Estudios nacionales con registros de precisión desigual.</td></tr>
-      <tr><td>10 minutos</td><td>≈ 18 km</td><td>Estudios continentales, exploración rápida y ejemplos de enseñanza —es la resolución de las capas incluidas—.</td></tr>
+      <tr><td>10 minutos</td><td>≈ 18 km</td><td>Estudios continentales y enseñanza: es la de los ejemplos de este manual.</td></tr>
     </tbody>
   </table>
   <p>La regla práctica: <b>la celda no debería ser más fina que la precisión de tus coordenadas</b>. Con registros georreferenciados a 5 km, una capa de 1 km da una falsa sensación de detalle.</p>

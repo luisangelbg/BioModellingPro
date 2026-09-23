@@ -336,8 +336,8 @@
         <div class="pick-card">
           <div class="pick-tag">C</div>
           <h4><span data-l="es">Capas de ejemplo</span><span data-l="en">Example layers</span></h4>
-          <p class="hint"><span data-l="es">Región de <i>Pinus cembroides</i> a 10 arc-min. Funciona sin conexión ni servidor; cámbialas por las de 30 arc-seg cuando las tengas.</span><span data-l="en"><i>Pinus cembroides</i> region at 10 arc-minutes. Works offline with no server; swap them for the 30 arc-second layers when you have them.</span></p>
-          <button class="btn btn-secondary" id="envUseSample" type="button"><span data-l="es">🧪 Usar las capas de ejemplo</span><span data-l="en">🧪 Use the example layers</span></button>
+          <p class="hint"><span data-l="es">Las que estén en la carpeta <code>datos/</code> del programa: WorldClim a 10 arc-min, que se descarga una vez (ver <code>datos/LEE-ME.md</code>), y Köppen-Geiger, que sí viene incluido. Necesita el servidor local.</span><span data-l="en">Whatever sits in the program's <code>datos/</code> folder: WorldClim at 10 arc-minutes, downloaded once (see <code>datos/LEE-ME.md</code>), and Köppen-Geiger, which is bundled. Needs the local server.</span></p>
+          <button class="btn btn-secondary" id="envUseSample" type="button"><span data-l="es">🧪 Usar las capas de <code>datos/</code></span><span data-l="en">🧪 Use the layers in <code>datos/</code></span></button>
           <div class="pick-status" id="envSampleStatus"></div>
         </div>
       </div>
@@ -1264,7 +1264,7 @@
       <div class="pick-card">
         <div class="pick-tag">C</div>
         <h4><span data-l="es">Derivar de las bioclimáticas</span><span data-l="en">Derive from the bioclimatic layers</span></h4>
-        <p class="hint"><span data-l="es">Reconstruye un ciclo mensual a partir de BIO1, BIO2, BIO5, BIO6, BIO10, BIO11, BIO12, BIO15, BIO18 y BIO19 del paso 5, reproduciendo BIO1, BIO5, BIO6 y BIO12 exactamente. Es la vía que usan las capas de ejemplo.</span><span data-l="en">Reconstructs a monthly cycle from BIO1, BIO2, BIO5, BIO6, BIO10, BIO11, BIO12, BIO15, BIO18 and BIO19 of step 5, reproducing BIO1, BIO5, BIO6 and BIO12 exactly. This is the route used by the example layers.</span></p>
+        <p class="hint"><span data-l="es">Reconstruye un ciclo mensual a partir de BIO1, BIO2, BIO5, BIO6, BIO10, BIO11, BIO12, BIO15, BIO18 y BIO19 del paso 5, reproduciendo BIO1, BIO5, BIO6 y BIO12 exactamente. Es la vía cuando solo tienes las bioclimáticas.</span><span data-l="en">Reconstructs a monthly cycle from BIO1, BIO2, BIO5, BIO6, BIO10, BIO11, BIO12, BIO15, BIO18 and BIO19 of step 5, reproducing BIO1, BIO5, BIO6 and BIO12 exactly. This is the route when you only have the bioclimatic layers.</span></p>
         <button class="btn btn-secondary" id="agUseBio" type="button"><span data-l="es">🌡 Usar las capas del paso 5</span><span data-l="en">🌡 Use the layers of step 5</span></button>
         <div class="pick-status" id="agBioStatus"></div>
       </div>
@@ -1602,7 +1602,6 @@
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/geotiff.js"></script>
 <script src="js/example-records.js"></script>
-<script src="js/example-rasters.js"></script>
 <script src="js/state.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/help.js"></script>
