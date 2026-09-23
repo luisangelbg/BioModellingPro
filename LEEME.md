@@ -78,7 +78,7 @@ estudio real) y el paso 5 las lee de donde las tengas. Köppen-Geiger sí viene 
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(versión 1.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+(versión 1.1.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 Ese DOI es el **DOI de concepto**: siempre lleva a la versión más reciente. La versión 1.0.0 tiene además el suyo,
 [10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), por si necesitas señalar exactamente el código

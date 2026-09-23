@@ -1,7 +1,7 @@
 /* Entry point. Each module wires its own controls; this file only does the final set-up. */
 
 (function () {
-  console.log('%cBioModelling Pro · v1.1.0', 'color:#1f7a4d;font-weight:bold');
+  console.log('%cBioModelling Pro · v1.1.1', 'color:#1f7a4d;font-weight:bold');
 
   // Warn early if the browser is offline: GBIF, the base maps and the Python engine need a connection
   if (!navigator.onLine) {

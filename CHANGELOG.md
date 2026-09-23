@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1 — 2026-09-23
+
+- Wording. Everywhere the climate layers are explained — `NOTICE.md`, the README, the Spanish readme,
+  `datos/LEE-ME.md` and the manual — the text now states the condition itself, that WorldClim data may not be
+  redistributed without prior permission and that the program therefore ships none, without recounting how that
+  was handled. Nothing else changed.
+
 ## 1.1.0 — 2026-09-23
 
 - **No WorldClim data travels with the program any more.** Their terms do not allow it to be redistributed without

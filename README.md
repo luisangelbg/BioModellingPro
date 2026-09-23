@@ -128,7 +128,7 @@ server.ps1, *.bat          optional local web server (Windows)
 
 Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &
 Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
-(Version 1.1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
+(Version 1.1.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 That DOI is the **concept DOI**: it always resolves to the latest version. Version 1.0.0 also has its own,
 [10.5281/zenodo.22907826](https://doi.org/10.5281/zenodo.22907826), if you need to point at exactly the code you used.
