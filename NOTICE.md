@@ -24,7 +24,7 @@ The full licence texts are in [`vendor/THIRD-PARTY-NOTICES.txt`](vendor/THIRD-PA
 
 | Source | What it is | Terms | Redistributed in this repository |
 |---|---|---|---|
-| [WorldClim 2.1](https://www.worldclim.org) (Fick & Hijmans 2017) | bioclimatic variables and elevation | free for academic and other non-commercial use; **redistribution or commercial use is not allowed without prior permission**, and permission was requested and refused | **nothing**: neither the global layers nor any subset. You download them yourself, see [`datos/LEE-ME.md`](datos/LEE-ME.md) and §3 |
+| [WorldClim 2.1](https://www.worldclim.org) (Fick & Hijmans 2017) | bioclimatic variables and elevation | free for academic and other non-commercial use; **redistribution or commercial use is not allowed without prior permission** | **nothing**: neither the global layers nor any subset. You download them yourself, see [`datos/LEE-ME.md`](datos/LEE-ME.md) and §3 |
 | [Köppen-Geiger maps](https://doi.org/10.6084/m9.figshare.6396959) (Beck et al. 2018) | climate classification at 1 km | CC BY 4.0 | yes, `datos/koppen/`, with attribution |
 | [Natural Earth](https://www.naturalearthdata.com) admin-1, 1:10 m | boundaries of the 32 federal entities of Mexico, in `js/mexico-states.js` | public domain, no permission needed | yes, filtered to Mexico and simplified (Douglas–Peucker, ≈0.4 km) |
 | [GBIF](https://www.gbif.org) | the presence records of the bundled example, in `js/example-records.js` | each record keeps the licence of the institution that published it (CC0, CC BY or CC BY-NC) | yes; the 70 institutions and 91 datasets behind them are listed in [`datos/GBIF-FUENTES.md`](datos/GBIF-FUENTES.md) |
@@ -33,9 +33,10 @@ The full licence texts are in [`vendor/THIRD-PARTY-NOTICES.txt`](vendor/THIRD-PA
 ## 3. No climate layers travel with the program
 
 Up to version 1.0.2 the program bundled `js/example-rasters.js`, a subset of WorldClim cropped to Mexico, so
-that the example ran from a double click with no downloads. **We asked WorldClim for permission to
-redistribute that subset and they turned it down, so the file was removed in version 1.1.0.** No WorldClim
-byte travels with BioModelling Pro any more.
+that the example ran from a double click with no downloads. WorldClim's terms of use do not allow their data
+to be redistributed without prior permission, so **that file was removed in version 1.1.0** rather than leave
+the program in a position that those terms do not cover. No WorldClim byte travels with BioModelling Pro any
+more.
 
 Nothing of the analysis changed. What changed is where the layers come from:
 

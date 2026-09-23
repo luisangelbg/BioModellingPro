@@ -90,9 +90,9 @@ El programa es software libre con **licencia GPL v3 o posterior** (archivo `LICE
 código fuente escrito por las personas autoras.
 
 Las bibliotecas que el programa usa y los datos que trae de ejemplo son de otras personas y conservan sus propias
-condiciones. **WorldClim no permite redistribuir sus capas sin permiso previo**; lo pedimos para el recorte del
-ejemplo y lo negaron, así que desde la versión 1.1.0 el programa no lleva ni un byte de WorldClim y las capas se
-descargan una vez (`datos/LEE-ME.md`).
+condiciones. **WorldClim no permite redistribuir sus capas sin permiso previo**, así que desde la versión 1.1.0 el
+programa no lleva ni un byte suyo —ni siquiera el recorte que traía el ejemplo— y las capas se descargan una vez
+(`datos/LEE-ME.md`).
 
 `NOTICE.md` dice, fuente por fuente, qué es propio y qué es de terceros; `vendor/THIRD-PARTY-NOTICES.txt` trae las
 licencias completas de las bibliotecas, y `datos/GBIF-FUENTES.md`, las 70 instituciones que publicaron los

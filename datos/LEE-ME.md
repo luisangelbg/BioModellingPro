@@ -5,9 +5,10 @@
 Los **registros** del ejemplo (*Pinus cembroides*) sí vienen con el programa, en `js/example-records.js`: en el paso 1
 pulsa **«Usar registros de ejemplo»** y funciona con doble clic, sin descargar nada.
 
-Las **capas de clima no**. Desde la versión 1.1.0 el programa no trae ninguna capa de WorldClim: pedimos permiso para
-distribuir el recorte del ejemplo y **WorldClim lo negó**. Así que la primera vez hay que descargarlas, con las
-instrucciones de abajo, y después se cargan de cualquiera de estas tres formas en el paso 5:
+Las **capas de clima no**. Desde la versión 1.1.0 el programa no trae ninguna capa de WorldClim, porque sus
+condiciones **no permiten redistribuirlas sin permiso previo** y preferimos no quedar fuera de ellas. Así que la
+primera vez hay que descargarlas, con las instrucciones de abajo, y después se cargan de cualquiera de estas tres
+formas en el paso 5:
 
 - **Elegir carpeta** o **elegir archivos**: leen las capas de donde las tengas. Funcionan con doble clic.
 - **Usar las capas de `datos/`**: lee esta carpeta, y para eso hace falta el servidor local
@@ -16,9 +17,9 @@ instrucciones de abajo, y después se cargan de cualquiera de estas tres formas 
 **Köppen-Geiger sí viene incluido** en `koppen/`, porque su licencia lo permite: es una descarga menos.
 
 *The example records ship with the program, so step 1 works from a double click. The climate layers do not: from
-version 1.1.0 no WorldClim data travels with BioModelling Pro — we asked for permission to distribute the example
-subset and WorldClim refused — so you download them once with the instructions below and load them with either of the
-two pickers of step 5, or from this folder with the local server. Köppen-Geiger is bundled.*
+version 1.1.0 no WorldClim data travels with BioModelling Pro, because their terms do not allow it to be
+redistributed without prior permission. You download them once with the instructions below and load them with either
+of the two pickers of step 5, or from this folder with the local server. Köppen-Geiger is bundled.*
 
 ## Contenido de esta carpeta / What is here
 

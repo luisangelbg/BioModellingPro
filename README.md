@@ -90,11 +90,11 @@ JPEG, WebP, SVG, **TIFF** and georeferenced **GeoTIFF** for further editing in Q
 - **Köppen-Geiger** (Beck et al. 2018, *Scientific Data*, CC BY 4.0) — climate classification.
 - **[SoilGrids](https://soilgrids.org)** (ISRIC; Poggio et al. 2021) — WRB soil classification.
 
-**No WorldClim data travels with the program.** We asked for permission to bundle a small cropped subset for the
-example and WorldClim refused, so since version 1.1.0 there is none: you download the layers once
-([`datos/LEE-ME.md`](datos/LEE-ME.md) says how — 10 arc-minutes to learn, 30 arc-seconds for a real study) and step 5
-reads them with the folder picker, the file picker, or from the program's own `datos/` folder. Köppen-Geiger is
-bundled, because CC BY 4.0 allows it.
+**No WorldClim data travels with the program.** Their terms do not allow it to be redistributed without prior
+permission, so since version 1.1.0 the program ships none — not even the small cropped subset the example used to
+carry. You download the layers once ([`datos/LEE-ME.md`](datos/LEE-ME.md) says how — 10 arc-minutes to learn,
+30 arc-seconds for a real study) and step 5 reads them with the folder picker, the file picker, or from the
+program's own `datos/` folder. Köppen-Geiger is bundled, because CC BY 4.0 allows it.
 
 Who is behind the records of the example: [`datos/GBIF-FUENTES.md`](datos/GBIF-FUENTES.md), 70 institutions and 91
 datasets. What is ours and what is not, source by source: [`NOTICE.md`](NOTICE.md). Third-party libraries and their

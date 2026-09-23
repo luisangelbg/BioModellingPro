@@ -2,8 +2,8 @@
 
 ## 1.1.0 — 2026-09-23
 
-- **No WorldClim data travels with the program any more.** We asked WorldClim for permission to redistribute the
-  small cropped subset that the bundled example used, and they refused, so `js/example-rasters.js` (3.7 MB) was
+- **No WorldClim data travels with the program any more.** Their terms do not allow it to be redistributed without
+  prior permission, so `js/example-rasters.js` (3.7 MB) — the cropped subset the bundled example used — was
   removed. Nothing of the analysis changed: the layers are now downloaded once — `datos/LEE-ME.md` says how — and
   step 5 reads them with the folder picker, the file picker, or from the program's own `datos/` folder. The
   Köppen-Geiger map stays bundled, because CC BY 4.0 allows it, so it is one download less.
