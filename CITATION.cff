@@ -36,7 +36,7 @@ authors:
     family-names: "Mojica-Zárate"
     orcid: "https://orcid.org/0000-0002-9067-3983"
 version: "1.0.0"
-date-released: "2026-09-21"
+date-released: "2026-09-22"
 repository-code: "https://github.com/luisangelbg/BioModellingPro"
 url: "https://luisangelbg.github.io/BioModellingPro/"
 license: GPL-3.0-or-later

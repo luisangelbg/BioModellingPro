@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 — 2026-09-22
+
+First archived release. Everything below was written before it, so it is all part of 1.0.0.
 
 - **Step 10 honours the chosen extent too.** Like step 9, the agroclimatic grid no longer widens the chosen extent to
   hold every record: «country of the records (MX)» was reaching 38.7° N because of a handful of records in the United
@@ -69,7 +71,7 @@
   and agreement maps, trajectories over periods, three dispersal assumptions, climatic refugia, and the extrapolation
   flagged everywhere.
 
-## 1.0.0 — 2026-09-21
+### Earlier work in the same cycle
 
 - **Own data in step 1**: upload a CSV, TXT or Excel (.xlsx) file, or paste from a spreadsheet, with species, longitude and latitude (columns found by name or by content; decimal comma, degrees-minutes-seconds, Windows-1252 files, several sheets and optional country / state / locality / year / month / elevation / uncertainty columns are handled), with checks for empty, unreadable, out-of-range and swapped coordinates; use it alone or add it to the GBIF records.
 - **Renamed from BioSDM to BioModelling Pro** and rebuilt on the interface of the other LABG apps: sticky top bar with
