@@ -6,16 +6,16 @@
 .ag-months .ag-vn { font-size: .78rem; font-weight: 700; min-width: 3.4em; color: var(--text); }
 .ag-mo { width: 22px; height: 20px; border-radius: 5px; font-size: .64rem; font-weight: 700; display: inline-flex;
   align-items: center; justify-content: center; border: 1px solid var(--border); color: var(--text-muted); background: var(--card-bg); }
-.ag-mo.ok { background: rgba(47,143,74,.16); color: var(--success); border-color: transparent; }
+.ag-mo.ok { background: var(--success-soft); color: var(--success-text); border-color: transparent; }
 .ag-mo.band { background: rgba(var(--sky-rgb),.16); color: var(--sky); border-color: transparent; }
-.ag-mo.no { background: rgba(196,58,47,.10); color: var(--danger); border-color: transparent; }
+.ag-mo.no { background: var(--danger-soft); color: var(--danger-text); border-color: transparent; }
 
 /* ---------- index availability ---------- */
 .ag-badge { display: inline-block; font-size: .64rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
   padding: 1px 6px; border-radius: 999px; margin-left: 6px; vertical-align: 1px; }
-.ag-badge.exact { background: rgba(47,143,74,.16); color: var(--success); }
-.ag-badge.approx { background: rgba(201,128,20,.16); color: var(--warning); }
-.ag-badge.off { background: rgba(196,58,47,.11); color: var(--danger); }
+.ag-badge.exact { background: var(--success-soft); color: var(--success-text); }
+.ag-badge.approx { background: var(--warning-soft); color: var(--warning-text); }
+.ag-badge.off { background: var(--danger-soft); color: var(--danger-text); }
 .ag-avail { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 2px 14px; margin-top: 8px; }
 .ag-avail div { font-size: .82rem; color: var(--text-muted); }
 
@@ -27,7 +27,7 @@
 .ag-cat input[type=text] { width: 130px; padding: 3px 6px; font-size: .8rem; }
 .ag-cat .ag-name { font-weight: 600; color: var(--text); }
 .ag-cat tr.sel { background: rgba(var(--primary-rgb), .06); }
-.ag-cat .ag-rm { border: 0; background: transparent; color: var(--danger); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 4px; }
+.ag-cat .ag-rm { border: 0; background: transparent; color: var(--danger-text); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 4px; }
 .ag-cat .ag-rm:hover { color: var(--text); }
 .ag-note { color: var(--text-muted); font-size: .78rem; white-space: normal; min-width: 220px; max-width: 320px; }
 

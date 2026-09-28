@@ -7,48 +7,59 @@
 <meta name="description" content="GBIF records, cleaning, bioclimatic variables, statistics, multivariate methods and species distribution models (MaxEnt and nine more algorithms) in the browser.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%231f7a4d' stroke-width='3'/%3E%3Cpath d='M5 19c5-7 10-7 14-3s6 2 8-2' stroke='%23cf6a24' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='11' r='2.4' fill='%23e0ac2b'/%3E%3Ccircle cx='21' cy='21' r='2.4' fill='%23e0ac2b'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/labg-base.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/filters.css">
 <link rel="stylesheet" href="css/figstudio.css">
 <link rel="stylesheet" href="css/diversity.css">
 <link rel="stylesheet" href="css/agroclim.css">
 <link rel="stylesheet" href="css/help.css">
+<!-- común de la suite primero; i18n.js aplica el tema guardado antes de pintar -->
+<script src="js/labg-core.js"></script>
 <script src="js/i18n.js"></script>
 </head>
 <body class="on-home">
 
+<a class="skip-link" href="#main"><span data-l="es">Saltar al contenido</span><span data-l="en">Skip to content</span></a>
 <header class="topbar">
   <div class="topbar-inner">
     <div class="topbar-row">
-      <div class="brand" id="brand" data-es-title="Inicio" data-en-title="Home"><span id="brandLogo"></span><span>BioModelling <span class="brand-pro">Pro</span></span>
-        <span class="brand-sub">· <span data-l="es">biogeografía y modelado de distribución</span><span data-l="en">biogeography and distribution modelling</span></span></div>
+      <a class="brand" id="brand" href="#" data-es-title="Inicio de BioModelling Pro" data-en-title="BioModelling Pro home"><span id="brandLogo"></span><span>BioModelling <span class="brand-pro">Pro</span></span>
+        <span class="brand-sub">· <span data-l="es">biogeografía y modelado de distribución</span><span data-l="en">biogeography and distribution modelling</span></span></a>
       <div class="top-tools">
+        <a class="suite-link" href="https://luisangelbg.github.io/" data-es-title="Volver al portal de la LABG Suite" data-en-title="Back to the LABG Suite portal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span class="suite-text">LABG Suite</span>
+        </a>
         <div class="seg lang-seg" role="group" aria-label="Idioma / Language">
-          <button data-lang="es" title="Español">ES</button><button data-lang="en" title="English">EN</button>
+          <button type="button" data-lang="es" title="Español">ES</button><button type="button" data-lang="en" title="English">EN</button>
         </div>
-        <button class="icon-btn theme-btn" id="themeBtn" data-es-title="Cambiar entre tema claro y oscuro" data-en-title="Switch between light and dark theme">
-          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
-          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+        <button type="button" class="icon-btn theme-btn" id="themeBtn" aria-label="Cambiar el tema" title="Cambiar el tema">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="helpBtn" data-es-title="Atajos de teclado (?)" data-en-title="Keyboard shortcuts (?)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>
         </button>
       </div>
     </div>
-    <nav class="stepper" id="stepper" aria-label="Steps">
-      <button class="step-btn active" data-step="0"><span class="step-num">⌂</span> <span data-l="es">Inicio</span><span data-l="en">Home</span></button>
-      <button class="step-btn" data-step="1"><span class="step-num">1</span> <span data-l="es">GBIF</span><span data-l="en">GBIF</span></button>
-      <button class="step-btn" data-step="2" disabled><span class="step-num">2</span> <span data-l="es">Filtrar</span><span data-l="en">Filter</span></button>
-      <button class="step-btn" data-step="3" disabled><span class="step-num">3</span> <span data-l="es">Depurar</span><span data-l="en">Clean</span></button>
-      <button class="step-btn" data-step="4" disabled><span class="step-num">4</span> <span data-l="es">Mapa</span><span data-l="en">Map</span></button>
-      <button class="step-btn" data-step="5" disabled><span class="step-num">5</span> <span data-l="es">Variables</span><span data-l="en">Variables</span></button>
-      <button class="step-btn" data-step="6" disabled><span class="step-num">6</span> <span data-l="es">Correlación</span><span data-l="en">Correlation</span></button>
-      <button class="step-btn" data-step="7" disabled><span class="step-num">7</span> <span data-l="es">Estadística</span><span data-l="en">Statistics</span></button>
-      <button class="step-btn" data-step="8" disabled><span class="step-num">8</span> <span data-l="es">ML y ecología</span><span data-l="en">ML and ecology</span></button>
-      <button class="step-btn" data-step="9" disabled><span class="step-num">9</span> <span data-l="es">Modelado SDM</span><span data-l="en">SDM modelling</span></button>
-      <button class="step-btn" data-step="10" disabled><span class="step-num">10</span> <span data-l="es">Agroclima</span><span data-l="en">Agroclimate</span></button>
+    <nav class="stepper" id="stepper" aria-label="Pasos">
+      <button type="button" class="step-btn active" data-step="0"><span class="step-num">⌂</span> <span data-l="es">Inicio</span><span data-l="en">Home</span></button>
+      <button type="button" class="step-btn" data-step="1"><span class="step-num">1</span> <span data-l="es">GBIF</span><span data-l="en">GBIF</span></button>
+      <button type="button" class="step-btn" data-step="2" disabled><span class="step-num">2</span> <span data-l="es">Filtrar</span><span data-l="en">Filter</span></button>
+      <button type="button" class="step-btn" data-step="3" disabled><span class="step-num">3</span> <span data-l="es">Depurar</span><span data-l="en">Clean</span></button>
+      <button type="button" class="step-btn" data-step="4" disabled><span class="step-num">4</span> <span data-l="es">Mapa</span><span data-l="en">Map</span></button>
+      <button type="button" class="step-btn" data-step="5" disabled><span class="step-num">5</span> <span data-l="es">Variables</span><span data-l="en">Variables</span></button>
+      <button type="button" class="step-btn" data-step="6" disabled><span class="step-num">6</span> <span data-l="es">Correlación</span><span data-l="en">Correlation</span></button>
+      <button type="button" class="step-btn" data-step="7" disabled><span class="step-num">7</span> <span data-l="es">Estadística</span><span data-l="en">Statistics</span></button>
+      <button type="button" class="step-btn" data-step="8" disabled><span class="step-num">8</span> <span data-l="es">ML y ecología</span><span data-l="en">ML and ecology</span></button>
+      <button type="button" class="step-btn" data-step="9" disabled><span class="step-num">9</span> <span data-l="es">Modelado SDM</span><span data-l="en">SDM modelling</span></button>
+      <button type="button" class="step-btn" data-step="10" disabled><span class="step-num">10</span> <span data-l="es">Agroclima</span><span data-l="en">Agroclimate</span></button>
     </nav>
   </div>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 
 <!-- ==================== HOME ==================== -->
 <section class="step-panel active" id="panel-0">

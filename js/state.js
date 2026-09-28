@@ -47,6 +47,8 @@ function showMessage(container, type, html) {
   const div = document.createElement('div');
   div.className = 'msg msg-' + type;
   div.innerHTML = html;
+  /* errors and warnings are announced to screen readers */
+  if (window.LABG) LABG.messageRole(div, type);
   container.appendChild(div);
   return div;
 }

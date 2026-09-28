@@ -11,9 +11,8 @@
 .fstudio { margin: 10px 0 4px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-soft); }
 .fstudio > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-weight: 600; border-radius: 12px; }
 .fstudio > summary::-webkit-details-marker { display: none; }
-.fstudio > summary:hover { color: var(--primary); }
-.fstudio > summary:focus-visible { outline: 2px solid rgba(var(--primary-rgb), .5); outline-offset: 2px; }
-.fstudio .fs-ico { display: inline-flex; color: var(--primary); }
+.fstudio > summary:hover { color: var(--primary-text); }
+.fstudio .fs-ico { display: inline-flex; color: var(--primary-text); }
 .fstudio .fs-sub { font-weight: 400; font-size: .8rem; color: var(--text-muted); margin-left: 4px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fstudio > summary::after { content: "▾"; margin-left: auto; color: var(--accent); transition: transform .15s; }
 .fstudio[open] > summary::after { transform: rotate(180deg); }
@@ -22,8 +21,7 @@
 .fs-tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
 .fs-tab { border: 1px solid transparent; background: transparent; color: var(--text-muted); border-radius: 8px; padding: 6px 12px; font-size: .84rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .fs-tab:hover { background: var(--card-bg); color: var(--text); }
-.fs-tab.on { background: var(--card-bg); color: var(--primary); border-color: var(--border-strong); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-.fs-tab:focus-visible { outline: 2px solid rgba(var(--primary-rgb), .5); }
+.fs-tab.on { background: var(--card-bg); color: var(--primary-text); border-color: var(--border-strong); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
 .fs-pane[hidden], .fs-sec[hidden], .fs-f[hidden] { display: none !important; }
 
 .fs-sec { margin-bottom: 14px; }
@@ -45,9 +43,9 @@
 .fs-ca input[type=color] { flex: 1; min-width: 0; height: 30px; padding: 2px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--card-bg); cursor: pointer; }
 .fs-hint { font-size: .8rem; color: var(--text-muted); margin: 8px 0 0; }
 .fs-info { font-size: .82rem; color: var(--text-muted); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
-.fs-notes { font-size: .8rem; color: var(--warning); margin: 8px 0 0; display: none; }
+.fs-notes { font-size: .8rem; color: var(--warning-text); margin: 8px 0 0; display: none; }
 .fs-status { min-height: 1.3em; margin-top: 10px; font-size: .84rem; color: var(--text-muted); }
-.fs-status.ok { color: var(--success); } .fs-status.warn { color: var(--warning); } .fs-status.err { color: var(--danger); }
+.fs-status.ok { color: var(--success-text); } .fs-status.warn { color: var(--warning-text); } .fs-status.err { color: var(--danger-text); }
 .fs-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
 /* text table: one row per piece of text */
@@ -58,8 +56,7 @@
 .fs-trow input[type=number], .fs-trow select { width: 100%; min-width: 0; padding: 4px 6px; font-size: .82rem; }
 .fs-trow .fs-ca input[type=color] { height: 26px; }
 .fs-tog { width: 32px; height: 28px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--card-bg); color: var(--text-muted); cursor: pointer; font-size: .84rem; }
-.fs-tog[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
-.fs-tog:focus-visible { outline: 2px solid rgba(var(--primary-rgb), .5); }
+.fs-tog[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
 
 /* series list */
 .fs-list { display: flex; flex-direction: column; gap: 5px; max-height: 340px; overflow-y: auto; }
@@ -69,7 +66,7 @@
 .fs-sr-sr { display: inline-block; width: 13px; height: 13px; border-radius: 3px; border: 1px solid var(--border-strong); }
 .fs-ord { display: flex; gap: 3px; }
 .fs-ord button { width: 28px; height: 26px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--card-bg); color: var(--text-muted); cursor: pointer; }
-.fs-ord button:hover { color: var(--primary); }
+.fs-ord button:hover { color: var(--primary-text); }
 
 /* annotations */
 .fs-arow { border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; background: var(--card-bg); }
@@ -82,7 +79,6 @@
 .fs-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 8px; }
 .fs-preset { text-align: left; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--card-bg); padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
 .fs-preset:hover { border-color: var(--primary); }
-.fs-preset:focus-visible { outline: 2px solid rgba(var(--primary-rgb), .5); }
 .fs-pname { font-weight: 600; font-size: .86rem; color: var(--text); }
 .fs-pdes { font-size: .76rem; color: var(--text-muted); }
 

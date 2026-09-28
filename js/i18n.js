@@ -14,9 +14,9 @@
    4. Figures drawn by Python read the language and the theme from I18N / Theme
       and are redrawn through the view registry (see Views in state.js).
 
-   The initial language is the one saved by the user; otherwise English when the
-   browser is set to English and Spanish in every other case. The theme follows
-   the operating system until the user picks one. */
+   The initial language is the one saved by the user; otherwise Spanish, as in
+   the whole LABG Suite. The theme follows the operating system until the user
+   picks one; the saved choice is applied here, in <head>, before painting. */
 
 (function () {
   const KEY_LANG = 'biomodellingpro:lang', KEY_THEME = 'biomodellingpro:theme';
@@ -26,8 +26,7 @@
   function initialLang() {
     const saved = read(KEY_LANG);
     if (saved === 'es' || saved === 'en') return saved;
-    const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'es';
-    return /^en\b/i.test(nav) ? 'en' : 'es';
+    return 'es';                       /* Spanish by default in the whole LABG Suite */
   }
 
   const I18N = {
@@ -56,7 +55,10 @@
       });
       const t = document.querySelector('title');
       if (t && t.dataset.es) document.title = t.getAttribute('data-' + L);
-      document.querySelectorAll('.lang-seg button').forEach(b => b.classList.toggle('on', b.dataset.lang === L));
+      document.querySelectorAll('.lang-seg button').forEach(b => {
+        b.classList.toggle('on', b.dataset.lang === L);
+        b.setAttribute('aria-pressed', b.dataset.lang === L ? 'true' : 'false');
+      });
     },
   };
 
