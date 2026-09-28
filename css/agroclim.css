@@ -7,7 +7,7 @@
 .ag-mo { width: 22px; height: 20px; border-radius: 5px; font-size: .64rem; font-weight: 700; display: inline-flex;
   align-items: center; justify-content: center; border: 1px solid var(--border); color: var(--text-muted); background: var(--card-bg); }
 .ag-mo.ok { background: var(--success-soft); color: var(--success-text); border-color: transparent; }
-.ag-mo.band { background: rgba(var(--sky-rgb),.16); color: var(--sky); border-color: transparent; }
+.ag-mo.band { background: rgba(var(--sky-rgb),.16); color: var(--sky-text); border-color: transparent; }
 .ag-mo.no { background: var(--danger-soft); color: var(--danger-text); border-color: transparent; }
 
 /* ---------- index availability ---------- */

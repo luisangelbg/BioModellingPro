@@ -20,6 +20,8 @@
   --c1: #1f7a4d; --c2: #cf6a24; --c3: #2a78b5; --c4: #e0ac2b; --c5: #7a5cc4; --c6: #c4506e;
   --c7: #3aa39a; --c8: #8a6a4a; --c9: #5f6b86; --c10: #5aa03b;
   --map-bg: #dbe8ee;
+  /* the sky hue darkened for TEXT on light backgrounds (fills and maps keep --sky) */
+  --sky-text: color-mix(in srgb, var(--sky) 68%, #000);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -29,6 +31,7 @@
     --c1: #57c98a; --c2: #f0a05a; --c3: #62aee0; --c4: #efc45a; --c5: #ab90ec; --c6: #ee8aa3;
     --c7: #5fd0c3; --c8: #c7a684; --c9: #9aa6c2; --c10: #8ccb66;
     --map-bg: #1f2d35;
+    --sky-text: var(--sky);
   }
 }
 :root[data-theme="dark"] {
@@ -38,6 +41,7 @@
   --c1: #57c98a; --c2: #f0a05a; --c3: #62aee0; --c4: #efc45a; --c5: #ab90ec; --c6: #ee8aa3;
   --c7: #5fd0c3; --c8: #c7a684; --c9: #9aa6c2; --c10: #8ccb66;
   --map-bg: #1f2d35;
+  --sky-text: var(--sky);
 }
 
 /* ---------- language: both texts live in the page, one is hidden ---------- */
@@ -119,7 +123,7 @@ button { font-family: inherit; }
 .m-fam { display: inline-block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; padding: 1px 7px; border-radius: 999px; margin-bottom: 6px; }
 .m-fam.reg { background: var(--primary-soft); color: var(--primary-text); }
 .m-fam.mac { background: var(--accent-soft); color: var(--accent-text); }
-.m-fam.env { background: rgba(var(--sky-rgb), .14); color: var(--sky); }
+.m-fam.env { background: rgba(var(--sky-rgb), .14); color: var(--sky-text); }
 
 /* ---------- Playground / labs ---------- */
 .playground { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px 20px; }
@@ -179,7 +183,8 @@ textarea { width: 100%; font-family: var(--mono); }
 .search-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .search-row input[type=text] { flex: 1; min-width: 220px; }
 .btn-row { margin: 12px 0; }
-.inline-label { font-size: 0.9rem; color: var(--text-muted); display: inline-flex; gap: 6px; align-items: center; margin: 2px 8px 2px 0; }
+.inline-label { font-size: 0.9rem; color: var(--text-muted); display: inline-flex; gap: 6px; align-items: center; margin: 2px 8px 2px 0; flex-wrap: wrap; max-width: 100%; min-width: 0; }
+.inline-label > select { min-width: 0; }
 .config-group { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
 .config-group:last-of-type { border-bottom: none; }
 .checkbox-label, .radio-label { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; cursor: pointer; margin-bottom: 6px; }
@@ -219,7 +224,7 @@ tr:hover td { background: var(--primary-soft); }
 .year-range { display: flex; gap: 10px; align-items: center; }
 .year-range input { width: 80px; }
 .bbox-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-.bbox-row label { font-size: 0.85rem; display: flex; flex-direction: column; gap: 3px; color: var(--text-muted); }
+.bbox-row label { font-size: 0.85rem; display: flex; flex-direction: column; gap: 3px; color: var(--text-muted); max-width: 100%; min-width: 0; }
 .bbox-row input { width: 90px; }
 .rule-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .rule-item:last-child { border-bottom: none; }
@@ -309,7 +314,7 @@ tr:hover td { background: var(--primary-soft); }
 
 /* ---------- step 6: correlation and variable selection ---------- */
 .corr-table td, .corr-table th { padding: 6px 10px; white-space: nowrap; }
-.corr-table tr.off td { opacity: .62; }
+.corr-table tr.off td { color: var(--text-muted); }
 .corr-table input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; }
 .corr-table .cv-vif.lo { color: var(--success-text); font-weight: 700; }
 .corr-table .cv-vif.mid { color: var(--warning-text); font-weight: 700; }

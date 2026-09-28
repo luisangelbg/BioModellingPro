@@ -80,7 +80,7 @@
   /* ---------- method gallery ---------- */
   $('methodGallery').innerHTML = METHODS.map(m =>
     `<div class="method-card"><span class="m-fam ${m.fam}">${two(m.famLabel || FAM[m.fam])}</span>${Art.methodArt[m.k]()}
-      <div class="m-name">${two(m.n)}</div><div class="m-sub">${two(m.sub)}</div><div class="m-sub" style="opacity:.8">${m.ref}</div></div>`).join('');
+      <div class="m-name">${two(m.n)}</div><div class="m-sub">${two(m.sub)}</div><div class="m-sub">${m.ref}</div></div>`).join('');
 
   /* ---------- theory ---------- */
   const THEORY = [

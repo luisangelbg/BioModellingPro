@@ -54,8 +54,8 @@ function buildFilters() {
     yBox.className = 'filter-box';
     yBox.innerHTML = `<h3>${L2('Año de registro', 'Year of record')}</h3>
       <div class="year-range">
-        <input type="number" id="fYearMin" value="${ymin}" min="${ymin}" max="${ymax}"><span>${L2('a', 'to')}</span>
-        <input type="number" id="fYearMax" value="${ymax}" min="${ymin}" max="${ymax}">
+        <input type="number" id="fYearMin" aria-label="${I18N.lang === 'en' ? 'First year' : 'Año inicial'}" data-es-title="Año inicial" data-en-title="First year" value="${ymin}" min="${ymin}" max="${ymax}"><span>${L2('a', 'to')}</span>
+        <input type="number" id="fYearMax" aria-label="${I18N.lang === 'en' ? 'Last year' : 'Año final'}" data-es-title="Año final" data-en-title="Last year" value="${ymax}" min="${ymin}" max="${ymax}">
       </div>
       <p class="hint">${L2(`${years.length.toLocaleString('en-US')} registros con año.`, `${years.length.toLocaleString('en-US')} records with a year.`)}</p>`;
     grid.appendChild(yBox);

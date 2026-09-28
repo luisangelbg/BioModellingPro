@@ -21,7 +21,8 @@
      LABG.toast(texto, {type, timeout})  aviso flotante que se anuncia al lector de pantalla
      LABG.announce(texto)              anuncio silencioso (solo lector de pantalla)
      LABG.messageRole(el, type)        role=alert / status para los mensajes en línea
-     LABG.guardUnload(hayDatos)        pregunta antes de cerrar si hay trabajo sin guardar
+     LABG.linkLabels(raíz)             une cada <label> suelta con su campo (corre sola)
+     LABG.guardUnload(hayDatos)      pregunta antes de cerrar si hay trabajo sin guardar
      LABG.shortcuts(lista)             registra atajos y abre el panel «?»
      LABG.theme.init(clave) / toggle() tema claro/oscuro con memoria
      LABG.SUITE_URL                    dirección del portal
@@ -137,6 +138,43 @@
     if (!el) return;
     el.setAttribute('role', type === 'error' || type === 'warning' ? 'alert' : 'status');
   };
+
+  /* ---------------- etiquetas de los campos ----------------
+     Muchos formularios escriben <label>Texto</label><input>, sin «for»: a la
+     vista está claro, pero un lector de pantalla anuncia un campo sin nombre.
+     Cada etiqueta suelta se une aquí con su control: el hermano que la sigue o,
+     si no, el único control de su caja. Si la caja tiene varios (un grupo de
+     opciones) no se adivina nada. Corre al cargar y cada vez que una app
+     construye un formulario nuevo. */
+  let autoId = 0;
+  const CONTROL = 'input:not([type="hidden"]), select, textarea';
+  LABG.linkLabels = function (root) {
+    (root || document).querySelectorAll('label:not([for])').forEach(l => {
+      if (l.querySelector(CONTROL)) return;               /* ya envuelve su control */
+      let c = l.nextElementSibling;
+      if (!c || !c.matches(CONTROL)) {
+        const box = l.parentElement;
+        const inBox = box ? box.querySelectorAll(CONTROL) : [];
+        if (inBox.length !== 1) return;
+        c = inBox[0];
+      }
+      if ((c.labels && c.labels.length) || c.hasAttribute('aria-label') || c.hasAttribute('aria-labelledby')) return;
+      if (!c.id) c.id = 'labg-campo-' + (++autoId);
+      l.htmlFor = c.id;
+    });
+  };
+  function watchLabels() {
+    LABG.linkLabels();
+    if (!window.MutationObserver) return;
+    let pending = false;
+    new MutationObserver(() => {
+      if (pending) return;
+      pending = true;
+      setTimeout(() => { pending = false; LABG.linkLabels(); }, 150);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchLabels);
+  else watchLabels();
 
   /* ---------------- no perder el trabajo ---------------- */
   LABG.guardUnload = function (hasData) {

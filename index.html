@@ -130,7 +130,7 @@
   <div class="card">
     <p class="hint"><span data-l="es">Escribe el <b>nombre científico</b> (género y epíteto). GBIF resolverá el nombre aceptado y su clave taxonómica.</span><span data-l="en">Type the <b>scientific name</b> (genus and epithet). GBIF will resolve the accepted name and its taxon key.</span></p>
     <div class="search-row">
-      <input type="text" id="speciesInput" placeholder="Pinus cembroides" value="Pinus cembroides" autocomplete="off">
+      <input type="text" id="speciesInput" aria-label="Nombre científico" data-es-title="Nombre científico" data-en-title="Scientific name" placeholder="Pinus cembroides" value="Pinus cembroides" autocomplete="off">
       <button class="btn btn-primary" id="matchBtn"><span data-l="es">Buscar nombre</span><span data-l="en">Look up name</span></button>
       <button class="btn btn-secondary" id="loadExampleBtn" data-es-title="Cargar registros de ejemplo incluidos (funciona sin conexión a GBIF)" data-en-title="Load the bundled example records (works without reaching GBIF)"><span data-l="es">Usar registros de ejemplo</span><span data-l="en">Use example records</span></button>
     </div>
@@ -144,13 +144,13 @@
     <div class="dropzone" id="userDrop">
       <div><span data-l="es">Arrastra aquí tu archivo o</span><span data-l="en">Drop your file here or</span></div>
       <div class="search-row" style="justify-content:center;margin-top:8px">
-        <input type="file" id="userFile" accept=".csv,.txt,.tsv,.xlsx">
+        <input type="file" id="userFile" accept=".csv,.txt,.tsv,.xlsx" aria-label="Elegir el archivo de registros" data-es-title="Elegir el archivo de registros" data-en-title="Choose the records file">
         <button class="btn btn-ghost btn-sm" id="userTemplateBtn"><span data-l="es">⬇ Descargar plantilla</span><span data-l="en">⬇ Download template</span></button>
       </div>
     </div>
     <details class="acc" style="margin-top:8px"><summary><span data-l="es">O pega tus datos desde Excel</span><span data-l="en">Or paste your data from a spreadsheet</span></summary>
       <div class="acc-body">
-        <textarea id="userPaste" rows="5" style="width:100%;font-family:var(--mono);font-size:.82rem" data-es-ph="especie&#9;longitud&#9;latitud&#10;Pinus cembroides&#9;-99.85&#9;19.42" data-en-ph="species&#9;longitude&#9;latitude&#10;Pinus cembroides&#9;-99.85&#9;19.42"></textarea>
+        <textarea id="userPaste" aria-label="Registros pegados (especie, longitud, latitud)" data-es-title="Registros pegados (especie, longitud, latitud)" data-en-title="Pasted records (species, longitude, latitude)" rows="5" style="width:100%;font-family:var(--mono);font-size:.82rem" data-es-ph="especie&#9;longitud&#9;latitud&#10;Pinus cembroides&#9;-99.85&#9;19.42" data-en-ph="species&#9;longitude&#9;latitude&#10;Pinus cembroides&#9;-99.85&#9;19.42"></textarea>
         <button class="btn btn-secondary btn-sm" id="userPasteBtn"><span data-l="es">Leer el texto pegado</span><span data-l="en">Read the pasted text</span></button>
       </div>
     </details>
@@ -448,8 +448,8 @@
       <div class="bbox-row">
         <label><span data-l="es">Método</span><span data-l="en">Method</span>
           <select id="corrMethod"><option value="pearson">Pearson</option><option value="spearman">Spearman</option></select></label>
-        <label><span data-l="es">|r| máximo</span><span data-l="en">Max |r|</span><span data-help="pearson"></span> <input type="number" id="corrR" value="0.8" step="0.05" min="0.5" max="0.99" style="width:70px"></label>
-        <label><span data-l="es">VIF máximo</span><span data-l="en">Max VIF</span><span data-help="vif"></span> <input type="number" id="corrVif" value="10" step="1" min="2" max="30" style="width:70px"></label>
+        <label><span data-l="es">|r| máximo</span><span data-l="en">Max |r|</span><span data-help="pearson"></span> <input type="number" id="corrR" aria-label="|r| máximo" data-es-title="|r| máximo" data-en-title="Max |r|" value="0.8" step="0.05" min="0.5" max="0.99" style="width:70px"></label>
+        <label><span data-l="es">VIF máximo</span><span data-l="en">Max VIF</span><span data-help="vif"></span> <input type="number" id="corrVif" aria-label="VIF máximo" data-es-title="VIF máximo" data-en-title="Max VIF" value="10" step="1" min="2" max="30" style="width:70px"></label>
       </div>
       <div class="btn-row" style="margin-top:10px">
         <button class="btn btn-primary" id="corrAuto"><span data-l="es">✨ Selección recomendada</span><span data-l="en">✨ Recommended selection</span></button><span data-help="corrSelection"></span>

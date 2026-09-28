@@ -15,4 +15,4 @@
 .state-head a { font-weight: 600; }
 #stateCard .bbox-row { align-items: flex-end; }
 #stateCard .bbox-row .checkbox-label { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 6px; }
-#stateCard .bbox-row > label > select { min-width: 240px; }
+#stateCard .bbox-row > label > select { min-width: min(240px, 100%); }
