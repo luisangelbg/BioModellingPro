@@ -13,7 +13,9 @@ barra superior y la elección se recuerda.
 
 - **Doble clic en `index.html`.** Funciona todo, incluidos los registros del ejemplo (*Pinus cembroides*, 2 400
   registros de GBIF). Las capas de clima se descargan una vez (ver `datos/LEE-ME.md`) y se cargan desde donde las
-  tengas. Necesitas internet para GBIF, los mapas base y el motor de Python (estadística, ML y modelado).
+  tengas. Necesitas internet para GBIF y los mapas base. El motor de Python (estadística, ML y modelado)
+  viaja dentro de la app, en `vendor/pyodide/`: con el servidor local funciona sin internet; con doble clic
+  el navegador no deja leerlo y se descarga en línea la primera vez.
 - **En línea:** https://luisangelbg.github.io/BioModellingPro/
 - **Servidor local opcional** (por ejemplo, para abrirlo desde una tablet en la misma red): doble clic en
   `Open BioModelling Pro.bat`, o clic derecho en `server.ps1` → *Ejecutar con PowerShell*, y abre

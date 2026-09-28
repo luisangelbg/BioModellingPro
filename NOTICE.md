@@ -15,7 +15,7 @@ someone else and keeps its own terms. This file says exactly what, so that nobod
 | [Leaflet](https://github.com/Leaflet/Leaflet) 1.9.4 | interactive maps | BSD 2-Clause | yes, `vendor/leaflet/`, unmodified |
 | [geotiff.js](https://github.com/geotiffjs/geotiff.js) 2.1.3 | reads GeoTIFF rasters by window | MIT | yes, `vendor/geotiff.js`, unmodified |
 | [html2canvas](https://github.com/niklasvh/html2canvas) 1.4.1 | composes the map image when exporting | MIT | yes, `vendor/html2canvas.min.js`, unmodified |
-| [Pyodide](https://pyodide.org) 0.27.2 and its packages (NumPy, SciPy, pandas, scikit-learn, statsmodels, Matplotlib) | the Python engine of the statistics, machine-learning and modelling steps | MPL-2.0 and the licence of each package | no: downloaded from a public CDN the first time it is needed |
+| [Pyodide](https://pyodide.org) 0.27.2 and its packages (NumPy, SciPy, pandas, scikit-learn, Matplotlib and their dependencies) | the Python engine of the statistics, machine-learning and modelling steps | MPL-2.0 and the licence of each package | yes, `vendor/pyodide/`, unmodified; list and texts in `vendor/pyodide/LICENSES.txt`. Loaded from a public CDN only when the app is opened by double-click |
 | Cormorant, Crimson Pro, Jost | typefaces of the user manual only | SIL Open Font Licence 1.1 | no: requested from Google Fonts when the manual is opened |
 
 The full licence texts are in [`vendor/THIRD-PARTY-NOTICES.txt`](vendor/THIRD-PARTY-NOTICES.txt).

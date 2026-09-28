@@ -2,8 +2,8 @@ THIRD-PARTY COMPONENTS USED BY BioModelling Pro
 ===============================================
 
 BioModelling Pro (GPL-3.0-or-later) includes unmodified copies of the following open-source
-libraries in this folder, and loads others from a public content-delivery network when the
-statistics, machine-learning and modelling steps are first used. Each keeps its own licence,
+libraries in this folder, including the Python engine of the statistics, machine-learning and
+modelling steps. Each keeps its own licence,
 reproduced below or referenced as that licence requires.
 
 INCLUDED IN vendor/
@@ -18,11 +18,12 @@ INCLUDED IN vendor/
 3. html2canvas.min.js   (html2canvas 1.4.1, exports the map view to a PNG image)
    Licence: MIT. (C) 2012 Niklas von Hertzen. Source: https://github.com/niklasvh/html2canvas
 
-LOADED FROM A CONTENT-DELIVERY NETWORK (not redistributed here)
----------------------------------------------------------------
-4. Pyodide 0.27.2 (Python in WebAssembly)   Licence: MPL-2.0.   https://pyodide.org
-   With the scientific packages built for it: NumPy, SciPy, pandas, scikit-learn (BSD-3-Clause)
-   and Matplotlib (Matplotlib licence, a PSF-style permissive licence).
+4. pyodide/   (Pyodide 0.27.2, Python compiled to WebAssembly, with the scientific packages built
+   for it: NumPy, SciPy, pandas, scikit-learn, Matplotlib and their dependencies)
+   Licence: MPL-2.0 for Pyodide; each package keeps its own (BSD, MIT, PSF-based, HPND).
+   Full list and texts: vendor/pyodide/LICENSES.txt. Source: https://github.com/pyodide/pyodide
+   Used when the app is served over http(s); if this copy is missing or the app is opened by
+   double-click, the same release is loaded from a public content-delivery network instead.
 
 DATA
 ----

@@ -1,5 +1,7 @@
 /* Lazy loading of Pyodide (Python in the browser) and the JS <-> Python bridge.
-   Used by steps 6, 7 and 8. Needs an internet connection the first time only for the interpreter itself.
+   Used by steps 6, 7 and 8. The interpreter and its libraries ship inside the app, in vendor/pyodide/,
+   and are used when the app is served by server.ps1, so it works offline. If that copy is missing or
+   fails to load, the online copy is used instead.
 
    Conventions shared by every Python block:
    - Always call Python through runPy(code) (never py.runPython directly): it first synchronises the
@@ -9,21 +11,49 @@
      so it is redrawn automatically when the user switches language or theme. */
 
 const PYODIDE_VERSION = 'v0.27.2';
+const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
+const PYODIDE_LOCAL = 'vendor/pyodide/';
 let _pyPromise = null;
+
+/* The local copy only works over http(s): browsers block reading it from file://. */
+async function _localPyodideBase() {
+  if (!/^https?:$/.test(location.protocol)) return null;
+  const base = new URL(PYODIDE_LOCAL, location.href).href;
+  try {
+    const r = await fetch(base + 'pyodide-lock.json');
+    return r.ok ? base : null;
+  } catch (e) { return null; }
+}
+
+/* Starts the interpreter and the base libraries from one location. */
+async function _bootPyodide(base) {
+  if (!window.loadPyodide) await loadScript(base + 'pyodide.js');
+  setSpinner(T('Iniciando intérprete de Python…', 'Starting the Python interpreter…'));
+  const pyodide = await loadPyodide({ indexURL: base });
+  setSpinner(T('Cargando las bibliotecas científicas…', 'Loading the scientific libraries…'));
+  await pyodide.loadPackage(['numpy', 'pandas', 'scipy', 'scikit-learn', 'matplotlib']);
+  return pyodide;
+}
+
+/* Local copy first; the online copy if that fails. */
+async function _startPyodide() {
+  const local = await _localPyodideBase();
+  if (local) {
+    try { return await _bootPyodide(local); }
+    catch (e) {
+      console.warn('Local Python copy failed; using the online copy.', e);
+      delete window.loadPyodide;
+    }
+  }
+  return _bootPyodide(PYODIDE_CDN);
+}
 
 async function getPyodide() {
   if (_pyPromise) return _pyPromise;
   _pyPromise = (async () => {
     showSpinner(T('Cargando el motor de Python. La primera vez tarda ~30–60 s…', 'Loading the Python engine. The first time takes ~30–60 s…'));
     try {
-      if (!window.loadPyodide)
-        await loadScript(`https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/pyodide.js`);
-      setSpinner(T('Iniciando intérprete de Python…', 'Starting the Python interpreter…'));
-      const pyodide = await loadPyodide({
-        indexURL: `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`,
-      });
-      setSpinner(T('Cargando las bibliotecas científicas…', 'Loading the scientific libraries…'));
-      await pyodide.loadPackage(['numpy', 'pandas', 'scipy', 'scikit-learn', 'matplotlib']);
+      const pyodide = await _startPyodide();
       setSpinner(T('Preparando entorno…', 'Preparing the environment…'));
       pyodide.runPython(PY_SETUP);
       window.__pyodide = pyodide;

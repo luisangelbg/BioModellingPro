@@ -15,8 +15,9 @@ top bar; the choice is remembered.
 
 👉 **https://luisangelbg.github.io/BioModellingPro/**
 
-You only need a modern browser (Chrome or Edge recommended) and an internet connection for GBIF, the base
-maps and the Python engine.
+You only need a modern browser and an internet connection for GBIF and the base maps. The Python engine
+ships inside the app (`vendor/pyodide/`): served by the local server it works offline; opened by
+double-click, the browser cannot read it and it is fetched online the first time.
 
 ## Use it locally
 
