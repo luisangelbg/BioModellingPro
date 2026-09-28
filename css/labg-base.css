@@ -450,6 +450,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color:
 
 /* --- tablas de resultados --- */
 .table-scroll {
+  position: relative;   /* contiene los textos para lector de pantalla (posición absoluta) */
   overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r-md);
   background: var(--card-bg); -webkit-overflow-scrolling: touch;
 }
