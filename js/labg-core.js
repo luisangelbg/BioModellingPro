@@ -346,6 +346,43 @@
   function buildScene(kind, host) {
     const scene = el('div', 'lw-scene', host);
     scene.setAttribute('aria-hidden', 'true');
+    if (kind === 'tree') {
+      /* un cladograma que se dibuja desde la raíz: ((A,B),(C,(D,(E,F)))). Cada pieza
+         lleva su momento t (0–1): en bucle brota en orden; con porcentaje, cuando f ≥ t */
+      const id = 'lwt' + (++sceneSeq), X = 184;
+      const P = [
+        ['h', 14, 36, 42, 0], ['v', 36, 21, 63.5, 0.08],
+        ['h', 36, 120, 21, 0.16], ['h', 36, 78, 63.5, 0.16],
+        ['v', 120, 12, 30, 0.28], ['v', 78, 48, 79, 0.28],
+        ['h', 120, X, 12, 0.38], ['h', 120, X, 30, 0.38], ['h', 78, X, 48, 0.38], ['h', 78, 112, 79, 0.38],
+        ['v', 112, 66, 92, 0.5], ['h', 112, X, 66, 0.6], ['h', 112, 150, 92, 0.6],
+        ['v', 150, 84, 100, 0.7], ['h', 150, X, 84, 0.8], ['h', 150, X, 100, 0.8],
+      ];
+      [12, 30, 48, 66, 84, 100].forEach((y, i) => P.push(['tip', X, y, i, [0.46, 0.46, 0.46, 0.68, 0.88, 0.88][i]]));
+      let css = '';
+      const parts = P.map((p, i) => {
+        const n = el('div', p[0] === 'tip' ? 'lw-tipdot g' + (p[3] % 3) : 'lw-seg ' + p[0], scene);
+        let from;
+        if (p[0] === 'h') { Object.assign(n.style, { left: p[1] + 'px', top: (p[3] - 1.25) + 'px', width: (p[2] - p[1]) + 'px' }); from = 'scaleX(0)'; }
+        else if (p[0] === 'v') { Object.assign(n.style, { left: (p[1] - 1.25) + 'px', top: p[2] + 'px', height: (p[3] - p[2]) + 'px' }); from = 'scaleY(0)'; }
+        else { Object.assign(n.style, { left: (p[1] - 4.5) + 'px', top: (p[2] - 4.5) + 'px' }); from = 'scale(0)'; }
+        n.style.transform = from;
+        const a = Math.round(p[4] * 55), b = a + 8;
+        css += '@keyframes ' + id + 'p' + i + '{0%,' + a + '%{transform:' + from + '}' + b + '%,84%{transform:none}96%,100%{transform:' + from + '}}';
+        return { n, t: p[4], from };
+      });
+      const st = el('style', '', scene); st.textContent = css;
+      return {
+        scene,
+        loop() {
+          if (reduced()) { parts.forEach(p => { p.n.style.transform = 'none'; }); return; }
+          parts.forEach((p, i) => { p.n.style.animation = id + 'p' + i + ' 3.8s cubic-bezier(.3,.7,.3,1) infinite'; });
+        },
+        land(f) {
+          parts.forEach(p => { p.n.style.animation = 'none'; p.n.style.transform = f >= p.t ? 'none' : p.from; });
+        },
+      };
+    }
     if (kind === 'grow') {
       ['lw-soil', 'lw-seed', 'lw-stem', 'lw-leaf l1', 'lw-leaf l2', 'lw-leaf l3', 'lw-bud'].forEach(c => el('div', c, scene));
       const stem = scene.querySelector('.lw-stem'), parts = scene.querySelectorAll('.lw-leaf, .lw-bud');
@@ -482,6 +519,9 @@
       },
       done(text, opt) {
         if (ended) return Promise.resolve();
+        /* a wait that ended before its window showed (o.delay) closes quietly: a
+           celebration for something the person never saw waiting would only get in the way */
+        if (o.delay && performance.now() - t0 < o.delay + 150) { w.close(); return Promise.resolve(); }
         const oo = Object.assign({ title: LABG.t('¡Listo!', 'Done!'), hold: o.hold }, opt || {});
         ended = true; stopTimers();
         const ms = performance.now() - t0;

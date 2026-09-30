@@ -601,6 +601,14 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
   background: var(--accent); transform: scale(0); transition: transform 550ms cubic-bezier(.34, 1.6, .64, 1); }
 .lw-leaf.on { transform: scale(1) rotate(var(--rot)); }
 .lw-bud.on { transform: scale(1); }
+/* árbol filogenético que se dibuja desde la raíz */
+.lw-seg { position: absolute; background: var(--primary); border-radius: 2px; transition: transform 450ms var(--ease); }
+.lw-seg.h { height: 2.5px; transform-origin: 0 50%; }
+.lw-seg.v { width: 2.5px; transform-origin: 50% 50%; }
+.lw-tipdot { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--primary);
+  transition: transform 500ms cubic-bezier(.34, 1.6, .64, 1); }
+.lw-tipdot.g1 { background: var(--accent); }
+.lw-tipdot.g2 { background: var(--success); }
 
 /* barra */
 .lw-bar { position: relative; height: 8px; border-radius: var(--r-pill); background: var(--bg-soft);
@@ -717,7 +725,7 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
 @keyframes lw-leaf3 { 0%, 34% { transform: scale(0) rotate(-30deg); } 46%, 82% { transform: scale(1) rotate(-30deg); } 92%, 100% { transform: scale(0) rotate(-30deg); } }
 @keyframes lw-bud { 0%, 44% { transform: scale(0); } 56%, 82% { transform: scale(1); } 92%, 100% { transform: scale(0); } }
 @media (prefers-reduced-motion: reduce) {
-  .lw-backdrop, .lw-card, .lw-dot, .lw-fill, .lw-badge, .lw-check, .lw-scene, .lw-stem, .lw-leaf, .lw-bud, .lw-line, .lw-halo, .lw-imark, .lw-tip { transition: none; }
+  .lw-backdrop, .lw-card, .lw-dot, .lw-fill, .lw-badge, .lw-check, .lw-scene, .lw-stem, .lw-leaf, .lw-bud, .lw-line, .lw-halo, .lw-imark, .lw-tip, .lw-seg, .lw-tipdot { transition: none; }
   .lw-bar.indet .lw-fill { width: 100%; transform: none; opacity: .4; }
 }
 
