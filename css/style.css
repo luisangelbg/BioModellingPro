@@ -203,6 +203,11 @@ textarea { width: 100%; font-family: var(--mono); }
 .progress-bar { flex: 1; height: 10px; background: var(--border); border-radius: 6px; overflow: hidden; }
 .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .2s; }
 .progress-label { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; }
+/* ending of an inline bar (finishBar): full and green with a check mark, or red with a cross */
+.progress-wrap.is-done .progress-fill, .div-progress.is-done .div-progress-bar > div { width: 100% !important; background: var(--success); }
+.progress-wrap.is-failed .progress-fill, .div-progress.is-failed .div-progress-bar > div { background: var(--danger); }
+.progress-wrap.is-done .progress-label, .div-progress.is-done [id$="Label"] { color: var(--success-text); font-weight: 600; }
+.progress-wrap.is-failed .progress-label, .div-progress.is-failed [id$="Label"] { color: var(--danger-text); }
 .results-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 14px 0; }
 .stat-tile { background: var(--bg-soft); border-radius: 10px; padding: 12px 16px; }
 .stat-tile .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }

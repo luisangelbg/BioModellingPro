@@ -341,7 +341,7 @@ async function sdmPrepare() {
     }
   }
   Object.assign(sdm, { extentKind: extKind, extentName: extentLabel(extKind), bbox });
-  el('sdmPrepProgress').style.display = 'flex'; el('sdmPrepareBtn').disabled = true;
+  el('sdmPrepProgress').style.display = 'flex'; resetBar('sdmPrepProgress'); el('sdmPrepareBtn').disabled = true;
   try {
     const { stack, meta } = await sdmReadStack(keys, keys.map(k => ({ file: files[k], band: 0 })), bbox,
       Math.max(5000, +el('sdmMaxCells').value || 80000),
@@ -380,8 +380,9 @@ async function sdmPrepare() {
       'Few presences (<15): the models will be unstable; use the block scheme with caution.'));
     await sdmDrawDataMap(info);
     el('sdmSections').style.display = 'block'; el('sdmResults').style.display = 'none';
+    finishBar('sdmPrepProgress', true, T('Datos listos', 'Data ready'));
     showMessage('sdmMessages', 'success', L2('Datos listos. Elige algoritmos y valida los modelos más abajo.', 'Data ready. Choose algorithms and validate the models below.'));
-  } catch (e) { console.error(e); showMessage('sdmMessages', 'error', L2('Error al preparar los datos: ', 'Error preparing the data: ') + sdmErr(e)); }
+  } catch (e) { console.error(e); finishBar('sdmPrepProgress', false, T('No se pudo preparar', 'Could not prepare')); showMessage('sdmMessages', 'error', L2('Error al preparar los datos: ', 'Error preparing the data: ') + sdmErr(e)); }
   finally { el('sdmPrepareBtn').disabled = false; }
 }
 
@@ -446,7 +447,7 @@ async function sdmRun() {
   clearMessages('sdmRunMessages');
   const algos = sdmSelectedAlgos();
   if (!algos.length) { showMessage('sdmRunMessages', 'error', L2('Elige al menos un algoritmo.', 'Choose at least one algorithm.')); return; }
-  el('sdmRunProgress').style.display = 'flex'; el('sdmRunBtn').disabled = true;
+  el('sdmRunProgress').style.display = 'flex'; resetBar('sdmRunProgress'); el('sdmRunBtn').disabled = true;
   try {
     await ensureSdmPy();
     await pyf('sdm_reset_results');
@@ -475,8 +476,9 @@ async function sdmRun() {
     /* the section must be visible before the map is created, otherwise the map fits its bounds to a 0 × 0 container */
     el('sdmResults').style.display = 'block';
     await sdmRenderResults();
+    finishBar('sdmRunProgress', true, T(`${algos.length} algoritmo(s) listo(s)`, `${algos.length} algorithm(s) ready`));
     showMessage('sdmRunMessages', 'success', L2(`${algos.length} algoritmo(s) ajustado(s) y validado(s).`, `${algos.length} algorithm(s) fitted and validated.`));
-  } catch (e) { console.error(e); showMessage('sdmRunMessages', 'error', L2('Error al ejecutar los modelos: ', 'Error running the models: ') + sdmErr(e)); }
+  } catch (e) { console.error(e); finishBar('sdmRunProgress', false, T('Los modelos no terminaron', 'The models did not finish')); showMessage('sdmRunMessages', 'error', L2('Error al ejecutar los modelos: ', 'Error running the models: ') + sdmErr(e)); }
   finally { el('sdmRunBtn').disabled = false; }
 }
 
@@ -597,7 +599,7 @@ el('sdmTuneBtn').addEventListener('click', async () => {
     const combos = []; ['lq', 'lqh', 'lqhp'].forEach(c => [0.5, 1, 2, 4].forEach(r => combos.push([c, r])));
     const rows = [];
     for (let i = 0; i < combos.length; i++) {
-      setSpinner(T(`Tipo MaxEnt: clases ${combos[i][0].toUpperCase()} · reg ${combos[i][1]} (${i + 1}/${combos.length})`,
+      spinnerProgress(i / combos.length, T(`Tipo MaxEnt: clases ${combos[i][0].toUpperCase()} · reg ${combos[i][1]} (${i + 1}/${combos.length})`,
         `MaxEnt-style: classes ${combos[i][0].toUpperCase()} · reg ${combos[i][1]} (${i + 1}/${combos.length})`)); await tick();
       rows.push(JSON.parse(await pyf('sdm_tune_one', combos[i][0], combos[i][1], +el('sdmKnots').value || 10)));
     }
@@ -1163,7 +1165,7 @@ async function futProject() {
     showMessage('sdmProjMessages', 'info', L2('No hay escenarios pendientes; añade más archivos para proyectar otros.', 'There are no pending scenarios; add more files to project others.'));
     return;
   }
-  el('sdmFutProgress').style.display = 'flex'; el('sdmProjBtn').disabled = true;
+  el('sdmFutProgress').style.display = 'flex'; resetBar('sdmFutProgress'); el('sdmProjBtn').disabled = true;
   let done = 0, ok = 0;
   try {
     await ensureSdmPy();
@@ -1199,8 +1201,9 @@ async function futProject() {
         L2(`${ok} escenario(s) proyectado(s)${bad ? `; ${bad} con error (mira la columna «Estado»).` : '.'}`,
           `${ok} scenario(s) projected${bad ? `; ${bad} failed (see the “Status” column).` : '.'}`));
     } else showMessage('sdmProjMessages', 'error', L2('Ningún escenario pudo proyectarse.', 'No scenario could be projected.'));
-  } catch (e) { console.error(e); showMessage('sdmProjMessages', 'error', L2('Error en la proyección: ', 'Projection error: ') + sdmErr(e)); }
-  finally { el('sdmProjBtn').disabled = false; el('sdmFutProgress').style.display = 'none'; }
+    finishBar('sdmFutProgress', ok > 0, ok ? T(`${ok} escenario(s) proyectado(s)`, `${ok} scenario(s) projected`) : T('Ningún escenario', 'No scenario'));
+  } catch (e) { console.error(e); finishBar('sdmFutProgress', false, T('Proyección interrumpida', 'Projection interrupted')); showMessage('sdmProjMessages', 'error', L2('Error en la proyección: ', 'Projection error: ') + sdmErr(e)); }
+  finally { el('sdmProjBtn').disabled = false; }
 }
 
 /* ---------------- per-scenario table ---------------- */

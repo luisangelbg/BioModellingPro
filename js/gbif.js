@@ -245,7 +245,7 @@ async function doFetch() {
     maxRecords: Math.max(300, parseInt(el('maxRecords').value, 10) || 20000),
     countries: selectedCountries(),
   };
-  el('fetchProgress').style.display = 'flex';
+  el('fetchProgress').style.display = 'flex'; resetBar('fetchProgress');
   el('fetchBtn').disabled = true;
   const setProg = (done, cap, total, note) => {
     if (note) { el('fetchProgressLabel').textContent = note; return; }
@@ -270,7 +270,9 @@ async function doFetch() {
         `Your ${own.length.toLocaleString('en-US')} own records were kept and added to the GBIF ones.`));
     }
     acceptRecords(records, total, truncated);
+    finishBar('fetchProgress', true, T(`${records.length.toLocaleString('en-US')} registros listos`, `${records.length.toLocaleString('en-US')} records ready`));
   } catch (err) {
+    finishBar('fetchProgress', false, T('Descarga interrumpida', 'Download interrupted'));
     showMessage('fetchMessages', 'error', L2('Error al descargar los registros: ', 'Error downloading the records: ') + errHTML(err));
     /* the download died halfway: offer what did arrive instead of throwing it away */
     const partial = err.partial || [];

@@ -249,6 +249,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
 }
 .suite-link:hover { color: var(--primary-text); border-color: var(--primary); }
 .suite-link svg { width: 14px; height: 14px; }
+.suite-link .labg-iso { width: 18px; height: 18px; flex: none; }
 
 /* conmutador segmentado (idioma) */
 .seg {
@@ -545,6 +546,179 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
 @media (prefers-reduced-motion: no-preference) {
   .skeleton { animation: labg-shimmer 1.4s ease infinite; }
   @keyframes labg-shimmer { from { background-position: 100% 50%; } to { background-position: 0 50%; } }
+}
+
+/* --- espera animada: LABG.work, LABG.progressBar, LABG.busyButton ---
+   Todo lo que se mueve durante el cálculo usa transform y opacity: el navegador
+   lo anima aparte, así que sigue vivo aunque el cálculo ocupe la página. */
+.lw-backdrop {
+  position: fixed; inset: 0; z-index: var(--z-dialog);
+  display: grid; place-items: center; padding: var(--sp-4);
+  background: rgba(10, 14, 24, 0.40);
+  opacity: 0; transition: opacity var(--dur-slow) var(--ease);
+}
+.lw-backdrop.open { opacity: 1; }
+.lw-card {
+  position: relative; width: min(400px, 100%);
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-lg);
+  padding: var(--sp-6) var(--sp-6) var(--sp-5); text-align: center;
+  transform: translateY(10px) scale(.97); transition: transform 320ms cubic-bezier(.34, 1.4, .64, 1);
+}
+.lw-backdrop.open .lw-card { transform: none; }
+.lw-card:focus { outline: none; }
+.lw-title { margin: 0; font-size: var(--fs-lg); line-height: var(--lh-tight); }
+.lw-msg { margin: var(--sp-1) 0 0; min-height: 1.4em; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* escenario */
+.lw-stage { position: relative; width: 200px; height: 112px; margin: 0 auto var(--sp-4); }
+.lw-scene { position: absolute; inset: 0; transition: opacity 300ms var(--ease), transform 300ms var(--ease); }
+.lw-dot { position: absolute; left: 0; top: 0; width: 9px; height: 9px; will-change: transform;
+  transition: transform 850ms cubic-bezier(.34, 1.5, .64, 1); }
+.lw-dot i { display: block; width: 100%; height: 100%; border-radius: 50%; background: var(--primary); }
+.lw-dot.g1 i { background: var(--accent); }
+.lw-dot.g2 i { background: var(--success); }
+.lw-axis { position: absolute; background: var(--border-strong); border-radius: 2px; }
+.lw-axis.x { left: 8px; right: 4px; bottom: 6px; height: 2px; }
+.lw-axis.y { left: 8px; top: 2px; bottom: 6px; width: 2px; }
+.lw-line { position: absolute; height: 3px; margin-top: -1.5px; border-radius: 3px; background: var(--accent);
+  transform-origin: 0 50%; opacity: 0; transition: opacity 500ms var(--ease); }
+.lw-halo { position: absolute; width: 50px; height: 50px; margin: -25px 0 0 -25px; border-radius: 50%;
+  border: 2px dashed var(--primary); opacity: 0; transition: opacity 500ms var(--ease); }
+.lw-halo.g1 { border-color: var(--accent); }
+.lw-halo.g2 { border-color: var(--success); }
+/* planta que crece */
+.lw-soil { position: absolute; left: 36px; right: 36px; bottom: 8px; height: 4px; border-radius: 4px; background: var(--accent); opacity: .6; }
+.lw-seed { position: absolute; left: 93px; bottom: 7px; width: 14px; height: 9px; border-radius: 50%; background: var(--accent); }
+.lw-stem { position: absolute; left: 98.5px; bottom: 12px; width: 3px; height: 76px; border-radius: 3px;
+  background: var(--success); transform-origin: 50% 100%; transform: scaleY(.05); transition: transform 700ms var(--ease); }
+.lw-leaf { position: absolute; width: 28px; height: 13px; background: var(--success);
+  transform: scale(0) rotate(var(--rot)); transition: transform 550ms cubic-bezier(.34, 1.6, .64, 1); }
+.lw-leaf.l1 { left: 101px; bottom: 30px; --rot: -22deg; border-radius: 0 100% 0 100%; transform-origin: 0 100%; }
+.lw-leaf.l2 { left: 71px;  bottom: 48px; --rot: 22deg;  border-radius: 100% 0 100% 0; transform-origin: 100% 100%; }
+.lw-leaf.l3 { left: 101px; bottom: 64px; --rot: -30deg; border-radius: 0 100% 0 100%; transform-origin: 0 100%; width: 22px; height: 11px; }
+.lw-bud { position: absolute; left: 92.5px; bottom: 84px; width: 15px; height: 15px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: var(--accent); transform: scale(0); transition: transform 550ms cubic-bezier(.34, 1.6, .64, 1); }
+.lw-leaf.on { transform: scale(1) rotate(var(--rot)); }
+.lw-bud.on { transform: scale(1); }
+
+/* barra */
+.lw-bar { position: relative; height: 8px; border-radius: var(--r-pill); background: var(--bg-soft);
+  overflow: hidden; margin: var(--sp-4) 0 var(--sp-2); }
+.lw-fill { position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform-origin: 0 50%; transform: scaleX(0); transition: transform 420ms var(--ease), background-color 300ms; }
+.lw-bar.indet .lw-fill { right: auto; width: 38%; transform: translateX(-100%); }
+.lw-meta { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: var(--fs-xs);
+  color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.lw-tip { margin: var(--sp-4) 0 0; min-height: 2.9em; font-size: var(--fs-sm); color: var(--text-muted);
+  line-height: 1.45; transition: opacity 350ms var(--ease); }
+.lw-tip:not(:empty)::before { content: "✦ "; color: var(--accent-text); }
+.lw-tip.fade { opacity: 0; }
+.lw-actions { margin-top: var(--sp-4); display: flex; justify-content: center; gap: var(--sp-2); }
+.lw-actions:empty { display: none; }
+
+/* final: el isotipo LABG con la insignia de la palomita, onda y estallido */
+.lw-badge { position: absolute; left: 50%; top: 50%; width: 80px; height: 80px; margin: -40px 0 0 -40px;
+  opacity: 0; transform: scale(.3) rotate(-14deg); pointer-events: none;
+  transition: transform 560ms cubic-bezier(.34, 1.6, .64, 1), opacity 180ms; }
+.lw-iso { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 18px rgba(12, 106, 68, .35)); }
+.lw-iso .iso-dot { transform-box: fill-box; transform-origin: center; }
+.lw-mark { position: absolute; right: -11px; bottom: -11px; width: 38px; height: 38px; border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--card-bg); transform: scale(0);
+  transition: transform 500ms 420ms cubic-bezier(.34, 1.7, .64, 1); }
+.lw-mark svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.lw-card.is-done .lw-mark, .lw-card.is-failed .lw-mark { transform: none; }
+.lw-disc { fill: var(--success); }
+.lw-check, .lw-cross { fill: none; stroke: var(--card-bg); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.lw-check { stroke-dasharray: 36; stroke-dashoffset: 36; transition: stroke-dashoffset 420ms 300ms var(--ease); }
+.lw-mark .lw-check { transition-delay: 700ms; }
+.lw-cross { display: none; }
+.lw-ripple { position: absolute; inset: 0; border-radius: 22%; border: 3px solid #3ED68B; opacity: 0; }
+.lw-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.lw-burst i { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; opacity: 0; background: var(--primary); }
+.lw-burst i:nth-child(4n+1) { background: var(--accent); border-radius: 2px; }
+.lw-burst i:nth-child(4n+2) { background: var(--success); }
+.lw-burst i:nth-child(4n+3) { background: var(--info); width: 6px; height: 10px; border-radius: 3px; }
+.lw-card.is-done .lw-scene, .lw-card.is-failed .lw-scene { opacity: 0; transform: scale(.8); }
+.lw-card.is-done .lw-badge, .lw-card.is-failed .lw-badge { opacity: 1; transform: none; }
+.lw-card.is-done .lw-check { stroke-dashoffset: 0; }
+.lw-card.is-done .lw-fill { background: var(--success); transform: scaleX(1); }
+.lw-card.is-failed .lw-disc { fill: var(--danger); }
+.lw-card.is-failed .lw-check { display: none; }
+.lw-card.is-failed .lw-cross { display: inline; }
+.lw-card.is-failed .lw-fill { background: var(--danger); }
+.lw-card.is-done .lw-tip, .lw-card.is-failed .lw-tip { display: none; }
+.lw-card.is-done .lw-title { color: var(--success-text); }
+.lw-card.is-failed .lw-title { color: var(--danger-text); }
+
+/* barra en línea que termina en palomita */
+.lw-inline { display: flex; align-items: center; gap: var(--sp-2); min-height: 26px; }
+.lw-inline .lw-bar { flex: 1; margin: 0; }
+.lw-ilabel { font-size: var(--fs-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: right; }
+.lw-imark { flex: none; width: 22px; height: 22px; opacity: 0; transform: scale(.2) rotate(-60deg);
+  transition: transform 520ms cubic-bezier(.34, 1.7, .64, 1), opacity 160ms; }
+.lw-imark svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.lw-imark .lw-check, .lw-imark .lw-cross { stroke-width: 3.2; }
+.lw-inline.is-done .lw-imark, .lw-inline.is-failed .lw-imark { opacity: 1; transform: none; }
+.lw-inline.is-done .lw-check { stroke-dashoffset: 0; }
+.lw-inline.is-done .lw-fill { background: var(--success); transform: scaleX(1); }
+.lw-inline.is-done .lw-ilabel { color: var(--success-text); font-weight: 600; }
+.lw-inline.is-failed .lw-disc { fill: var(--danger); }
+.lw-inline.is-failed .lw-check { display: none; }
+.lw-inline.is-failed .lw-cross { display: inline; }
+.lw-inline.is-failed .lw-fill { background: var(--danger); }
+.lw-inline.is-failed .lw-ilabel { color: var(--danger-text); }
+
+/* botón que trabaja y termina en palomita */
+.lw-btn-working { cursor: progress; }
+.lw-btn-working:disabled { opacity: 1; cursor: progress; }
+.lw-dots { display: inline-flex; gap: 3px; align-items: center; }
+.lw-dots i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .5; }
+.lw-btn-done, .lw-btn-done:disabled { opacity: 1; background: var(--success-soft); color: var(--success-text); border-color: var(--success); cursor: default; }
+.lw-btn-done svg { width: 16px; height: 16px; overflow: visible; }
+.lw-btn-done .lw-check { stroke: var(--success-text); stroke-width: 3.4; }
+.lw-btn-failed { border-color: var(--danger); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .lw-bar.indet .lw-fill { animation: lw-indet 1.35s ease-in-out infinite; }
+  .lw-bar:not(.indet) .lw-fill::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent);
+    transform: translateX(-100%); animation: lw-shine 1.8s ease-in-out infinite;
+  }
+  .lw-card.is-done .lw-fill::after, .lw-inline.is-done .lw-fill::after { animation: none; opacity: 0; }
+  .lw-card.is-done .lw-ripple { animation: lw-ripple 900ms 200ms var(--ease) both; }
+  .lw-card.is-done .lw-iso .iso-dot { animation: lw-dot-on 520ms cubic-bezier(.34, 1.7, .64, 1) both; animation-delay: calc(260ms + var(--i) * 80ms); }
+  .lw-card.is-failed { animation: lw-shake 450ms var(--ease); }
+  .lw-inline.is-failed .lw-imark, .lw-btn-failed { animation: lw-shake 450ms var(--ease); }
+  .lw-dots i { animation: lw-hop 1s ease-in-out infinite; }
+  .lw-dots i:nth-child(2) { animation-delay: .15s; }
+  .lw-dots i:nth-child(3) { animation-delay: .3s; }
+  .lw-btn-done svg { animation: lw-pop 480ms cubic-bezier(.34, 1.7, .64, 1); }
+  .lw-scene.loop .lw-stem { animation: lw-stem 3.6s var(--ease) infinite; }
+  .lw-scene.loop .lw-leaf.l1 { animation: lw-leaf1 3.6s var(--ease) infinite; }
+  .lw-scene.loop .lw-leaf.l2 { animation: lw-leaf2 3.6s var(--ease) infinite; }
+  .lw-scene.loop .lw-leaf.l3 { animation: lw-leaf3 3.6s var(--ease) infinite; }
+  .lw-scene.loop .lw-bud { animation: lw-bud 3.6s var(--ease) infinite; }
+  .lw-scene.loop .lw-line, .lw-scene.loop .lw-halo { animation: lw-reveal 3.4s ease-in-out infinite; }
+}
+@keyframes lw-indet { from { transform: translateX(-100%); } to { transform: translateX(270%); } }
+@keyframes lw-shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes lw-dot-on { from { transform: scale(0); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes lw-ripple { from { transform: scale(1); opacity: .7; } to { transform: scale(2.1); opacity: 0; } }
+@keyframes lw-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(2px); } }
+@keyframes lw-hop { 0%, 70%, 100% { transform: translateY(0); opacity: .45; } 35% { transform: translateY(-4px); opacity: 1; } }
+@keyframes lw-pop { from { transform: scale(0) rotate(-40deg); } to { transform: none; } }
+@keyframes lw-reveal { 0%, 36% { opacity: 0; } 50%, 72% { opacity: 1; } 88%, 100% { opacity: 0; } }
+@keyframes lw-stem { 0% { transform: scaleY(.05); } 38%, 82% { transform: scaleY(1); } 96%, 100% { transform: scaleY(.05); } }
+@keyframes lw-leaf1 { 0%, 18% { transform: scale(0) rotate(-22deg); } 30%, 82% { transform: scale(1) rotate(-22deg); } 92%, 100% { transform: scale(0) rotate(-22deg); } }
+@keyframes lw-leaf2 { 0%, 26% { transform: scale(0) rotate(22deg); } 38%, 82% { transform: scale(1) rotate(22deg); } 92%, 100% { transform: scale(0) rotate(22deg); } }
+@keyframes lw-leaf3 { 0%, 34% { transform: scale(0) rotate(-30deg); } 46%, 82% { transform: scale(1) rotate(-30deg); } 92%, 100% { transform: scale(0) rotate(-30deg); } }
+@keyframes lw-bud { 0%, 44% { transform: scale(0); } 56%, 82% { transform: scale(1); } 92%, 100% { transform: scale(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .lw-backdrop, .lw-card, .lw-dot, .lw-fill, .lw-badge, .lw-check, .lw-scene, .lw-stem, .lw-leaf, .lw-bud, .lw-line, .lw-halo, .lw-imark, .lw-tip { transition: none; }
+  .lw-bar.indet .lw-fill { width: 100%; transform: none; opacity: .4; }
 }
 
 /* ================================================================

@@ -51,10 +51,11 @@ async function _startPyodide() {
 async function getPyodide() {
   if (_pyPromise) return _pyPromise;
   _pyPromise = (async () => {
-    showSpinner(T('Cargando el motor de Python. La primera vez tarda ~30–60 s…', 'Loading the Python engine. The first time takes ~30–60 s…'));
+    showSpinner(T('Preparando el motor de Python…', 'Preparing the Python engine…'), 4);
     try {
       const pyodide = await _startPyodide();
       setSpinner(T('Preparando entorno…', 'Preparing the environment…'));
+      await _paint();
       pyodide.runPython(PY_SETUP);
       window.__pyodide = pyodide;
       return pyodide;
@@ -81,8 +82,13 @@ function syncPyUI(py) {
 }
 
 /* Runs Python code (async allowed) and returns the result converted to plain JS. */
+/* With a waiting window open, let the browser paint it before Python takes over the page;
+   otherwise its text and bar do not update. */
+function _paint() { return window.LABG && spinnerCount ? LABG.nextPaint() : Promise.resolve(); }
+
 async function runPy(code, globals) {
   const py = await getPyodide();
+  await _paint();
   syncPyUI(py);
   if (globals) for (const [k, v] of Object.entries(globals)) py.globals.set(k, v);
   const res = await py.runPythonAsync(code);

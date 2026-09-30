@@ -470,7 +470,7 @@
     try { bbox = extentBox(); } catch (e) { showMessage('agMessages', 'error', eHTML(e)); return; }
     A.extentKind = $('agExtent').value; A.extentName = extentLabel(A.extentKind); A.bbox = bbox;
     const maxCells = Math.max(2000, +$('agMaxCells').value || 30000);
-    A.busy = true; $('agReadBtn').disabled = true; $('agProgress').style.display = 'flex';
+    A.busy = true; $('agReadBtn').disabled = true; $('agProgress').style.display = 'flex'; resetBar('agProgress');
     try {
       let mon, meta;
       if (A.mode === 'monthly') {
@@ -520,6 +520,7 @@
       ]);
       if (!valid) throw err('Ninguna celda tiene dato en la extensión elegida.', 'No cell has data within the chosen extent.');
       $('agOptCard').style.display = 'block';
+      finishBar('agProgress', true, T('Malla lista', 'Grid ready'));
       showMessage('agMessages', 'success', L2(`Malla lista: ${meta.ncol} × ${meta.nrow} celdas (${fmtInt(valid)} con dato). Ajusta las opciones y calcula los índices.`,
         `Grid ready: ${meta.ncol} × ${meta.nrow} cells (${fmtInt(valid)} with data). Adjust the options and compute the indices.`));
       if (A.approx) showMessage('agMessages', 'warning', L2(
@@ -527,10 +528,11 @@
         'The months were reconstructed from the bioclimatic layers: the month of the thermal peak is assumed to be July in the northern hemisphere and January in the southern one, and the rainfall shape follows a sinusoid. Calendar-dependent indices are indicative.'));
     } catch (e) {
       console.error(e);
+      finishBar('agProgress', false, T('No se pudo leer', 'Could not be read'));
       showMessage('agMessages', 'error', L2('No se pudo leer la malla: ', 'The grid could not be read: ') + eHTML(e));
     } finally {
       A.busy = false; $('agReadBtn').disabled = false;
-      setTimeout(() => { $('agProgress').style.display = 'none'; }, 600);
+      setTimeout(() => { $('agProgress').style.display = 'none'; }, 2400);
     }
   });
   function validArea(arr) {
@@ -1123,7 +1125,7 @@
   $('agCalcBtn').addEventListener('click', async () => {
     if (A.busy || !A.mon) return;
     clearMessages('agIdxMessages');
-    A.busy = true; $('agCalcBtn').disabled = true; $('agCalcProgress').style.display = 'flex';
+    A.busy = true; $('agCalcBtn').disabled = true; $('agCalcProgress').style.display = 'flex'; resetBar('agCalcProgress');
     try {
       const o = readOpts();
       if (o.cap <= o.base) throw err('El tope superior de grados-día debe ser mayor que la base.', 'The upper degree-day cap must be greater than the base.');
@@ -1142,14 +1144,16 @@
       ['agIdxCard', 'agZoneCard', 'agCropCard', 'agCatCard', 'agMultiCard', 'agAnaCard', 'agFutCard', 'agReportCard'].forEach(id => { $(id).style.display = 'block'; });
       A.idxFitted = false;
       drawIdxMap(); drawHist(); renderCatTable(); renderMethods();
+      finishBar('agCalcProgress', true, T(`${A.order.length} índices listos`, `${A.order.length} indices ready`));
       showMessage('agIdxMessages', 'success', L2(`${A.order.length} índices calculados en ${fmt((performance.now() - t0) / 1000, 1)} s.`,
         `${A.order.length} indices computed in ${fmt((performance.now() - t0) / 1000, 1)} s.`));
     } catch (e) {
       console.error(e);
+      finishBar('agCalcProgress', false, T('Cálculo interrumpido', 'Computation interrupted'));
       showMessage('agIdxMessages', 'error', L2('No se pudieron calcular los índices: ', 'The indices could not be computed: ') + eHTML(e));
     } finally {
       A.busy = false; $('agCalcBtn').disabled = false;
-      setTimeout(() => { $('agCalcProgress').style.display = 'none'; }, 600);
+      setTimeout(() => { $('agCalcProgress').style.display = 'none'; }, 2400);
     }
   });
 
@@ -1941,7 +1945,7 @@
     if (ids.length < 2) { showMessage('agMultiMessages', 'error', L2('Elige al menos 2 cultivos.', 'Choose at least 2 crops.')); return; }
     if (ids.length > 30) { showMessage('agMultiMessages', 'warning', L2('Se compararán los primeros 30 cultivos elegidos.', 'The first 30 chosen crops will be compared.')); }
     const use = ids.slice(0, 30);
-    $('agMultiProgress').style.display = 'flex';
+    $('agMultiProgress').style.display = 'flex'; resetBar('agMultiProgress');
     const cyc = $('agCycle').value, uc = $('agApplyChill').checked, ue = $('agApplyElev').checked;
     try {
       const res = [];
@@ -1981,12 +1985,13 @@
       buildTable('agMultiTable', multiCols(), rows);
       drawRank();
       $('agDlMultiCsv').style.display = '';
+      finishBar('agMultiProgress', true, T(`${rows.length} cultivos comparados`, `${rows.length} crops compared`));
       showMessage('agMultiMessages', 'success', L2(`${rows.length} cultivos comparados. El mapa «mejor cultivo por celda» ya está disponible en el apartado 5.`,
         `${rows.length} crops compared. The “best crop per cell” map is now available in section 5.`));
       renderMethods();
       if (A.fut.length) { A.fut.forEach(f => { rows.forEach(r => { if (!f.crops[r.id]) f.crops[r.id] = computeCrop(f.mon, f.idx, r.crop, cyc, uc, ue); }); }); renderFutureTables(); }
-    } catch (e) { console.error(e); showMessage('agMultiMessages', 'error', L2('Error en la comparación: ', 'Comparison error: ') + eHTML(e)); }
-    finally { setTimeout(() => { $('agMultiProgress').style.display = 'none'; }, 500); }
+    } catch (e) { console.error(e); finishBar('agMultiProgress', false, T('Comparación interrumpida', 'Comparison interrupted')); showMessage('agMultiMessages', 'error', L2('Error en la comparación: ', 'Comparison error: ') + eHTML(e)); }
+    finally { setTimeout(() => { $('agMultiProgress').style.display = 'none'; }, 2400); }
   });
   const monthList = ms => ms == null ? bi('perenne', 'perennial') : ms.length ? bi(ms.map(m => MONL[m - 1].es).join(' / '), ms.map(m => MONL[m - 1].en).join(' / ')) : '—';
   const multiCols = () => [
@@ -2110,7 +2115,7 @@
     clearMessages('agFutMessages');
     const gs = await groupFuture($('agFutFiles').files);
     if (!gs.length) { showMessage('agFutMessages', 'error', L2('Selecciona los archivos mensuales del escenario (mínima, máxima y precipitación de los 12 meses).', 'Select the monthly files of the scenario (minimum, maximum temperature and precipitation for the 12 months).')); return; }
-    $('agFutProgress').style.display = 'flex'; $('agFutBtn').disabled = true;
+    $('agFutProgress').style.display = 'flex'; resetBar('agFutProgress'); $('agFutBtn').disabled = true;
     try {
       for (let gi = 0; gi < gs.length; gi++) {
         const g = gs[gi];
@@ -2147,8 +2152,9 @@
       fillScnSelects();
       renderFutureTables();
       renderMethods();
-    } catch (e) { console.error(e); showMessage('agFutMessages', 'error', L2('Error al leer el escenario: ', 'Error reading the scenario: ') + eHTML(e)); }
-    finally { $('agFutBtn').disabled = false; setTimeout(() => { $('agFutProgress').style.display = 'none'; }, 600); }
+      finishBar('agFutProgress', true, T('Escenario listo', 'Scenario ready'));
+    } catch (e) { console.error(e); finishBar('agFutProgress', false, T('No se pudo leer el escenario', 'The scenario could not be read')); showMessage('agFutMessages', 'error', L2('Error al leer el escenario: ', 'Error reading the scenario: ') + eHTML(e)); }
+    finally { $('agFutBtn').disabled = false; setTimeout(() => { $('agFutProgress').style.display = 'none'; }, 2400); }
   });
 
   function renderFutureTables() {

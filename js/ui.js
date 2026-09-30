@@ -115,16 +115,103 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshStepFooters();
 });
 
-let spinnerCount = 0;
-function showSpinner(text) {
-  spinnerCount++;
-  el('spinnerText').textContent = text || T('Trabajando…', 'Working…');
-  el('spinner').style.display = 'flex';
+/* Waiting window: the suite's common one (LABG.work), with a growing plant.
+   showSpinner(text, steps)  opens it; if it is already open (a wait inside another), changes the text.
+                             With «steps», each setSpinner moves the bar one step. A wait with steps
+                             inside another (the Python engine inside an analysis) only moves within
+                             the stretch that belongs to it.
+   setSpinner(text)          changes the text and moves the active wait one step, if it has steps
+   spinnerProgress(f, text)  sets the finished fraction of the active wait, 0–1
+   hideSpinner()             closes it with a check mark; without it after an error or if it was very short */
+let spinnerCount = 0, spin = null;   /* spin.frames: one per open wait; the last one is active */
+if (window.LABG) {
+  LABG.work.scene = 'grow';
+  LABG.work.tips = [
+    ['El estudio de mapas cambia paleta, escala y leyenda sin repetir el análisis.',
+     'The map studio changes palette, scale and legend without rerunning the analysis.'],
+    ['Cada mapa se exporta como imagen o como GeoTIFF para abrirlo en un SIG.',
+     'Every map exports as an image or as a GeoTIFF to open in a GIS.'],
+    ['Las fichas de ayuda explican cómo leer cada resultado y qué escala usar.',
+     'The help cards explain how to read each result and which scale to use.'],
+  ];
 }
-function setSpinner(text) { el('spinnerText').textContent = text; }
-function hideSpinner() {
-  spinnerCount = Math.max(0, spinnerCount - 1);
-  if (spinnerCount === 0) el('spinner').style.display = 'none';
+const frameFrac = f => f.steps ? f.lo + (f.hi - f.lo) * Math.min(f.k / f.steps, 1) : f.frac;
+function paintSpinner(text) {
+  const f = frameFrac(spin.frames[spin.frames.length - 1]);
+  spin.w.update(f == null ? null : Math.min(f, 0.97), text);
+}
+function showSpinner(text, steps) {
+  spinnerCount++;
+  if (!window.LABG) {
+    el('spinnerText').textContent = text || T('Trabajando…', 'Working…');
+    el('spinner').style.display = 'flex';
+    return;
+  }
+  if (!spin) {
+    spin = { w: LABG.work({ title: text || T('Trabajando…', 'Working…'), delay: 350 }), t0: performance.now(), failed: false,
+             frames: [{ steps: steps || 0, k: 0, lo: 0, hi: 1, frac: steps ? 0 : null }] };
+  } else {
+    /* the inner wait's stretch: from where the outer one is to its next step */
+    const p = spin.frames[spin.frames.length - 1], pf = frameFrac(p);
+    const lo = pf == null ? 0 : pf;
+    const hi = pf == null ? 1 : p.steps ? Math.min(p.hi, pf + (p.hi - p.lo) / p.steps) : pf;
+    spin.frames.push({ steps: steps || 0, k: 0, lo, hi, frac: pf });
+    spin.w.message(text);
+  }
+  paintSpinner();
+}
+function setSpinner(text) {
+  if (!window.LABG) { el('spinnerText').textContent = text; return; }
+  if (!spin) return;
+  const f = spin.frames[spin.frames.length - 1];
+  if (f.steps) f.k++;
+  paintSpinner(text);
+}
+function spinnerProgress(frac, text) {
+  if (!spin) return;
+  const f = spin.frames[spin.frames.length - 1];
+  if (!f.steps) f.frac = frac;
+  paintSpinner(text);
+}
+/* state.js calls this when an error message is shown: that wait does not end with a check mark */
+function spinnerFailed() { if (spin) spin.failed = true; }
+function hideSpinner(force) {
+  spinnerCount = force ? 0 : Math.max(0, spinnerCount - 1);
+  if (spin && spinnerCount > 0) {
+    while (spin.frames.length > spinnerCount) spin.frames.pop();
+    paintSpinner();
+  }
+  if (spinnerCount !== 0) return;
+  if (!window.LABG) { el('spinner').style.display = 'none'; return; }
+  if (!spin) return;
+  const s = spin; spin = null;
+  if (s.failed || performance.now() - s.t0 < 450) s.w.close();
+  else s.w.done(null, { hold: 1300 });
+}
+/* Inline progress bars (.progress-wrap): when the work behind them ends, the bar fills, turns
+   green and a check mark pops at its end; with ok = false, a cross. The bar stays visible. */
+function finishBar(wrapId, ok, text) {
+  const wrap = el(wrapId);
+  if (!wrap) return;
+  const fill = wrap.querySelector('.progress-fill, .div-progress-bar > div');
+  const label = wrap.querySelector('.progress-label, [id$="Label"]');
+  if (fill && ok !== false) fill.style.width = '100%';
+  if (label && text != null) label.textContent = text;
+  let mark = wrap.querySelector('.lw-imark');
+  if (!mark) {
+    mark = document.createElement('span'); mark.className = 'lw-imark';
+    mark.innerHTML = '<svg viewBox="0 0 52 52" aria-hidden="true"><circle class="lw-disc" cx="26" cy="26" r="26"/><path class="lw-check" d="M14.5 27.5l8 8L38 19"/><path class="lw-cross" d="M18 18L34 34M34 18L18 34"/></svg>';
+    wrap.appendChild(mark);
+  }
+  wrap.classList.remove('is-done', 'is-failed');
+  void wrap.offsetWidth;                       /* restart the pop if it ends twice */
+  wrap.classList.add('lw-inline', ok === false ? 'is-failed' : 'is-done');
+  if (window.LABG && text) LABG.announce(text);
+}
+/* a bar that starts again loses its previous ending */
+function resetBar(wrapId) {
+  const wrap = el(wrapId);
+  if (wrap) wrap.classList.remove('is-done', 'is-failed');
 }
 
 window.goToStep = goToStep;
@@ -132,3 +219,7 @@ window.enableStep = enableStep;
 window.showSpinner = showSpinner;
 window.setSpinner = setSpinner;
 window.hideSpinner = hideSpinner;
+window.spinnerProgress = spinnerProgress;
+window.spinnerFailed = spinnerFailed;
+window.finishBar = finishBar;
+window.resetBar = resetBar;

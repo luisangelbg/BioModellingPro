@@ -488,7 +488,7 @@ el('ecoRunBtn').addEventListener('click', async () => {
   if (!mlPrepared) {
     showMessage('mlMessages', 'warning', L2('Pulsa primero «Preparar datos» arriba.', 'First press "Prepare data" above.')); return;
   }
-  showSpinner(T('Análisis ecológico…', 'Ecological analysis…'));
+  showSpinner(T('Análisis ecológico…', 'Ecological analysis…'), 3);
   try {
     const py = await getPyodide();
     if (!ecoReady) { py.runPython(PY_ECO); ecoReady = true; }

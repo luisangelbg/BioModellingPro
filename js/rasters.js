@@ -163,7 +163,8 @@ async function openGeo(file) {
 }
 
 /* Returns an array of values (or null) for each {lat, lon} point. */
-async function sampleGeo(geo, pts, { categorical }) {
+/* onPoint(i, n), optional: called while sampling point by point, which can take minutes on a large layer */
+async function sampleGeo(geo, pts, { categorical, onPoint }) {
   const method = categorical ? 'nearest' : state.env.sampling;
   const cols = pts.map(p => (p.lon - geo.ox) / geo.rx);
   const rows = pts.map(p => (p.lat - geo.oy) / geo.ry);
@@ -211,6 +212,7 @@ async function sampleGeo(geo, pts, { categorical }) {
   // point-by-point mode (very scattered points)
   const out = new Array(pts.length).fill(null);
   for (let i = 0; i < pts.length; i++) {
+    if (onPoint && i % 25 === 0) onPoint(i, pts.length);
     if (!finite[i]) continue;
     const c = cols[i], r = rows[i];
     const cc = Math.max(0, Math.floor(c) - 1), rr = Math.max(0, Math.floor(r) - 1);
@@ -245,7 +247,7 @@ async function extractAll() {
     ...(state.env.files.elev ? ['elev'] : []),
     ...(state.env.files.koppen ? ['koppen'] : [])];
 
-  el('envProgress').style.display = 'flex';
+  el('envProgress').style.display = 'flex'; resetBar('envProgress');
   el('envExtractBtn').disabled = true;
   clearMessages('envMessages');
   let done = 0;
@@ -256,7 +258,11 @@ async function extractAll() {
       el('envProgressFill').style.width = Math.round(done / layers.length * 100) + '%';
       await new Promise(r => setTimeout(r, 15)); // let the browser paint
       const geo = await openGeo(state.env.files[key]);
-      const vals = await sampleGeo(geo, pts, { categorical: key === 'koppen' });
+      const name = key === 'koppen' ? 'Köppen' : key.toUpperCase();
+      const vals = await sampleGeo(geo, pts, { categorical: key === 'koppen', onPoint: (i, n) => {
+        el('envProgressLabel').textContent = `${T('Leyendo', 'Reading')} ${name}: ${T('punto', 'point')} ${i.toLocaleString('en-US')} ${T('de', 'of')} ${n.toLocaleString('en-US')} (${done}/${layers.length})`;
+        el('envProgressFill').style.width = ((done + i / n) / layers.length * 100).toFixed(1) + '%';
+      } });
       vals.forEach((v, i) => {
         if (key === 'koppen') {
           const iv = v == null ? null : Math.round(v);
@@ -268,7 +274,7 @@ async function extractAll() {
       });
       done++;
     }
-    el('envProgressFill').style.width = '100%';
+    finishBar('envProgress', true, T(`${layers.length} capas leídas`, `${layers.length} layers read`));
 
     // flag / drop points with no bioclimatic data
     const bioPresent = BIO_ONLY.filter(k => state.env.files[k]);
@@ -296,6 +302,7 @@ async function extractAll() {
     [6, 7, 8, 9].forEach(enableStep);
   } catch (err) {
     console.error(err);
+    finishBar('envProgress', false, T('Lectura interrumpida', 'Reading interrupted'));
     showMessage('envMessages', 'error', L2('Error leyendo los GeoTIFF: ', 'Error reading the GeoTIFF files: ') + esc(err.message) +
       '<br>' + L2('Revisa que los archivos no estén corruptos y que sean WorldClim 2.1 (EPSG:4326).',
         'Check that the files are not corrupted and that they are WorldClim 2.1 (EPSG:4326).'));
@@ -490,7 +497,7 @@ async function runSoil() {
   const uniq = [...cells.entries()];
 
   clearMessages('soilMessages');
-  el('soilProgress').style.display = 'flex';
+  el('soilProgress').style.display = 'flex'; resetBar('soilProgress');
   el('soilRunBtn').disabled = true; el('soilStopBtn').disabled = false;
   state.env.soilRunning = true;
   const cache = loadSoilCache();
@@ -533,6 +540,8 @@ async function runSoil() {
 
   state.env.soilRunning = false;
   el('soilRunBtn').disabled = false; el('soilStopBtn').disabled = true;
+  /* a complete run ends with a check mark; a stopped one keeps its bar where it was */
+  if (i >= uniq.length) finishBar('soilProgress', true, T(`${ok}/${uniq.length} celdas con suelo`, `${ok}/${uniq.length} cells with soil`));
   const nPts = t.filter(r => r.soil_wrb).length;
   showMessage('soilMessages', ok ? 'success' : 'warning',
     L2(`Suelo asignado en ${ok}/${uniq.length} celdas → ${nPts} puntos` + (fromCache ? ` (${fromCache} desde caché local).` : '.') +

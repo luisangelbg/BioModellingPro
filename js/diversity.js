@@ -1975,11 +1975,17 @@
     };
   }
   function prog(f, text) {
+    clearTimeout(D._progEnd); resetBar('divProgress');
     $('divProgress').style.display = 'flex';
     $('divProgressFill').style.width = Math.round(f * 100) + '%';
     $('divProgressLabel').textContent = text;
   }
-  const progEnd = () => { $('divProgress').style.display = 'none'; };
+  /* with a delay, the bar stays a moment showing its ending (finishBar) before hiding */
+  const progEnd = ms => {
+    clearTimeout(D._progEnd);
+    if (ms) D._progEnd = setTimeout(() => { $('divProgress').style.display = 'none'; }, ms);
+    else $('divProgress').style.display = 'none';
+  };
 
   async function run() {
     if (D.running) return;
@@ -2101,16 +2107,18 @@
       const note = [];
       if (D.raref.shown < m.nS) note.push(L2(`la rarefacción dibuja los ${D.raref.shown} sitios con más registros`, `the rarefaction draws the ${D.raref.shown} sites with most records`));
       if (D.profile.shown < m.nS) note.push(L2(`el perfil dibuja los ${D.profile.shown} con más registros`, `the profile draws the ${D.profile.shown} with most records`));
+      finishBar('divProgress', true, T('Diversidad lista', 'Diversity ready'));
       showMessage('divMessages', 'success', L2(
         `Listo: ${m.nS} ${m.nS === 1 ? 'sitio' : 'sitios'} × ${m.nT} ${m.nT === 1 ? 'taxón' : 'taxones'}, ${fmtInt(m.total)} registros.`,
         `Done: ${m.nS} ${m.nS === 1 ? 'site' : 'sites'} × ${m.nT} ${m.nT === 1 ? 'taxon' : 'taxa'}, ${fmtInt(m.total)} records.`) + (note.length ? ' (' + note.join('; ') + ').' : ''));
     } catch (e) {
       console.error(e);
+      finishBar('divProgress', false, T('Cálculo interrumpido', 'Computation interrupted'));
       showMessage('divMessages', 'error', L2('Error en el cálculo de la diversidad: ', 'Error computing the diversity: ') + esc(e.message));
     } finally {
       D.running = false;
       $('divRunBtn').disabled = false;
-      progEnd();
+      progEnd(2400);
     }
   }
 
@@ -2405,10 +2413,12 @@
           `Estrés 1 de Kruskal = <b>${fmt(N.stress, 4)}</b> con ${N.starts} arranque(s): ajuste <b>${q.es}</b>. El mejor arranque fue ${N.start === 'pcoa' ? 'la PCoA' : 'uno aleatorio'}.`,
           `Kruskal's stress 1 = <b>${fmt(N.stress, 4)}</b> with ${N.starts} start(s): <b>${q.en}</b> fit. The best start was ${N.start === 'pcoa' ? 'the PCoA' : 'a random one'}.`)}</div>`;
         renderMethods();
+        finishBar('divProgress', true, T('NMDS ajustado', 'NMDS fitted'));
       } catch (e) {
         console.error(e);
+        finishBar('divProgress', false, T('NMDS sin ajustar', 'NMDS not fitted'));
         $('divNmdsNote').innerHTML = `<div class="msg msg-error">${L2('No se pudo ajustar el NMDS: ', 'The NMDS could not be fitted: ') + esc(e.message)}</div>`;
-      } finally { $('divNmdsBtn').disabled = false; progEnd(); }
+      } finally { $('divNmdsBtn').disabled = false; progEnd(2400); }
     });
     $('divContribBtn').addEventListener('click', () => {
       if (!D.mat) return;

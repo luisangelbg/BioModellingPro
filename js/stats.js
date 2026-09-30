@@ -156,7 +156,7 @@ async function runStats() {
     showMessage('statsMessages', 'error', L2('No hay tabla de variables ambientales (vuelve al paso 5).', 'There is no environmental variable table (go back to step 5).')); return;
   }
   clearMessages('statsMessages');
-  showSpinner(T('Preparando análisis…', 'Preparing the analysis…'));
+  showSpinner(T('Preparando análisis…', 'Preparing the analysis…'), 5);
   try {
     const py = await getPyodide();
     if (!statsReady) { py.runPython(PY_STATS); statsReady = true; }
