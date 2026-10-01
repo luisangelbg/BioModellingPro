@@ -989,7 +989,23 @@
     const put = blk => { if (!blk) return; const [x, y] = place(blk.corner, blk.w, blk.h, blk.mg); placed.push({ blk, x, y }); };
     put(titleBlock(S, st, c));
     put(northBlock(S, st, c));
-    if (st.legendOn && info.legend) { const lb = legendBlock(S, info.legend, st, info, H * 0.78 - cur[st.legendPos]); put({ corner: st.legendPos, w: lb.w, h: lb.h, draw: lb.draw }); }
+    if (st.legendOn && info.legend) {
+      const maxH = H * 0.78 - cur[st.legendPos], availW = W - 2 * edge;
+      let lb = legendBlock(S, info.legend, st, info, maxH), k = 1;
+      /* a legend wider than the map (a journal column, long names in two columns): the arrangement that keeps the
+         biggest text, shrunk just enough to fit, instead of a legend cut by the edge of the picture */
+      if (lb.w > availW && availW > 0) {
+        const fit = b => Math.min(1, availW / b.w, Math.max(maxH, H * 0.3) / b.h);
+        const one = legendBlock(S, info.legend, Object.assign({}, st, { legendCols: 1 }), info, Infinity);
+        if (fit(one) > fit(lb)) lb = one;
+        k = fit(lb);
+      }
+      if (k < 1) {
+        const b0 = lb;
+        lb = { w: b0.w * k, h: b0.h * k, draw: (x, y) => { S.scaleStart(k); try { b0.draw(x / k, y / k); } finally { S.scaleEnd(); } } };
+      }
+      put({ corner: st.legendPos, w: lb.w, h: lb.h, draw: lb.draw });
+    }
     if (st.scaleOn) put(scaleBlock(S, view, st, c, info));
     put(creditBlock(S, st, c));
     if (st.grat) {
@@ -1839,7 +1855,7 @@
     studio.applyStyle = applyStyle;
 
     /* ================= panel UI ================= */
-    const panel = mk('details', 'mstudio'); panel.dataset.kind = kind;
+    const panel = mk('details', 'mstudio'); panel.dataset.kind = kind; studio.panel = panel;
     panel.innerHTML = `<summary><span class="ms-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/><path d="M3 16.5l9 4.5 9-4.5"/></svg></span>` +
       `<span class="ms-tt">${L2('Estudio de mapa', 'Map studio')}</span><span class="ms-sub">${L2('mapa base, título, leyenda, colores, estilos y exportación', 'base map, title, legend, colours, looks and export')}</span></summary>`;
     const body = mk('div', 'ms-body'); panel.appendChild(body);
@@ -2496,4 +2512,67 @@
 
   const STUDIOS = [];
   window.mapstudio = { attach, RAMPS, PALETTES, rampStops, whiteFirst, rampAt, rampName, makeScale, classBreaks, sortedFinite, categoryColors, palColor, PRESETS, SIZES, planExport, convexHull, studios: STUDIOS };
+
+  /* ================= the LABG Figure Studio =================
+     Every map with a studio opens there too. The figure studio asks this studio for the map at the output size
+     (millimetres and dpi) and gets it through the very same export as the "Export" tab: PNG, SVG and GeoTIFF,
+     with the framing, clip and base-map options set here (it makes the PDF and the TIFF from the PNG, at the
+     exact dpi). One export at a time: the live map is resized while one is drawn. */
+  let figQueue = Promise.resolve();
+  /* the shape of the picture: the map as it is on screen, or the extent asked for when the framing trims the picture */
+  function figAspect(studio) {
+    const size = studio.map.getSize(), a = size.x ? size.y / size.x : 0.66, ex = studio.ex;
+    if (ex.lockAspect !== false || !ex.frame || ex.frame === 'asis') return a;
+    try { const p = planExport(studio, Object.assign({}, ex, { size: 'custom', cunit: 'mm', cw: 100, ch: 100 * a })); return p.mm ? p.mm[1] / p.mm[0] : a; } catch (e) { return a; }
+  }
+  function figDraw(studio, fmt, o) {
+    const st = studio.style, was = st.bgMode;
+    const hmm = o.hmm || o.wmm * figAspect(studio);   // with the shape of the picture the width stays exact
+    /* the paper of the figure studio: transparent, or white instead of a dark theme or a transparent background */
+    if (o.transparent) st.bgMode = 'transparent';
+    else if (o.bg === 'white' && (was === 'transparent' || (was === 'theme' && lum(studio.bgColor()) < 0.4))) st.bgMode = 'white';
+    return studio.exportBlob({ fmt, size: 'custom', cunit: 'mm', cw: o.wmm, ch: hmm, dpi: o.dpi })
+      .then(r => (fmt === 'geotiff' ? tiffDpi(r.blob, o) : r.blob))
+      .finally(() => { st.bgMode = was; });
+  }
+  /* the resolution of the GeoTIFF written exactly (the export rounds it from its pixel scale), when it has exactly
+     the pixels of those millimetres at that dpi */
+  async function tiffDpi(blob, o) {
+    const buf = await blob.arrayBuffer(), dv = new DataView(buf), le = dv.getUint16(0) === 0x4949;
+    const u16 = p => dv.getUint16(p, le), u32 = p => dv.getUint32(p, le), ifd = u32(4), n = u16(ifd);
+    let width = 0; const res = [];
+    for (let i = 0; i < n; i++) {
+      const p = ifd + 2 + i * 12, tag = u16(p), type = u16(p + 2);
+      if (tag === 256) width = type === 3 ? u16(p + 8) : u32(p + 8);
+      if ((tag === 282 || tag === 283) && type === 5) res.push(u32(p + 8));
+    }
+    if (Math.abs(width - Math.round(o.wmm / 25.4 * o.dpi)) > 1) return blob;
+    res.forEach(off => { dv.setUint32(off, Math.round(o.dpi), le); dv.setUint32(off + 4, 1, le); });
+    return new Blob([buf], { type: 'image/tiff' });
+  }
+  const prevHook = window.LABG_FIGSTUDIO && window.LABG_FIGSTUDIO.nativeExport;
+  window.LABG_FIGSTUDIO = Object.assign(window.LABG_FIGSTUDIO || {}, {
+    nativeExport: rec => {
+      const el = rec && rec.el;
+      const studio = el && el.classList && el.classList.contains('leaflet-container') ? STUDIOS.find(s => s.map.getContainer() === el) : null;
+      if (!studio || typeof studio.exportBlob !== 'function') return typeof prevHook === 'function' ? prevHook(rec) : null;
+      return {
+        label: T('el estudio de mapa de la app', 'the app’s map studio'),
+        formats: ['png', 'svg', 'geotiff'],
+        extra: [['geotiff', ['GeoTIFF', 'GeoTIFF']]],
+        notes: {
+          svg: ['El SVG lleva los datos y los textos como vectores, sin las teselas del mapa base.', 'The SVG holds the data and the texts as vectors, without the base-map tiles.'],
+          geotiff: studio.ex.geoDecor === true
+            ? ['GeoTIFF georreferenciado, con título, leyenda, escala y flecha, como pide «Exportar» del estudio de mapa.', 'Georeferenced GeoTIFF, with title, legend, scale bar and arrow, as the map studio’s “Export” asks.']
+            : ['GeoTIFF georreferenciado; sin título, leyenda, escala ni flecha, para que el amarre sea exacto (se pueden incluir en «Exportar» del estudio de mapa).', 'Georeferenced GeoTIFF; without title, legend, scale bar or arrow so that the fit is exact (they can be included in the map studio’s “Export”).'],
+        },
+        studioStyles: false,
+        lift: false,
+        title: () => (studio.style.title || '').trim() || (studio.hooks.defaultTitle && studio.hooks.defaultTitle()) || T('Mapa', 'Map'),
+        aspect: () => figAspect(studio),
+        controls: () => (studio.panel && studio.panel.isConnected ? { node: studio.panel, title: ['Estudio de mapa (de la app)', 'Map studio (the app’s)'] } : null),
+        render: (fmt, o) => (figQueue = figQueue.catch(() => null).then(() => figDraw(studio, fmt, o))),
+      };
+    },
+  });
 })();

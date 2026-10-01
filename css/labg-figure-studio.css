@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.1.0 (hoja de estilo del módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.2.0 (hoja de estilo del módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán — GPL-3.0 (ver LICENSE).
 
    Oro y negro de la marca LABG; fondos, textos y bordes salen de los tokens de
@@ -58,6 +58,11 @@
 *:hover > .lfs-open, .lfs-open:focus-visible, *:focus-within > .lfs-open { opacity: 1; }
 .lfs-open:focus-visible { outline: 2px solid var(--lfs-oro); outline-offset: 2px; }
 .lfs-open.lfs-open-inline { position: static; opacity: 1; margin-left: 6px; vertical-align: middle; flex: none; }
+/* en un mapa interactivo: un control más, debajo del zoom (o, si el mapa no tiene esa esquina, encima de sus capas) */
+.lfs-mapbar { overflow: hidden; }
+.lfs-open.lfs-open-leaflet { position: static; opacity: 1; width: 30px; height: 30px; border: 0; border-radius: 0; background: var(--lfs-card); color: var(--lfs-ink); }
+.lfs-open.lfs-open-leaflet:hover { background: #111; color: #E6C470; }
+.lfs-open.lfs-open-map { top: auto; bottom: 34px; right: 10px; z-index: 1000; width: 30px; height: 30px; opacity: .92; box-shadow: 0 2px 8px rgba(0, 0, 0, .25); }
 .fig-head:has(> .lfs-open) { display: flex; align-items: center; gap: 6px; }
 .fig-head > .lfs-open { margin-left: auto; }
 @media (hover: none) { .lfs-open { opacity: 1; } }
@@ -203,6 +208,15 @@ html.lfs-is-open { overflow: hidden; }
 .lfs-r-check label { display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; font-size: 13px; }
 .lfs-r-check input { accent-color: var(--lfs-oro); width: 16px; height: 16px; margin: 0; }
 .lfs-r-btn { grid-template-columns: 1fr; }
+/* la sección de la app donde vive cada control */
+.lfs-subh { margin: 12px 0 4px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--lfs-oro-texto, #8a6a1f); }
+.lfs-filtering .lfs-subh { display: none; }
+/* un botón con título y descripción */
+.lfs-pbtn.lfs-pbtn-2 { flex-direction: column; align-items: flex-start; text-align: left; gap: 1px; }
+.lfs-pbtn.lfs-pbtn-2 small { font-size: 11.5px; font-weight: 400; opacity: .78; }
+/* las pestañas de un panel de la app, como fichas en línea */
+.lfs-r-chip { display: inline-flex; margin: 0 4px 6px 0; padding: 0; vertical-align: top; }
+.lfs-r-chip .lfs-pbtn { min-height: 28px; padding: 4px 11px; border-radius: 999px; font-size: 12px; }
 .lfs-r-w .lfs-ctl, .lfs-r-h .lfs-ctl { flex-wrap: wrap; }
 .lfs-r-w select { flex: 0 0 64px; }
 .lfs-inl { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 12.5px; color: var(--lfs-muted); cursor: pointer; }
@@ -247,6 +261,8 @@ html.lfs-is-open { overflow: hidden; }
 .lfs-warn { color: var(--warning-text, #8a5a00); }
 .lfs-pt { margin: 6px 0; font-size: 12.5px; }
 .lfs-note-native { display: flex; align-items: flex-start; gap: 7px; color: var(--success-text, #2f7a45); }
+.lfs-readout .lfs-note-s { display: flex; align-items: flex-start; gap: 6px; color: var(--lfs-muted); }
+.lfs-readout .lfs-note-s .lfs-i { width: 15px; height: 15px; margin-top: 1px; }
 .lfs-note-native .lfs-i { width: 15px; height: 15px; margin-top: 2px; }
 .lfs-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .lfs-btn {
@@ -339,6 +355,20 @@ svg .lfs-hl-el { filter: drop-shadow(0 0 1.6px #D4A848) drop-shadow(0 0 1.6px #D
 .lfs-ring.flash { animation: lfs-ring 900ms ease-out; }
 .lfs-ring.hl { box-shadow: 0 0 0 2px rgba(212, 168, 72, .85); }
 @keyframes lfs-ring { 0% { box-shadow: 0 0 0 2px rgba(212, 168, 72, .95), 0 0 0 0 rgba(212, 168, 72, .5); } 100% { box-shadow: 0 0 0 2px rgba(212, 168, 72, 0), 0 0 0 14px rgba(212, 168, 72, 0); } }
+/* el papel de un mapa vivo (no se eleva: aquí se pinta su vista previa) */
+.lfs-paperbox {
+  position: absolute; background: #ffffff; border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12), 0 18px 48px rgba(0, 0, 0, .22);
+}
+.lfs-paperbox[hidden] { display: none; }
+.lfs-paperbox.lfs-bg-screen { background: var(--card-bg, #ffffff); }
+.lfs-paperbox.lfs-transp { background: repeating-conic-gradient(#e8e8e8 0% 25%, #ffffff 0% 50%) 50% / 16px 16px; }
+.lfs-paperbox.lfs-wait { background-image: linear-gradient(110deg, rgba(212, 168, 72, 0) 30%, rgba(212, 168, 72, .16) 50%, rgba(212, 168, 72, 0) 70%); background-size: 220% 100%; animation: lfs-sheen 1.4s linear infinite; }
+@keyframes lfs-sheen { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+.lfs-native.lfs-cvd-p { filter: url(#lfs-cvd-p); }
+.lfs-native.lfs-cvd-d { filter: url(#lfs-cvd-d); }
+.lfs-native.lfs-cvd-t { filter: url(#lfs-cvd-t); }
+.lfs-native.lfs-cvd-a { filter: url(#lfs-cvd-a); }
 /* vista previa a tamaño de salida (exportación nativa) */
 .lfs-native { position: absolute; object-fit: contain; pointer-events: none; }
 .lfs-native[hidden] { display: none; }

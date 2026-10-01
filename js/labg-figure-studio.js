@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.1.0 (módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.2.0 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -35,6 +35,11 @@
    al tamaño, la resolución y el formato de salida —PNG con sus ppp, SVG y PDF vectoriales— en
    lugar de ampliar la imagen de la pantalla, y muestra una vista previa a tamaño de salida.
 
+   Mapas (1.2.0): los mapas que una app arma con su propio estudio de mapas (PollinationPro,
+   BioModellingPro) también se abren aquí. Un mapa interactivo no se eleva: el papel muestra la
+   vista previa que dibuja el estudio de mapas de la app al tamaño de salida, y la exportación la
+   hace ese mismo estudio (PNG, SVG, TIFF y GeoTIFF; el PDF sale de su PNG).
+
    Lo propio del estudio: paletas científicas con simulación de daltonismo,
    tamaño del texto y grosor de las líneas pensados para el tamaño de salida,
    edición de un texto con doble clic, historial, comparación, preajustes de un
@@ -53,7 +58,7 @@
 (function () {
   'use strict';
   if (window.LABGFigureStudio && window.LABGFigureStudio.version) return;
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -143,7 +148,7 @@
       if (n.nodeType !== 1) return;
       const t = n.tagName;
       if (/^(SCRIPT|STYLE|TEMPLATE|OUTPUT|SELECT|OPTION|TEXTAREA)$/.test(t) || t.toLowerCase() === 'svg') return;
-      if (n.hidden || n.classList.contains('sr-only') || n.classList.contains('range-val') || n.classList.contains('lfs-own') || n.classList.contains('lnav-own')) return;
+      if (n.hidden || n.classList.contains('sr-only') || /(^|\s)[\w]+-val(\s|$)/.test(n.className || '') || n.classList.contains('lfs-own') || n.classList.contains('lnav-own')) return;
       if (n !== el && (n.hasAttribute('data-help') || /(^|\s)(help-badge|help-btn|help-dot|info-btn|hint-btn)(\s|$)/.test(n.className || ''))) return;
       const dl = n.getAttribute('data-l') || n.getAttribute('lang');
       if (dl && n !== el && /^(es|en)/.test(dl) && dl.slice(0, 2) !== L) return;
@@ -171,8 +176,9 @@
     controlsFor: null,          /* función(fig) → un nodo más con controles de esa figura */
   };
   const PERFILES = {
-    pollinationpro: { exclude: DEF.exclude + ', .ms-view' },                 /* el mapa ya tiene su estudio dividido */
-    biomodellingpro: { exclude: DEF.exclude + ', .main-map, .leaflet-container' },
+    /* los mapas: los abre el estudio y los exporta el estudio de mapas de la app (js/mapstudio.js declara
+       su exportación nativa y dónde están sus pestañas); dentro de un mapa interactivo nada es figura suelta */
+    biomodelling: { exclude: DEF.exclude + ', .leaflet-pane, .leaflet-control-container' },   /* «BioModelling Pro»: el nombre va hasta el espacio */
     statspro: {
       hosts: DEF.hosts + ', .plot-canvas',
       controlsFor: f => { const p = f.host.closest('.step-panel, .subtab-panel'); return p ? p.querySelector('.style-bar, [id$="StyleBar"]') : null; },
@@ -247,7 +253,12 @@
     if (typeof hook !== 'function') return null;
     try { const d = hook(rec); return d && typeof d.render === 'function' ? d : null; } catch (e) { return null; }
   }
+  const TAB_SEL = '.ms-tab, .fig-tab, .fs-tab, [role="tab"]';
+  function bumpPreview(n) { if (!ST.noLift || (n && n.matches && n.matches(TAB_SEL))) return; ST.pvVer = (ST.pvVer || 0) + 1; schedulePreview(); }
   const nativeCan = (N, fmt) => !!(N && (N.formats || ['png']).indexOf(fmt) >= 0);
+  /* ¿el aspecto de la figura es del estudio? No cuando la app la dibuja con su propio estilo (los mapas) */
+  const ownLook = () => !(ST.native && ST.native.studioStyles === false);
+  const canStyle = () => !!(ST.rec && ADAPTERS[ST.rec.lib] && ADAPTERS[ST.rec.lib].styles && ownLook());
   function uriBlob(uri) {
     const c = uri.indexOf(','), head = uri.slice(5, c), mime = head.split(';')[0] || 'application/octet-stream';
     if (/;base64/.test(head)) {
@@ -280,6 +291,8 @@
     if (!el || !el.isConnected || el.closest(SKIP)) return false;
     if (CFG.exclude && el.closest(CFG.exclude)) return false;
     const tag = el.tagName.toLowerCase();
+    if (el.matches(MAP_SEL)) { const r = el.getBoundingClientRect(); return !r.width || (r.width >= 200 && r.height >= 120); }
+    if (el.parentElement && el.parentElement.closest(MAP_SEL)) return false;   /* las piezas de un mapa no son figuras sueltas */
     if (tag === 'svg') {
       if (el.parentElement && el.parentElement.closest('svg')) return false;
       const r = el.getBoundingClientRect();
@@ -292,6 +305,7 @@
     return false;
   }
   function hostOf(el) {
+    if (el.matches && el.matches(MAP_SEL)) return el;
     const fc = el.parentElement && el.parentElement.closest('.fig-canvas');
     if (fc && fc.parentElement) return fc.parentElement;
     return (el.parentElement && el.parentElement.closest(CFG.hosts)) || el.parentElement;
@@ -323,7 +337,7 @@
     if (rec.opts && rec.opts.key) return String(rec.opts.key);
     const anchor = rec.host.id ? rec.host : (rec.el.id ? rec.el : rec.host.closest('[id]'));
     const base = anchor ? anchor.id : 'doc';
-    const list = anchor ? $$('svg, canvas, img', anchor).filter(isFigEl) : [];
+    const list = anchor ? $$('svg, canvas, img, ' + MAP_SEL, anchor).filter(isFigEl) : [];
     const i = Math.max(0, list.indexOf(rec.el));
     return base + (i ? ':' + i : '');
   }
@@ -346,7 +360,7 @@
   function figures(root) {
     if (!cache || root) {
       const scope = root || $(CFG.root) || document.body;
-      const list = $$('svg, canvas, img', scope).filter(isFigEl).map(el => recOf(el));
+      const list = $$('svg, canvas, img, ' + MAP_SEL, scope).filter(isFigEl).map(el => recOf(el));
       attached.forEach(a => { if (a.el.isConnected && list.indexOf(a) < 0) list.push(recOf(a.el, a.opts)); });
       if (root) return list;
       cache = list;
@@ -383,7 +397,15 @@
       aspect: el => (el.width ? el.height / el.width : 0.62),
       styles: false,
     },
+    /* mapas interactivos: el contenedor entero es la figura; no se eleva (sigue vivo en la página) y lo dibuja la app */
+    map: {
+      test: el => !!(el.classList && (el.classList.contains('leaflet-container') || el.hasAttribute('data-lfs-map'))),
+      aspect: el => (el.offsetWidth ? el.offsetHeight / el.offsetWidth : 0.66),
+      styles: false,
+      lift: false,
+    },
   };
+  const MAP_SEL = '.leaflet-container, [data-lfs-map]';
 
   /* ---------------- botón de entrada en cada figura ---------------- */
   const openTitle = () => T('Abrir en el estudio de figuras: pantalla dividida para editar y exportar', 'Open in the figure studio: split screen to edit and export');
@@ -392,6 +414,7 @@
     figures().forEach(rec => {
       const host = rec.host;
       if (!host) return;
+      if (rec.lib === 'map' && !nativeFor(rec)) return;
       let inline = null;
       try { inline = CFG.btnHost ? host.querySelector(':scope > ' + CFG.btnHost.split(',').map(x => x.trim()).join(', :scope > ')) : null; } catch (e) { inline = null; }
       if (!inline) { const card = host.closest('.chart-card'); if (card) inline = card.querySelector('.chart-actions'); }
@@ -400,7 +423,28 @@
       b.type = 'button';
       b.setAttribute('data-for', rec.key);
       b.title = openTitle(); b.setAttribute('aria-label', openTitle() + ' — ' + rec.title);
-      b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); open(rec.el, b); });
+      b.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        let el = rec.el;
+        if (!el.isConnected) { const now = figures().find(r => r.key === rec.key && r.el.isConnected); el = now ? now.el : host; }
+        open(el, b);
+      });
+      if (rec.lib === 'map') {
+        /* que el mapa no se arrastre ni se acerque al pulsar el botón */
+        ['pointerdown', 'mousedown', 'touchstart', 'dblclick', 'wheel'].forEach(t => b.addEventListener(t, e => e.stopPropagation(), { passive: true }));
+        /* un control más del mapa, debajo del zoom: no tapa la leyenda, el título ni la flecha */
+        const corner = host.querySelector(':scope > .leaflet-control-container > .leaflet-top.leaflet-left');
+        if (corner) {
+          const bar = mk('div', 'leaflet-control leaflet-bar lfs-mapbar lfs-own');
+          b.classList.add('lfs-open-leaflet');
+          bar.appendChild(b);
+          corner.appendChild(bar);
+          return;
+        }
+        b.classList.add('lfs-open-map');
+        host.appendChild(b);
+        return;
+      }
       if (inline) { b.classList.add('lfs-open-inline'); inline.appendChild(b); return; }
       /* a la izquierda de los botones flotantes que ya tenga la figura (⤓, ✎) */
       const others = $$(':scope > .fig-dl, :scope > .fig-ed, :scope > .fig-ed-solo', host).filter(x => getComputedStyle(x).position === 'absolute');
@@ -590,7 +634,7 @@
     /* capa de encima de la figura: cortina, guías, resaltes y edición en sitio */
     over = mk('div', 'lfs-over lfs-own');
     if (hasPopover) over.setAttribute('popover', 'manual');
-    over.innerHTML = '<div class="lfs-guides"></div><img class="lfs-native" alt="" hidden><span class="lfs-native-tag" hidden></span><div class="lfs-ring"></div>' +
+    over.innerHTML = '<div class="lfs-guides"></div><div class="lfs-paperbox" hidden></div><img class="lfs-native" alt="" hidden><span class="lfs-native-tag" hidden></span><div class="lfs-ring"></div>' +
       '<div class="lfs-curtain" hidden><div class="lfs-before-wrap"><img class="lfs-before" alt=""></div><div class="lfs-handle" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100"><i></i></div><span class="lfs-tag lfs-tag-a"></span><span class="lfs-tag lfs-tag-b"></span></div>' +
       '<input type="text" class="lfs-inplace" hidden>';
     document.body.appendChild(over);
@@ -643,7 +687,9 @@
   function open(target, opener) {
     try {
       let el = target;
-      if (el && !/^(svg|canvas|img)$/i.test(el.tagName)) el = $$('svg, canvas, img', el).find(isFigEl) || null;
+      /* una figura que la app ya reemplazó al redibujar: se abre la que ocupa su lugar */
+      if (el && !el.isConnected && recs.get(el)) { const k = recs.get(el).key, now = figures().find(r => r.key === k && r.el.isConnected); if (now) el = now.el; }
+      if (el && !/^(svg|canvas|img)$/i.test(el.tagName) && !(el.matches && el.matches(MAP_SEL))) el = $$('svg, canvas, img, ' + MAP_SEL, el).find(isFigEl) || null;
       if (!el || !el.isConnected) return false;
       /* si está en una sección plegada o escondida por el navegador, se muestra primero */
       if (window.LABGNavigator && LABGNavigator.reveal && el.closest('.lnav-out, .lnav-hid, [inert]')) LABGNavigator.reveal(el);
@@ -658,15 +704,17 @@
       ST.zoom = 'fit'; ST.pan = { x: 0, y: 0 };
       ST.aspect0 = ADAPTERS[rec.lib].aspect(el) || 0.62;
       ST.compare = false; ST.cvd = '';
-      ST.native = nativeFor(rec); ST.nativeAspect = null; ST.pvKey = null;
+      ST.native = nativeFor(rec); ST.nativeAspect = null; ST.pvKey = null; ST.pvVer = 0; ST.firstPreview = true;
+      ST.noLift = ADAPTERS[rec.lib].lift === false || !!(ST.native && ST.native.lift === false);
       document.documentElement.classList.add('lfs-is-open');
       studio.classList.add('on');
       if (hasPopover) { try { studio.showPopover(); } catch (e) { /* ya abierto */ } }
       applyLayoutClass();
-      lift(el);
+      if (!ST.noLift) lift(el);
+      $('.lfs-paperbox', over).hidden = !ST.noLift;
       if (hasPopover) { try { over.showPopover(); } catch (e) { /* nada */ } }
       over.classList.add('on');
-      $('.lfs-figname', studio).textContent = rec.title;
+      $('.lfs-figname', studio).textContent = natTitle();
       ST.open = true;
       render();
       place();
@@ -677,7 +725,7 @@
       window.addEventListener('resize', onResize);
       document.addEventListener('keydown', onKey, true);
       setTimeout(() => { const b = $('[data-a="close"]', studio); if (b) b.focus(); }, 30);
-      say(T('Estudio de figuras abierto: ', 'Figure studio open: ') + rec.title);
+      say(T('Estudio de figuras abierto: ', 'Figure studio open: ') + natTitle());
       document.dispatchEvent(new CustomEvent('labg-figure-studio:open', { detail: { key: rec.key, title: rec.title } }));
       return true;
     } catch (err) {
@@ -696,8 +744,8 @@
     clearTimeout(pvT); pvSeq++;
     showNative(false);
     if (ST.nativeUrl) { try { URL.revokeObjectURL(ST.nativeUrl); } catch (e) { /* nada */ } ST.nativeUrl = null; }
-    if (over) { const ni = $('.lfs-native', over); ni.removeAttribute('src'); }
-    ST.native = null; ST.nativeAspect = null; ST.pvKey = null;
+    if (over) { const ni = $('.lfs-native', over); ni.removeAttribute('src'); $('.lfs-paperbox', over).hidden = true; }
+    ST.native = null; ST.nativeAspect = null; ST.pvKey = null; ST.noLift = false;
     unlift();
     if (studio) {
       studio.classList.remove('on');
@@ -772,10 +820,11 @@
     Promise.resolve().then(() => {
       afterQ = false;
       if (!ST.open) return;
+      if (ST.noLift) { ST.pvVer = (ST.pvVer || 0) + 1; ST.native = nativeFor(ST.rec) || ST.native; readout(); schedulePreview(); return; }
       relocate();
       if (!ST.el) return;
-      if (ADAPTERS[ST.rec.lib].styles && !isDefault(ST.fig) && !ST.el.hasAttribute('data-lfs-done')) styleSvg(ST.el, ST.fig);
       ST.native = nativeFor(ST.rec);
+      if (canStyle() && !isDefault(ST.fig) && !ST.el.hasAttribute('data-lfs-done')) styleSvg(ST.el, ST.fig);
       if (ST.lift && over && !$('.lfs-native', over).hidden) ST.lift.classList.add('lfs-under-native');
       place();
       readout();
@@ -834,7 +883,19 @@
 
   /* tamaño de exportación en mm */
   const expW = () => (ST.exp.unit === 'in' ? ST.exp.w * MM_IN : ST.exp.w);
-  const expH = () => (ST.exp.h ? (ST.exp.unit === 'in' ? ST.exp.h * MM_IN : ST.exp.h) : expW() * (ST.native && ST.nativeAspect ? ST.nativeAspect : ST.aspect0));
+  /* el nombre que da la app (el título de su mapa, por ejemplo); si no da ninguno, el de la página */
+  function natTitle() {
+    const N = ST.native;
+    if (N && N.title != null) { try { const t = typeof N.title === 'function' ? N.title() : N.title; if (t) return String(TT(t)).slice(0, 120); } catch (e) { /* el de la página */ } }
+    return ST.rec ? ST.rec.title : '';
+  }
+  function natAspect() {
+    const N = ST.native;
+    if (!N) return null;
+    if (N.aspect != null) { try { const a = typeof N.aspect === 'function' ? N.aspect() : +N.aspect; if (a > 0 && isFinite(a)) return a; } catch (e) { /* la de la vista previa */ } }
+    return ST.nativeAspect;
+  }
+  const expH = () => (ST.exp.h ? (ST.exp.unit === 'in' ? ST.exp.h * MM_IN : ST.exp.h) : expW() * (natAspect() || ST.aspect0));
   const expPx = () => ({ w: Math.max(1, Math.round(expW() / MM_IN * ST.exp.dpi)), h: Math.max(1, Math.round(expH() / MM_IN * ST.exp.dpi)) });
 
   /* la figura sobre el «papel» del tamaño de salida */
@@ -844,7 +905,7 @@
     placeQ = true;
     raf(() => {
       placeQ = false;
-      if (!ST.open || !ST.lift) return;
+      if (!ST.open || (!ST.lift && !ST.noLift)) return;
       const s = stage.getBoundingClientRect();
       const pad = window.innerWidth < 900 ? 14 : 34;
       const wmm = expW(), hmm = expH();
@@ -856,11 +917,13 @@
       const cx = s.left + s.width / 2 + ST.pan.x, cy = s.top + (s.height - 26) / 2 + ST.pan.y;
       const r = { left: Math.round(cx - pw / 2), top: Math.round(cy - ph / 2), width: Math.round(pw), height: Math.round(ph) };
       ST.paper = r;
-      const w = ST.lift;
-      w.style.setProperty('left', r.left + 'px', 'important');
-      w.style.setProperty('top', r.top + 'px', 'important');
-      w.style.setProperty('width', r.width + 'px', 'important');
-      w.style.setProperty('height', r.height + 'px', 'important');
+      const w = ST.lift || $('.lfs-paperbox', over);
+      if (ST.lift) {
+        w.style.setProperty('left', r.left + 'px', 'important');
+        w.style.setProperty('top', r.top + 'px', 'important');
+        w.style.setProperty('width', r.width + 'px', 'important');
+        w.style.setProperty('height', r.height + 'px', 'important');
+      } else Object.assign(w.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
       w.classList.toggle('lfs-transp', ST.exp.bg === 'none');
       w.classList.toggle('lfs-bg-screen', ST.exp.bg === 'screen');
       /* la capa de encima sigue al papel */
@@ -887,6 +950,8 @@
     if (!over) return;
     $('.lfs-native', over).hidden = !on;
     if (ST.lift) ST.lift.classList.toggle('lfs-under-native', !!on);
+    const pb = $('.lfs-paperbox', over);
+    if (pb) pb.classList.toggle('lfs-wait', !on && !!ST.noLift);
   }
   function nativeTag(text, busy) {
     if (!over) return;
@@ -895,15 +960,16 @@
   }
   function schedulePreview(delay) {
     if (!ST.open) return;
-    if (!ST.native || ST.native.preview === false || !nativeCan(ST.native, 'png') || !ST.pvOn) { clearTimeout(pvT); showNative(false); nativeTag(''); return; }
+    if (!ST.native || ST.native.preview === false || !nativeCan(ST.native, 'png') || (!ST.pvOn && !ST.noLift)) { clearTimeout(pvT); showNative(false); nativeTag(''); return; }
     clearTimeout(pvT); pvT = setTimeout(runPreview, delay == null ? 450 : delay);
   }
   async function runPreview() {
     if (!ST.open || !ST.native || !ST.el) return;
     const N = ST.native;
+    if (busy) { schedulePreview(600); return; }   /* mientras exporta, la vista previa espera */
     const wpx = ST.paper && ST.paper.width ? ST.paper.width : 800;
     const dpi = Math.round(clamp(wpx * (window.devicePixelRatio || 1) / (expW() / MM_IN), 60, 300));
-    const key = (ST.el.getAttribute('src') || '').length + '|' + (ST.el.getAttribute('src') || '').slice(-80) + '|' + JSON.stringify([+expW().toFixed(2), ST.exp.h ? +expH().toFixed(2) : 0, ST.exp.bg, dpi]);
+    const key = (ST.el.getAttribute('src') || '').length + '|' + (ST.el.getAttribute('src') || '').slice(-80) + '|' + JSON.stringify([ST.pvVer || 0, +expW().toFixed(2), ST.exp.h ? +expH().toFixed(2) : 0, ST.exp.bg, dpi]);
     if (key === ST.pvKey && !$('.lfs-native', over).hidden) return;
     const seq = ++pvSeq;
     nativeTag(T('Dibujando a tamaño de salida…', 'Drawing at output size…'), true);
@@ -918,7 +984,10 @@
       if (ST.nativeUrl) URL.revokeObjectURL(ST.nativeUrl);
       ST.nativeUrl = url; ST.pvKey = key;
       if (!ST.exp.h && img.naturalWidth) ST.nativeAspect = img.naturalHeight / img.naturalWidth;
+      /* sin figura elevada, la primera vista previa es el «antes» de la comparación */
+      if (ST.noLift && ST.firstPreview) { ST.firstPreview = false; try { if (ST.before) URL.revokeObjectURL(ST.before); } catch (e) { /* nada */ } ST.before = URL.createObjectURL(blob); $('.lfs-before', over).src = ST.before; }
       showNative(true);
+      $('.lfs-figname', studio).textContent = natTitle();
       nativeTag(T('Así sale: dibujada de nuevo por ', 'This is the output: drawn again by ') + (N.label || T('la app', 'the app')), false);
       place(); readout();
     } catch (e) {
@@ -928,6 +997,10 @@
       console.warn('LABG Estudio: vista previa nativa', e);
     }
   }
+  /* formatos que la app añade a los cuatro del estudio (por ejemplo, GeoTIFF) y sus notas */
+  const extraFmts = () => (ST.native && Array.isArray(ST.native.extra) ? ST.native.extra : []);
+  const fmtLabel = f => { const x = extraFmts().find(e => e[0] === f); return x ? TT(x[1]) : f.toUpperCase(); };
+  const fmtNote = f => { const n = ST.native && ST.native.notes && ST.native.notes[f]; return n ? TT(n) : ''; };
   function nativeOpts(fmt, dpi) {
     const wmm = expW(), hmm = ST.exp.h ? expH() : null, bg = ST.exp.bg;
     return { fmt, wmm, hmm, win: wmm / MM_IN, hin: hmm ? hmm / MM_IN : null, dpi: dpi || ST.exp.dpi, bg, transparent: bg === 'none', light: bg !== 'screen' };
@@ -972,7 +1045,7 @@
   ];
   function render() {
     const rec = ST.rec;
-    const styl = ADAPTERS[rec.lib].styles;
+    const styl = canStyle();
     const html = SECTIONS().map(s => {
       if (s.id === 'docks') return '<div class="lfs-docks"></div>';
       if ((s.id === 'palette' || s.id === 'text') && !styl) return '';
@@ -1002,6 +1075,22 @@
     }
     return false;
   }
+  /* los controles de un panel con pestañas: un grupo por pestaña (con su nombre); si solo hay un
+     panel que la app rehace al cambiar de pestaña, sus botones de pestaña van arriba, como fichas */
+  function groupsFrom(root, title) {
+    const panes = $$(':scope > .fig-opts, .fs-pane, .ms-pane, [role="tabpanel"]', root).filter((p, i, a) => !a.some(q => q !== p && q.contains(p)));
+    if (panes.length > 1) {
+      const tabs = $$('.fig-tab, .fs-tab, .ms-tab, [role="tab"]', root);
+      const out = panes.map((p, i) => {
+        const lab = p.getAttribute('aria-labelledby') ? document.getElementById(p.getAttribute('aria-labelledby')) : null;
+        return { title: textOf(lab || tabs[i]) || T('Opciones', 'Options'), ctrls: controlsIn(p).filter(c => !hiddenIn(c, p)) };
+      });
+      const loose = controlsIn(root).filter(c => !panes.some(p => p.contains(c)) && !c.matches('.fig-tab, .fs-tab, .ms-tab, [role="tab"]') && !hiddenIn(c, root));
+      if (loose.length) out.unshift({ title, ctrls: loose });
+      return out;
+    }
+    return [{ title, ctrls: controlsIn(root).filter(c => !hiddenIn(c, root)) }];
+  }
   function appGroups(rec) {
     const groups = [];
     const host = rec.host;
@@ -1022,14 +1111,18 @@
       const cs = []; nodes.forEach(n => (n.matches && n.matches('select, input, textarea, button') ? cs.push(n) : controlsIn(n).forEach(c => cs.push(c))));
       if (cs.length) groups.push({ title: T('Ajustes', 'Settings'), ctrls: cs });
     }
-    const more = CFG.controlsFor ? CFG.controlsFor(rec) : null;
-    if (more) groups.push({ title: T('Ajustes del bloque', 'Block settings'), ctrls: controlsIn(more).filter(c => !hiddenIn(c, more)) });
+    let more = CFG.controlsFor ? CFG.controlsFor(rec) : null, moreNode = null;
+    if (!more && ST.native && ST.native.controls) more = typeof ST.native.controls === 'function' ? ST.native.controls(rec) : ST.native.controls;
+    if (more) {
+      const node = more.node || more, title = more.title ? TT(more.title) : T('Ajustes del bloque', 'Block settings');
+      if (node && node.nodeType === 1) { moreNode = node; groupsFrom(node, title).forEach(g => groups.push(g)); }
+    }
     /* los ajustes de la tarjeta donde vive la figura (fuera de otras figuras) */
     const card = host.closest('.card, .chart-card, .qc-section, section');
     if (card && card !== host) {
       const own = new Set(groups.flatMap(g => g.ctrls).concat(tc));
       const others = $$(CFG.hosts, card).filter(h => h !== host && !h.contains(host) && !host.contains(h));
-      const cs = controlsIn(card).filter(c => !host.contains(c) && !own.has(c) && !others.some(h => h.contains(c)) && mine(c) && !c.closest('details.fig-editor, .fig-tools') && !hiddenIn(c, card));
+      const cs = controlsIn(card).filter(c => !host.contains(c) && !own.has(c) && !(moreNode && moreNode.contains(c)) && !others.some(h => h.contains(c)) && mine(c) && !c.closest('details.fig-editor, .fig-tools') && !hiddenIn(c, card));
       if (cs.length && cs.length <= 60) groups.unshift({ title: T('Datos y opciones de la sección', 'Data and options of the section'), ctrls: cs });
     }
     if (tc.length) groups.push({ title: T('Descarga (la de la app)', 'Download (the app’s own)'), ctrls: tc, kind: 'export' });
@@ -1048,6 +1141,13 @@
     if (!t) { const pv = c.previousElementSibling; if (pv && /^(SPAN|B|SMALL|LABEL|STRONG)$/.test(pv.tagName)) t = textOf(pv); }
     return (t || c.name || c.id || '').replace(/\s+/g, ' ').trim().slice(0, 80);
   }
+  const SEC_SEL = '.ms-sec, .fig-sec, fieldset';
+  function secTitle(c) {
+    const s = c.closest(SEC_SEL);
+    const h = s && s.querySelector(':scope > h3, :scope > h4, :scope > h5, :scope > .ms-sec-h, :scope > legend');
+    const t = h ? textOf(h).replace(/\s+/g, ' ').trim() : '';
+    return t.length > 90 ? t.slice(0, 88) + '…' : t;
+  }
   function renderApp(pre) {
     const b = secB('app');
     if (!b) return;
@@ -1059,12 +1159,15 @@
       return;
     }
     const radios = new Set();
-    b.innerHTML = groups.map((g, gi) => '<div class="lfs-grp' + (g.kind ? ' lfs-grp-' + g.kind : '') + '"><h4>' + esc(g.title) + '</h4>' + g.ctrls.map(c => {
+    b.innerHTML = groups.map((g, gi) => { let last = ''; return '<div class="lfs-grp' + (g.kind ? ' lfs-grp-' + g.kind : '') + '"><h4>' + esc(g.title) + '</h4>' + g.ctrls.map(c => {
       if (c.type === 'radio') { if (radios.has(c.name)) return ''; radios.add(c.name); }
       const k = ST.proxies.length;
       ST.proxies.push({ n: c, g: gi });
-      return proxyHtml(c, k);
-    }).join('') + '</div>').join('');
+      const st = secTitle(c), head = st && st !== last && fold(st) !== fold(g.title) ? '<p class="lfs-subh">' + esc(st) + '</p>' : '';
+      if (st) last = st;
+      const html = proxyHtml(c, k);
+      return head + (st ? html.replace('<div class="lfs-row', '<div data-sec-t="' + esc(st) + '" class="lfs-row') : html);
+    }).join('') + '</div>'; }).join('');
     syncProxies(true);
   }
   function proxyHtml(c, k) {
@@ -1073,7 +1176,9 @@
     const dis = c.disabled ? ' disabled' : '';
     if (tag === 'SELECT') return row(lab, '<select data-k="' + k + '"' + dis + '>' + c.innerHTML.replace(/\sid="[^"]*"/g, '') + '</select>', 'lfs-r-select');
     if (tag === 'TEXTAREA') return row(lab, '<textarea data-k="' + k + '" rows="2"' + dis + '></textarea>', 'lfs-r-text');
-    if (tag === 'BUTTON') return '<div class="lfs-row lfs-r-btn"><button type="button" class="lfs-pbtn" data-k="' + k + '"' + dis + (c.getAttribute('aria-pressed') ? ' aria-pressed="' + c.getAttribute('aria-pressed') + '"' : '') + '>' + (c.querySelector('svg, i[style], span[style]') ? c.innerHTML.replace(/\sid="[^"]*"/g, '') : esc(labelFor(c))) + '</button></div>';
+    if (tag === 'BUTTON' && c.matches(TAB_SEL)) return '<div class="lfs-row lfs-r-chip"><button type="button" class="lfs-pbtn" data-k="' + k + '"' + dis + '>' + esc(labelFor(c)) + '</button></div>';
+    const bt = tag === 'BUTTON' && c.querySelector(':scope > b, :scope > strong'), sm = bt && c.querySelector(':scope > small');
+    if (tag === 'BUTTON') return '<div class="lfs-row lfs-r-btn"><button type="button" class="lfs-pbtn' + (sm ? ' lfs-pbtn-2' : '') + '" data-k="' + k + '"' + dis + (c.getAttribute('aria-pressed') ? ' aria-pressed="' + c.getAttribute('aria-pressed') + '"' : '') + '>' + (c.querySelector('svg, i[style], span[style]') ? c.innerHTML.replace(/\sid="[^"]*"/g, '') : sm ? '<b>' + esc(textOf(bt).trim()) + '</b><small>' + esc(textOf(sm).trim()) + '</small>' : esc(labelFor(c))) + '</button></div>';
     if (ty === 'checkbox') return '<div class="lfs-row lfs-r-check"><label><input type="checkbox" data-k="' + k + '"' + dis + '><span>' + lab + '</span></label></div>';
     if (ty === 'radio') {
       const all = $$('input[type="radio"][name="' + cssEsc(c.name) + '"]');
@@ -1097,7 +1202,7 @@
       if (!px || px === document.activeElement) return;
       const n = p.n;
       if (px.hasAttribute('data-radio')) { px.setAttribute('aria-pressed', String(!!n.checked)); return; }
-      if (px.classList.contains('lfs-pbtn')) { const ap = n.getAttribute('aria-pressed'); if (ap) px.setAttribute('aria-pressed', ap); px.classList.toggle('on', n.classList.contains('on') || n.classList.contains('active')); px.disabled = n.disabled; return; }
+      if (px.classList.contains('lfs-pbtn')) { const ap = n.getAttribute('aria-pressed'); if (ap) px.setAttribute('aria-pressed', ap); px.classList.toggle('on', n.classList.contains('on') || n.classList.contains('active') || n.getAttribute('aria-selected') === 'true'); px.disabled = n.disabled; return; }
       if (px.type === 'checkbox') { if (px.checked !== n.checked) px.checked = n.checked; }
       else {
         if (n.tagName === 'SELECT' && px.options.length !== n.options.length) px.innerHTML = n.innerHTML.replace(/\sid="[^"]*"/g, '');
@@ -1112,13 +1217,13 @@
   const DOCKS = [
     {
       id: 'figedit', icon: 'pencil', title: () => T('Edición fina de esta figura (✎ de la app)', 'Fine editing of this figure (the app’s ✎)'),
-      ok: () => !!(window.FigEdit && typeof window.FigEdit.show === 'function' && ST.el && ST.el.tagName.toLowerCase() === 'svg' && (ST.el.id || window.FigEdit.__labg)),
+      ok: () => !!(ownLook() && !ST.noLift && window.FigEdit && typeof window.FigEdit.show === 'function' && ST.el && ST.el.tagName.toLowerCase() === 'svg' && (ST.el.id || window.FigEdit.__labg)),
       open: anchor => { window.FigEdit.show(anchor, ST.el); return document.getElementById('figEditPanel') || $('.fe-panel'); },
       close: () => { try { window.FigEdit.hide(); } catch (e) { /* nada */ } },
     },
     {
       id: 'figstyle', icon: 'palette', title: () => T('Estilo de todas las figuras (de la app)', 'Style of every figure (the app’s)'),
-      ok: () => !!(window.FigStyle && typeof window.FigStyle.show === 'function' && typeof window.FigStyle.hide === 'function'),
+      ok: () => !!(ownLook() && window.FigStyle && typeof window.FigStyle.show === 'function' && typeof window.FigStyle.hide === 'function'),
       open: () => { window.FigStyle.show(); return document.getElementById('figStylePanel') || $('.fs-panel'); },
       close: () => { try { window.FigStyle.hide(); } catch (e) { /* nada */ } },
     },
@@ -1184,12 +1289,13 @@
   function renderSize() {
     const b = secB('size');
     if (!b) return;
+    if (['png', 'svg', 'pdf', 'tiff'].indexOf(ST.exp.fmt) < 0 && !extraFmts().some(x => x[0] === ST.exp.fmt)) ST.exp.fmt = 'png';
     const E = ST.exp, u = E.unit;
     const wv = fmtN(E.w, u === 'in' ? 2 : 1);
     const isVec = E.fmt === 'svg';
     const lib = ST.rec.lib;
     b.innerHTML =
-      row(T('Formato', 'Format'), '<div class="lfs-seg" role="radiogroup">' + ['png', 'svg', 'pdf', 'tiff'].map(f => '<button type="button" data-exp="fmt" data-v="' + f + '" aria-pressed="' + (E.fmt === f) + '"' + (f === 'svg' && lib !== 'svg' && !nativeCan(ST.native, 'svg') ? ' title="' + esc(T('Esta figura es una imagen: el SVG la lleva incrustada', 'This figure is an image: the SVG carries it embedded')) + '"' : '') + '>' + f.toUpperCase() + '</button>').join('') + '</div>', 'lfs-r-seg') +
+      row(T('Formato', 'Format'), '<div class="lfs-seg" role="radiogroup">' + ['png', 'svg', 'pdf', 'tiff'].concat(extraFmts().map(x => x[0])).map(f => '<button type="button" data-exp="fmt" data-v="' + f + '" aria-pressed="' + (E.fmt === f) + '"' + (fmtNote(f) ? ' title="' + esc(fmtNote(f)) + '"' : (f === 'svg' && lib !== 'svg' && !nativeCan(ST.native, 'svg') ? ' title="' + esc(T('Esta figura es una imagen: el SVG la lleva incrustada', 'This figure is an image: the SVG carries it embedded')) + '"' : '')) + '>' + esc(fmtLabel(f)) + '</button>').join('') + '</div>', 'lfs-r-seg') +
       row(T('Ancho', 'Width'), '<div class="lfs-seg lfs-seg-w">' + WIDTHS.map(([mm, nm]) => '<button type="button" data-exp="wmm" data-v="' + mm + '" aria-pressed="' + (Math.abs(expW() - mm) < 0.5) + '" title="' + esc(TT(nm)) + '">' + mm + '</button>').join('') + '</div>' +
         '<input type="number" data-exp="w" min="' + (u === 'in' ? 0.5 : 10) + '" max="' + (u === 'in' ? 40 : 1000) + '" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + wv + '"><select data-exp="unit"><option value="mm"' + (u === 'mm' ? ' selected' : '') + '>mm</option><option value="in"' + (u === 'in' ? ' selected' : '') + '>in</option></select>', 'lfs-r-w') +
       row(T('Alto', 'Height'), '<label class="lfs-inl"><input type="checkbox" data-exp="hauto"' + (E.h ? '' : ' checked') + '>' + esc(T('el de la figura', 'the figure’s')) + '</label><input type="number" data-exp="h" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + fmtN(u === 'in' ? expH() / MM_IN : expH(), u === 'in' ? 2 : 1) + '"' + (E.h ? '' : ' disabled') + '>', 'lfs-r-h') +
@@ -1197,7 +1303,7 @@
       row(T('Fondo', 'Background'), '<div class="lfs-seg">' + [['white', ['Blanco', 'White']], ['screen', ['Como se ve', 'As shown']], ['none', ['Transparente', 'Transparent']]].map(([v, n]) => '<button type="button" data-exp="bg" data-v="' + v + '" aria-pressed="' + (E.bg === v) + '">' + esc(TT(n)) + '</button>').join('') + '</div>', 'lfs-r-seg') +
       '<div class="lfs-readout"></div>' +
       (ST.native ? '<p class="lfs-note lfs-note-native">' + ico('check') + '<span>' + esc(T('La dibuja ' + (ST.native.label || 'la app') + ': al exportar, el estudio le pide la figura a este tamaño y resolución, no la amplía. En SVG y PDF sale vectorial y el texto conserva su tamaño en puntos.', 'Drawn by ' + (ST.native.label || 'the app') + ': on export the studio asks for the figure at this size and resolution instead of enlarging it. SVG and PDF come out as vectors and the text keeps its size in points.')) + '</span></p>' +
-        (ST.native.preview !== false && nativeCan(ST.native, 'png') ? '<div class="lfs-row lfs-r-check"><label><input type="checkbox" data-exp="pv"' + (ST.pvOn ? ' checked' : '') + '><span>' + esc(T('Ver en el papel cómo sale a este tamaño', 'Show on the paper how it comes out at this size')) + '</span></label></div>' : '')
+        (ST.native.preview !== false && nativeCan(ST.native, 'png') && !ST.noLift ? '<div class="lfs-row lfs-r-check"><label><input type="checkbox" data-exp="pv"' + (ST.pvOn ? ' checked' : '') + '><span>' + esc(T('Ver en el papel cómo sale a este tamaño', 'Show on the paper how it comes out at this size')) + '</span></label></div>' : '')
         : (lib !== 'svg' ? '<p class="lfs-note">' + esc(T('Esta figura es una imagen de píxeles: exportarla a más ppp no agrega detalle. Para más resolución usa la descarga de la app.', 'This figure is a pixel image: exporting it at a higher dpi adds no detail. For more resolution use the app’s own download.')) + '</p>' : '')) +
       '<div class="lfs-actions"><button type="button" class="lfs-btn lfs-btn-pri" data-a="export">' + ico('download') + esc(T('Exportar', 'Export')) + '</button><button type="button" class="lfs-btn" data-a="copy">' + ico('copy') + esc(T('Copiar imagen', 'Copy image')) + '</button><button type="button" class="lfs-btn" data-a="real">' + ico('ruler') + esc(T('Ver a tamaño real', 'View at real size')) + '</button></div>';
     readout();
@@ -1222,20 +1328,21 @@
   function readout() {
     if (!ST.open) return;
     const r = $('.lfs-readout', body);
-    const pt = minPt(ST.el);
+    const pt = ST.noLift || !ownLook() ? null : minPt(ST.el);
     const px = expPx();
     const big = px.w * px.h > 150e6 || px.w > 16000 || px.h > 16000;
     if (r) {
       r.innerHTML = '<b>' + esc(fmtSize()) + '</b>' +
         (pt != null ? '<span class="' + (pt < 6 ? 'lfs-warn' : 'lfs-ok') + '">' + ico(pt < 6 ? 'info' : 'check') + esc(T('Texto más chico: ', 'Smallest text: ') + pt.toFixed(1) + ' pt' + (pt < 6 ? T(' — las revistas suelen pedir 6 a 8 pt; sube el tamaño del texto o usa un preajuste', ' — journals usually ask for 6 to 8 pt; raise the text size or use a preset') : '')) + '</span>' : '') +
-        (ST.native ? '<span class="lfs-ok">' + ico('check') + esc(T('Se exporta dibujada de nuevo por ', 'Exported drawn again by ') + (ST.native.label || T('la app', 'the app')) + (nativeCan(ST.native, ST.exp.fmt === 'tiff' ? 'png' : ST.exp.fmt) ? '' : T(' (este formato sale de la imagen de la pantalla)', ' (this format comes from the screen image)'))) + '</span>' : '') +
+        (ST.native ? '<span class="lfs-ok">' + ico('check') + esc(T('Se exporta dibujada de nuevo por ', 'Exported drawn again by ') + (ST.native.label || T('la app', 'the app')) + (nativeCan(ST.native, ST.exp.fmt) || nativeCan(ST.native, 'png') && (ST.exp.fmt === 'tiff' || ST.exp.fmt === 'pdf' || ST.noLift) ? '' : T(' (este formato sale de la imagen de la pantalla)', ' (this format comes from the screen image)'))) + '</span>' : '') +
+        (fmtNote(ST.exp.fmt) ? '<span class="lfs-note-s">' + ico('info') + esc(fmtNote(ST.exp.fmt)) + '</span>' : '') +
         (darkTheme() && ST.exp.bg === 'white' && !ST.native ? '<span class="lfs-warn">' + ico('info') + esc(T('La app está en tema oscuro: sus figuras usan colores claros. Para fondo blanco, cámbiala a tema claro o elige «Como se ve».', 'The app is in dark theme: its figures use light colours. For a white background, switch it to light theme or choose “As shown”.')) + '</span>' : '') +
         (big && ST.exp.fmt !== 'svg' ? '<span class="lfs-warn">' + ico('info') + esc(T('Muy grande para el navegador: baja los ppp o el tamaño.', 'Too large for the browser: lower the dpi or the size.')) + '</span>' : '');
     }
     const p = $('.lfs-pt', body);
     if (p) p.innerHTML = pt != null ? '<span class="' + (pt < 6 ? 'lfs-warn' : 'lfs-ok') + '">' + esc(T('Al tamaño de salida, el texto más chico mide ', 'At the output size, the smallest text measures ') + pt.toFixed(1) + ' pt') + '</span>' : '';
     const info = $('.lfs-info', stage);
-    if (info) info.textContent = (ADAPTERS[ST.rec.lib].styles ? T('Clic en la figura: su sección · Doble clic en un texto: cambiarlo · ', 'Click the figure: its section · Double-click a text: change it · ') : '') + T('Ctrl + rueda: zoom · B: antes y ahora · ?: atajos', 'Ctrl + wheel: zoom · B: before and now · ?: shortcuts');
+    if (info) info.textContent = (canStyle() ? T('Clic en la figura: su sección · Doble clic en un texto: cambiarlo · ', 'Click the figure: its section · Double-click a text: change it · ') : '') + T('Ctrl + rueda: zoom · B: antes y ahora · ?: atajos', 'Ctrl + wheel: zoom · B: before and now · ?: shortcuts');
     guides(ST.paper || { left: 0, top: 0, width: 0, height: 0 }, ST.zoomNow || 1);
   }
   /* ----- preajustes ----- */
@@ -1283,8 +1390,8 @@
     ST.hi = ST.hist.length - 1;
     renderHistory(); paintUndo();
   }
-  function undo() { if (ST.hi < 0) return; const h = ST.hist[ST.hi--]; h.undo(); renderHistory(); paintUndo(); say(T('Deshecho: ', 'Undone: ') + h.label); ring(); }
-  function redo() { if (ST.hi >= ST.hist.length - 1) return; const h = ST.hist[++ST.hi]; h.redo(); renderHistory(); paintUndo(); say(T('Rehecho: ', 'Redone: ') + h.label); ring(); }
+  function undo() { if (ST.hi < 0) return; const h = ST.hist[ST.hi--]; h.undo(); bumpPreview(); renderHistory(); paintUndo(); say(T('Deshecho: ', 'Undone: ') + h.label); ring(); }
+  function redo() { if (ST.hi >= ST.hist.length - 1) return; const h = ST.hist[++ST.hi]; h.redo(); bumpPreview(); renderHistory(); paintUndo(); say(T('Rehecho: ', 'Redone: ') + h.label); ring(); }
   function jump(k) { let n = 0; while (ST.hi > k && n++ < 400) undo(); while (ST.hi < k && n++ < 800) redo(); }
   function paintUndo() {
     const u = $('[data-a="undo"]', studio), r = $('[data-a="redo"]', studio);
@@ -1296,7 +1403,7 @@
   function setFig(next, label) {
     const before = JSON.parse(JSON.stringify(ST.fig));
     const after = Object.assign(JSON.parse(JSON.stringify(ST.fig)), next);
-    const put = st => { ST.fig = JSON.parse(JSON.stringify(st)); setFigState(ST.rec.key, ST.fig); if (ST.el && ADAPTERS[ST.rec.lib].styles) styleSvg(ST.el, ST.fig); refreshStudioSecs(); readout(); emitChange(); };
+    const put = st => { ST.fig = JSON.parse(JSON.stringify(st)); setFigState(ST.rec.key, ST.fig); if (ST.el && canStyle()) styleSvg(ST.el, ST.fig); refreshStudioSecs(); readout(); emitChange(); };
     put(after);
     if (label) record(label, () => put(before), () => put(after));
     ring();
@@ -1325,6 +1432,7 @@
   function setCvd(k) {
     ST.cvd = k;
     if (ST.lift) { ['p', 'd', 't', 'a'].forEach(x => ST.lift.classList.toggle('lfs-cvd-' + x, x === k)); }
+    if (over) { const ni = $('.lfs-native', over); ['p', 'd', 't', 'a'].forEach(x => ni.classList.toggle('lfs-cvd-' + x, x === k)); }
     say(k ? T('Vista simulada: ', 'Simulated view: ') + T(CVD[k][0], CVD[k][1]) : T('Visión típica', 'Typical vision'));
   }
   function applyPreset(id) {
@@ -1342,7 +1450,7 @@
     if (p.line) f.line = p.line;
     if (p.txt) f.txt = p.txt;
     ST.exp = e;
-    if (p.minPt && ST.el && ADAPTERS[ST.rec.lib].styles) {
+    if (p.minPt && ST.el && canStyle()) {
       /* el tamaño del texto que deja el más chico en minPt al tamaño de salida */
       const was = ST.fig.txt;
       styleSvg(ST.el, Object.assign({}, f, { txt: 1 }));
@@ -1351,7 +1459,7 @@
       else f.txt = was;
     }
     const afterE = Object.assign({}, e), afterF = JSON.parse(JSON.stringify(f));
-    const put = (E, F) => { ST.exp = Object.assign({}, E); save('exp', ST.exp); ST.fig = JSON.parse(JSON.stringify(F)); setFigState(ST.rec.key, ST.fig); if (ST.el && ADAPTERS[ST.rec.lib].styles) styleSvg(ST.el, ST.fig); renderSize(); renderText(); refreshStudioSecs(); place(); readout(); emitChange(); };
+    const put = (E, F) => { ST.exp = Object.assign({}, E); save('exp', ST.exp); ST.fig = JSON.parse(JSON.stringify(F)); setFigState(ST.rec.key, ST.fig); if (ST.el && canStyle()) styleSvg(ST.el, ST.fig); renderSize(); renderText(); refreshStudioSecs(); place(); readout(); emitChange(); };
     put(afterE, afterF);
     record(T('Preajuste: ', 'Preset: ') + TT(p.name), () => put(beforeE, beforeF), () => put(afterE, afterF));
     ring();
@@ -1432,7 +1540,7 @@
     const pb = e.target.closest('.lfs-pbtn[data-k], [data-radio]');
     if (pb) {
       const p = ST.proxies[+pb.dataset.k];
-      if (p && p.n.isConnected) { p.n.click(); ring(); setTimeout(() => syncProxies(), 60); }
+      if (p && p.n.isConnected) { p.n.click(); ring(); setTimeout(() => syncProxies(), 60); bumpPreview(p.n); }
       return;
     }
     const a = e.target.closest('[data-a]');
@@ -1447,6 +1555,7 @@
       if (n.checked !== px.checked) {
         const was = n.checked;
         n.click();
+        bumpPreview(n);
         const lab = labelFor(n);
         record(lab + ': ' + (px.checked ? T('sí', 'on') : T('no', 'off')), () => { if (n.isConnected && n.checked !== was) n.click(); }, () => { if (n.isConnected && n.checked === was) n.click(); });
         ring();
@@ -1459,6 +1568,7 @@
       fire(n, ['input']);
       const o = px.parentElement.querySelector('output'); if (o) o.textContent = px.value;
     }
+    bumpPreview(n);
     if (commit) {
       fire(n, ['change']);
       const before = startVal.get(px), after = px.value;
@@ -1511,7 +1621,7 @@
   /* al pasar sobre un control, se resalta lo que cambia en la figura */
   function onInspHover(e) {
     const t = e.target;
-    if (!ST.el || ST.el.tagName.toLowerCase() !== 'svg') return;
+    if (!ST.el || ST.noLift || ST.el.tagName.toLowerCase() !== 'svg') return;
     if (t.closest('[data-pal]') || t.closest('.lfs-sec[data-sec="palette"]')) { hilite('series'); return; }
     if (t.closest('[data-st="txt"], [data-st="font"]')) { hilite('text'); return; }
     if (t.closest('[data-st="line"]')) { hilite('lines'); return; }
@@ -1541,11 +1651,12 @@
   /* buscador de controles */
   function filter(q) {
     const words = fold(q).split(/\s+/).filter(Boolean);
+    body.classList.toggle('lfs-filtering', words.length > 0);
     $$('.lfs-sec', body).forEach(sec => {
       const head = fold(sec.querySelector('.lfs-sec-btn').textContent);
       let any = false;
       $$('.lfs-row, .lfs-pal, .lfs-preset, .lfs-grp h4', sec).forEach(r => {
-        const ok = !words.length || words.every(w => fold(r.textContent).indexOf(w) >= 0 || head.indexOf(w) >= 0);
+        const ok = !words.length || words.every(w => fold(r.textContent + ' ' + (r.getAttribute('data-sec-t') || '')).indexOf(w) >= 0 || head.indexOf(w) >= 0);
         if (r.matches('.lfs-grp h4')) return;
         r.classList.toggle('lfs-nomatch', !ok);
         if (ok) any = true;
@@ -1605,6 +1716,7 @@
   function snapshotBefore() {
     ST.before = null;
     const el = ST.el;
+    if (ST.noLift) { $('.lfs-before', over).removeAttribute('src'); return; }
     try {
       if (el.tagName.toLowerCase() === 'svg') {
         const s = serialize(el, { forView: true });
@@ -1654,13 +1766,13 @@
   /* ---------------- la figura en el escenario: clic, doble clic y paneo ---------------- */
   function onFigDown(e) { ST.downAt = { x: e.clientX, y: e.clientY, t: Date.now() }; }
   function onFigClick(e) {
-    if (!ST.open) return;
+    if (!ST.open || ST.noLift || (ST.rec && ST.rec.lib === 'map')) return;
     const d = ST.downAt;
     if (d && (Math.abs(e.clientX - d.x) > 4 || Math.abs(e.clientY - d.y) > 4)) return;
     const t = e.target;
     /* un clic sobre la figura abre la sección que la cambia */
     if (t.closest && t.closest('text')) openSec('text');
-    else if (t.closest && (t.closest(SHAPES) && ADAPTERS[ST.rec.lib].styles)) {
+    else if (t.closest && (t.closest(SHAPES) && canStyle())) {
       const cs = getComputedStyle(t.closest(SHAPES));
       const C = seriesColors(ST.el);
       const h = hexOf(cs.fill) || hexOf(cs.stroke);
@@ -1696,7 +1808,7 @@
   /* doble clic sobre un texto: se cambia ahí mismo */
   function onFigDbl(e) {
     const t = e.target.closest && e.target.closest('text');
-    if (!t || !ADAPTERS[ST.rec.lib].styles || t.children.length) return;
+    if (!t || !canStyle() || t.children.length) return;
     e.preventDefault();
     const r = t.getBoundingClientRect();
     const inp = $('.lfs-inplace', over);
@@ -2060,8 +2172,8 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
   function fileName(ext) {
-    const t = slug(ST.rec.title || ST.rec.key);
-    return APP + '-' + t + '-' + fmtN(expW(), 0) + 'mm' + (ext === 'svg' ? '' : '-' + ST.exp.dpi + 'ppp') + '.' + ext;
+    const t = slug(natTitle() || ST.rec.key);
+    return APP + '-' + t + '-' + fmtN(expW(), 0) + 'mm' + (ext === 'svg' ? '' : '-' + ST.exp.dpi + 'ppp') + (ST.exp.fmt === 'geotiff' ? '-geo' : '') + '.' + ext;
   }
   let busy = false;
   async function doExport() {
@@ -2073,15 +2185,25 @@
     try {
       const fmt = ST.exp.fmt, wmm = expW(), hmm = expH();
       const bg = bgColor();
-      let blob, ext = fmt === 'tiff' ? 'tif' : fmt;
-      const N = ST.native, want = fmt === 'tiff' ? 'png' : fmt;
-      if (nativeCan(N, want)) {
+      let blob, ext = fmt === 'tiff' || fmt === 'geotiff' ? 'tif' : fmt;
+      const N = ST.native;
+      /* lo que la app dibuja por sí misma; si no, se arma con su PNG (y, sin figura elevada, siempre así) */
+      let want = nativeCan(N, fmt) ? fmt : (fmt === 'tiff' ? 'png' : null);
+      if (!want && N && nativeCan(N, 'png') && (fmt === 'pdf' || ST.noLift)) want = 'png';
+      if (want) {
         /* la app vuelve a dibujar la figura a las medidas de salida */
         say(T('Dibujando de nuevo con ', 'Drawing again with ') + (N.label || T('la app', 'the app')) + '…');
         blob = asBlob(await N.render(want, nativeOpts(want)));
         if (!blob) throw new Error(T('la app no devolvió la figura', 'the app did not return the figure'));
-        if (fmt === 'png') blob = await pngWithDpi(blob, ST.exp.dpi);
-        else if (fmt === 'tiff') blob = await tiffBlob(await blobCanvas(blob), ST.exp.dpi, ST.exp.bg === 'none');
+        if (want === 'png' && fmt !== 'png') {
+          const cv = await blobCanvas(blob), transp = ST.exp.bg === 'none';
+          if (fmt === 'tiff') blob = await tiffBlob(cv, ST.exp.dpi, transp);
+          else if (fmt === 'pdf') blob = await pdfBlob(cv, wmm, cv.height / cv.width * wmm, transp);
+          else if (fmt === 'svg') {
+            const url = cv.toDataURL('image/png'), hh = cv.height / cv.width * wmm;
+            blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="' + NS + '" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + fmtN(wmm, 2) + 'mm" height="' + fmtN(hh, 2) + 'mm" viewBox="0 0 ' + cv.width + ' ' + cv.height + '"><image width="' + cv.width + '" height="' + cv.height + '" xlink:href="' + url + '"/></svg>'], { type: 'image/svg+xml' });
+          }
+        } else if (fmt === 'png') blob = await pngWithDpi(blob, ST.exp.dpi);
         const name = fileName(ext);
         download(blob, name);
         say(T('Exportada (dibujada de nuevo por ', 'Exported (drawn again by ') + (N.label || T('la app', 'the app')) + '): ' + name + ' (' + (blob.size / 1048576).toFixed(2) + ' MB)');
@@ -2169,7 +2291,13 @@
       clearTimeout(decoT); decoT = setTimeout(decorate, 250);
     });
     mo.observe(root, { childList: true, subtree: true });
+    /* solo un cambio de idioma de verdad: hay apps que vuelven a escribir el mismo «lang» cada vez que traducen un
+       panel (el editor ✎ de PhenologyPro, al acoplarse), y rehacer el inspector por eso no terminaría nunca */
+    let langNow = document.documentElement.lang;
     new MutationObserver(() => {
+      const L = document.documentElement.lang;
+      if (L === langNow) return;
+      langNow = L;
       $$('.lfs-open').forEach(b => { b.title = openTitle(); });
       if (ST.open) { labels(); const sc = body.scrollTop; render(); dock(false); dock(true); body.scrollTop = sc; }
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
