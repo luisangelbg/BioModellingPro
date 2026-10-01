@@ -125,6 +125,8 @@
       const t = n.tagName;
       if (/^(SCRIPT|STYLE|TEMPLATE|SELECT|OPTION|TEXTAREA|OUTPUT)$/.test(t) || t.toLowerCase() === 'svg') return;
       if (n.hidden || n.classList.contains('sr-only') || n.classList.contains('step-state') || n.classList.contains('lnav-own')) return;
+      /* los distintivos de ayuda («?», «i») y los botones dentro de un título no son parte del texto */
+      if (n !== el && (t === 'BUTTON' || n.hasAttribute('data-help') || /(^|\s)(help-badge|help-btn|help-dot|info-btn|hint-btn)(\s|$)/.test(n.className || ''))) return;
       const dl = n.getAttribute('data-l') || n.getAttribute('lang');
       if (dl && n !== el && dl.slice(0, 2) !== L && /^(es|en)/.test(dl)) return;
       if (n.style && n.style.display === 'none') return;
@@ -269,7 +271,7 @@
     }
     const seen = {};
     return out.map((s, i) => {
-      const title = textOf(s.head).replace(/\s*[?¿ⓘ]\s*$/, '') || T('Sección ', 'Section ') + (i + 1);
+      const title = textOf(s.head).replace(/\s*ⓘ\s*$/, '') || T('Sección ', 'Section ') + (i + 1);
       let id = slug(title); if (seen[id]) id += '-' + (++seen[id]); else seen[id] = 1;
       return Object.assign(s, { i, id, title });
     });
@@ -965,7 +967,7 @@
       const seen = {};
       $$('h2, h3, .section-title', p).forEach(h => {
         if (h.closest('.lnav-own, dialog, .fig-editor, .fe-panel, .fs-panel, svg') || h.matches(CFG.blockHead) || h.closest(CFG.blockHead)) return;
-        const t = textOf(h).replace(/\s*[?¿ⓘ]\s*$/, '');
+        const t = textOf(h).replace(/\s*ⓘ\s*$/, '');
         if (!t || t.length > 120 || seen[t]) return; seen[t] = 1;
         add({ g: 'section', id: s.n + '/' + slug(t) + '/' + items.length, label: t, hint: s.label, icon: 'list', run: () => goToNode(s.n, h) });
       });

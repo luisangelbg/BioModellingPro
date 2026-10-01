@@ -139,6 +139,7 @@
       const t = n.tagName;
       if (/^(SCRIPT|STYLE|TEMPLATE|OUTPUT|SELECT|OPTION|TEXTAREA)$/.test(t) || t.toLowerCase() === 'svg') return;
       if (n.hidden || n.classList.contains('sr-only') || n.classList.contains('range-val') || n.classList.contains('lfs-own') || n.classList.contains('lnav-own')) return;
+      if (n !== el && (n.hasAttribute('data-help') || /(^|\s)(help-badge|help-btn|help-dot|info-btn|hint-btn)(\s|$)/.test(n.className || ''))) return;
       const dl = n.getAttribute('data-l') || n.getAttribute('lang');
       if (dl && n !== el && /^(es|en)/.test(dl) && dl.slice(0, 2) !== L) return;
       if (n.style && n.style.display === 'none') return;
