@@ -1171,6 +1171,10 @@
     if (a >= 1) return String(+v.toFixed(2)).replace('-', '−');
     return String(+v.toFixed(3)).replace('-', '−');
   };
+  /* marks for the figure studio: the area of the data (data-plot) and the legend, in one
+     group (data-role="legend") with its entries numbered (data-li); a colour key goes in
+     a group of its own (data-legend="colorbar") */
+  const plotArea = (x, y, w, h) => [x, y, w, h].map(v => +(+v).toFixed(2)).join(' ');
 
   /* main plotting helper: draws the frame, the grid, the ticks and the legend, and lets the
      caller add the data with the scale functions it returns */
@@ -1191,7 +1195,7 @@
     const sy = v => m.t + ih - (fy(v) - y0) / (y1 - y0) * ih;
     const xt = o.xticks || (o.xlog ? logTicks(o.xdom[0], o.xdom[1]) : niceTicks(o.xdom[0], o.xdom[1], o.nxt || 6));
     const yt = o.yticks || (o.ylog ? logTicks(o.ydom[0], o.ydom[1]) : niceTicks(o.ydom[0], o.ydom[1], 6));
-    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="system-ui, Segoe UI, sans-serif">`;
+    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-plot="${plotArea(m.l, m.t, iw, ih)}" font-family="system-ui, Segoe UI, sans-serif">`;
     s += `<rect width="${W}" height="${H}" fill="${p.bg}"/>`;
     if (o.title) s += `<text x="${W / 2}" y="22" text-anchor="middle" font-size="13" font-weight="600" fill="${p.text}">${esc(o.title)}</text>`;
     yt.forEach(v => {
@@ -1210,13 +1214,15 @@
     s += draw({ sx, sy, p, W, H, m, iw, ih });
     if (o.xlab) s += `<text x="${m.l + iw / 2}" y="${m.t + ih + 33}" text-anchor="middle" font-size="11" fill="${p.text}">${esc(o.xlab)}</text>`;
     if (o.ylab) s += `<text transform="translate(14,${m.t + ih / 2}) rotate(-90)" text-anchor="middle" font-size="11" fill="${p.text}">${esc(o.ylab)}</text>`;
+    s += '<g data-role="legend">';
     legend.forEach((it, i) => {
       const col = i % legCols, row = Math.floor(i / legCols);
       const lx = m.l + col * (iw / legCols), ly = m.t + ih + 46 + row * 17;
-      if (it.marker === 'square') s += `<rect x="${lx}" y="${ly - 7}" width="10" height="10" fill="${it.color}" fill-opacity="${it.opacity == null ? 1 : it.opacity}"/>`;
-      else s += `<line x1="${lx}" y1="${ly - 3}" x2="${lx + 18}" y2="${ly - 3}" stroke="${it.color}" stroke-width="2.2"${it.dash ? ` stroke-dasharray="${it.dash}"` : ''}/>`;
-      s += `<text x="${lx + (it.marker === 'square' ? 15 : 23)}" y="${ly}" font-size="10" fill="${p.text}">${esc(it.label)}</text>`;
+      if (it.marker === 'square') s += `<rect x="${lx}" y="${ly - 7}" width="10" height="10" fill="${it.color}" fill-opacity="${it.opacity == null ? 1 : it.opacity}" data-li="${i}"/>`;
+      else s += `<line x1="${lx}" y1="${ly - 3}" x2="${lx + 18}" y2="${ly - 3}" stroke="${it.color}" stroke-width="2.2"${it.dash ? ` stroke-dasharray="${it.dash}"` : ''} data-li="${i}"/>`;
+      s += `<text x="${lx + (it.marker === 'square' ? 15 : 23)}" y="${ly}" font-size="10" fill="${p.text}" data-li="${i}">${esc(it.label)}</text>`;
     });
+    s += '</g>';
     return s + '</svg>';
   }
   const lineOf = (pts, sx, sy) => pts.length
@@ -1362,7 +1368,7 @@
     const W = dW + lW + n * cs + right, H = top + n * cs + bot, x0 = dW + lW;
     const pos = {};
     order.forEach((v, r) => { pos[v] = r; });
-    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="system-ui, Segoe UI, sans-serif"><rect width="${W}" height="${H}" fill="${p.bg}"/>`;
+    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-plot="${plotArea(x0, top, n * cs, n * cs)}" font-family="system-ui, Segoe UI, sans-serif"><rect width="${W}" height="${H}" fill="${p.bg}"/>`;
     s += `<text x="${W / 2}" y="20" text-anchor="middle" font-size="13" font-weight="600" fill="${p.text}">${esc(BETA_NAME[key] ? T(BETA_NAME[key].es, BETA_NAME[key].en) : key)}</text>`;
     const hmax = tree.root.h || 1, xy = {};
     (function walk(nd) {
@@ -1385,10 +1391,12 @@
     });
     /* colour key */
     const kx = x0, ky = H - 12;
+    s += '<g data-legend="colorbar">';
     for (let i = 0; i <= 20; i++)
       s += `<rect x="${kx + i * 7}" y="${ky - 9}" width="7" height="9" fill="${mix(p.bg, p.accent, Math.pow(i / 20, 0.85) * 0.95)}"/>`;
     s += `<text x="${kx - 5}" y="${ky - 1}" text-anchor="end" font-size="9" fill="${p.muted}">0</text>`;
     s += `<text x="${kx + 147}" y="${ky - 1}" font-size="9" fill="${p.muted}">1 · ${esc(T('disimilitud', 'dissimilarity'))}</text>`;
+    s += '</g>';
     return s + '</svg>';
   }
 
