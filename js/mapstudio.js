@@ -2569,6 +2569,8 @@
         studioStyles: false,
         lift: false,
         title: () => (studio.style.title || '').trim() || (studio.hooks.defaultTitle && studio.hooks.defaultTitle()) || T('Mapa', 'Map'),
+        file: () => (studio.hooks.fileName ? studio.hooks.fileName() : ''),   // the name this map's own export gives it
+
         aspect: () => figAspect(studio),
         controls: () => (studio.panel && studio.panel.isConnected ? { node: studio.panel, title: ['Estudio de mapa (de la app)', 'Map studio (the app’s)'] } : null),
         render: (fmt, o) => (figQueue = figQueue.catch(() => null).then(() => figDraw(studio, fmt, o))),

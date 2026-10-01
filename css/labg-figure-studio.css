@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.2.0 (hoja de estilo del módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.3.0 (hoja de estilo del módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán — GPL-3.0 (ver LICENSE).
 
    Oro y negro de la marca LABG; fondos, textos y bordes salen de los tokens de
@@ -208,6 +208,21 @@ html.lfs-is-open { overflow: hidden; }
 .lfs-r-check label { display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; font-size: 13px; }
 .lfs-r-check input { accent-color: var(--lfs-oro); width: 16px; height: 16px; margin: 0; }
 .lfs-r-btn { grid-template-columns: 1fr; }
+/* la leyenda: una cuadrícula de 3 × 3 lugares dentro de la gráfica; el centro, donde la dibujó la app */
+.lfs-leggrid { display: grid; grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(3, 26px); gap: 4px; padding: 6px; border: 1px solid var(--lfs-line2); border-radius: 8px; background: var(--lfs-soft); width: max-content; }
+.lfs-legpos { position: relative; padding: 0; border: 1px solid var(--lfs-line2); border-radius: 5px; background: var(--lfs-card); cursor: pointer; }
+.lfs-legpos i { position: absolute; width: 12px; height: 7px; border-radius: 2px; background: var(--lfs-muted); opacity: .55; }
+.lfs-legpos[data-leg^="t"] i { top: 4px; } .lfs-legpos[data-leg^="m"] i { top: calc(50% - 3.5px); } .lfs-legpos[data-leg^="b"] i { bottom: 4px; }
+.lfs-legpos[data-leg$="l"] i { left: 4px; } .lfs-legpos[data-leg$="c"] i { left: calc(50% - 6px); } .lfs-legpos[data-leg$="r"] i { right: 4px; }
+.lfs-legpos-o i { top: calc(50% - 4px); left: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; }
+.lfs-legpos:hover { border-color: var(--lfs-oro); }
+.lfs-legpos[aria-pressed="true"] { border-color: var(--lfs-oro); background: var(--lfs-oro-suave); }
+.lfs-legpos[aria-pressed="true"] i { background: var(--lfs-oro-texto); opacity: 1; }
+.lfs-legpos:focus-visible { outline: 2px solid var(--lfs-oro); outline-offset: 1px; }
+.lfs-r-leg .lfs-ctl { justify-content: flex-start; }
+.lfs-lifted [data-lfs-leg] { cursor: move; }
+.lfs-row.lfs-pulse { animation: lfs-row-pulse 1.2s ease-out; border-radius: 8px; }
+@keyframes lfs-row-pulse { 0% { box-shadow: 0 0 0 0 rgba(212, 168, 72, .55); background: rgba(212, 168, 72, .16); } 100% { box-shadow: 0 0 0 10px rgba(212, 168, 72, 0); background: transparent; } }
 /* la sección de la app donde vive cada control */
 .lfs-subh { margin: 12px 0 4px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--lfs-oro-texto, #8a6a1f); }
 .lfs-filtering .lfs-subh { display: none; }

@@ -167,6 +167,7 @@ def fig_to_b64(fig):
     if _XP:
         # export from the LABG figure studio: other output measures, the same drawing
         fmt = _XP.get('fmt') or 'png'
+        _xp_legend(fig)
         _xp_fit(fig)
         if _XP.get('dpi'): kw['dpi'] = int(_XP['dpi'])
         if _XP.get('transparent'): kw['transparent'] = True
@@ -222,6 +223,60 @@ def _xp_fit(fig):
         sy = (H / th) if H else sx
         fig.set_size_inches(max(0.8, fw * sx), max(0.6, fh * sy))
         _xp_relayout(fig)
+
+_XP_LOC = {'tl': 'upper left', 'tc': 'upper center', 'tr': 'upper right', 'ml': 'center left',
+           'mr': 'center right', 'bl': 'lower left', 'bc': 'lower center', 'br': 'lower right'}
+
+def _xp_legend(fig):
+    """Puts each legend where the studio asked: inside (eight places), outside on the right, below in a
+    row, or hidden. Same keys and texts; only the place changes."""
+    pos = _XP.get('legend')
+    if not pos or pos == 'orig':
+        return
+    for ax in fig.get_axes():
+        leg = ax.get_legend()
+        if leg is None:
+            continue
+        if pos == 'none':
+            leg.set_visible(False)
+            continue
+        handles = list(getattr(leg, 'legend_handles', None) or getattr(leg, 'legendHandles', None) or [])
+        labels = [t.get_text() for t in leg.get_texts()]
+        if not handles or len(handles) != len(labels):
+            continue
+        tt = leg.get_title()
+        kw = dict(frameon=leg.get_frame_on(), title=(tt.get_text() or None) if tt is not None else None)
+        try:
+            kw['fontsize'] = leg.get_texts()[0].get_fontsize()
+        except Exception:
+            pass
+        if pos in _XP_LOC:
+            ax.legend(handles, labels, loc=_XP_LOC[pos], **kw)
+        elif pos == 'right':
+            ax.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), bbox_transform=ax.transAxes, borderaxespad=0.8, **kw)
+        elif pos == 'below':
+            fs = float(kw.get('fontsize') or 10)
+            off = 2.5
+            try:
+                leg.set_visible(False)
+                fig.canvas.draw()
+                r = fig.canvas.get_renderer()
+                bb, ab = ax.get_tightbbox(r), ax.get_window_extent(r)
+                off = (ab.y0 - bb.y0) / fig.dpi * 72.0 / fs + 0.6
+            except Exception:
+                pass
+            W = _XP.get('w')
+            for nc in range(max(1, min(len(labels), 6)), 0, -1):
+                lg2 = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0), bbox_transform=ax.transAxes,
+                                borderaxespad=off, ncol=nc, **kw)
+                if not W or nc == 1:
+                    break
+                try:
+                    fig.canvas.draw()
+                    if lg2.get_window_extent(fig.canvas.get_renderer()).width / fig.dpi <= float(W) * 0.92:
+                        break
+                except Exception:
+                    break
 
 def _xp_begin(o_json):
     _XP.clear()

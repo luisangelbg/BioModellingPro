@@ -92,7 +92,7 @@
   function dibujar(m, fmt, o) {
     const tarea = async () => {
       const run = (window.runPy && window.runPy.__orig) || window.runPy;
-      const xo = { fmt, dpi: o.dpi || 300, w: o.win || null, h: o.hin || null, transparent: !!o.transparent, light: !!o.light };
+      const xo = { fmt, dpi: o.dpi || 300, w: o.win || null, h: o.hin || null, transparent: !!o.transparent, light: !!o.light, legend: o.legend && o.legend !== 'orig' ? o.legend : null };
       const g = Object.assign({}, m.globals || {}, { _xp_o: JSON.stringify(xo), _xp_c: m.code });
       let res = await run('_xp_run(_xp_o, _xp_c)', g);
       res = tomar(res, m.path);
@@ -114,6 +114,7 @@
     return {
       label: 'Python',
       formats: ['png', 'svg', 'pdf'],
+      legend: true,                    // la leyenda de matplotlib va donde la pida el estudio
       render: (fmt, o) => dibujar(m, fmt, o || {}),
     };
   }
