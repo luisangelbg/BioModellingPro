@@ -249,7 +249,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
 }
 .suite-link:hover { color: var(--primary-text); border-color: var(--primary); }
 .suite-link svg { width: 14px; height: 14px; }
-.suite-link .labg-iso { width: 18px; height: 18px; flex: none; }
+.suite-link .labg-iso { width: auto; height: 20px; flex: none; }
 
 /* conmutador segmentado (idioma) */
 .seg {
@@ -630,8 +630,8 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
 .lw-badge { position: absolute; left: 50%; top: 50%; width: 80px; height: 80px; margin: -40px 0 0 -40px;
   opacity: 0; transform: scale(.3) rotate(-14deg); pointer-events: none;
   transition: transform 560ms cubic-bezier(.34, 1.6, .64, 1), opacity 180ms; }
-.lw-iso { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 18px rgba(12, 106, 68, .35)); }
-.lw-iso .iso-dot { transform-box: fill-box; transform-origin: center; }
+.lw-iso { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 18px rgba(125, 91, 20, .35)); }
+.lw-iso .iso-cubo { transform-box: fill-box; transform-origin: center; }
 .lw-mark { position: absolute; right: -11px; bottom: -11px; width: 38px; height: 38px; border-radius: 50%;
   box-shadow: 0 0 0 3px var(--card-bg); transform: scale(0);
   transition: transform 500ms 420ms cubic-bezier(.34, 1.7, .64, 1); }
@@ -642,7 +642,9 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
 .lw-check { stroke-dasharray: 36; stroke-dashoffset: 36; transition: stroke-dashoffset 420ms 300ms var(--ease); }
 .lw-mark .lw-check { transition-delay: 700ms; }
 .lw-cross { display: none; }
-.lw-ripple { position: absolute; inset: 0; border-radius: 22%; border: 3px solid #3ED68B; opacity: 0; }
+.lw-ripple { position: absolute; inset: -4%; opacity: 0; }
+.lw-ripple svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.lw-ripple polygon { fill: none; stroke: #D4A848; stroke-width: 30; }
 .lw-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
 .lw-burst i { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; opacity: 0; background: var(--primary); }
 .lw-burst i:nth-child(4n+1) { background: var(--accent); border-radius: 2px; }
@@ -697,7 +699,9 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
   }
   .lw-card.is-done .lw-fill::after, .lw-inline.is-done .lw-fill::after { animation: none; opacity: 0; }
   .lw-card.is-done .lw-ripple { animation: lw-ripple 900ms 200ms var(--ease) both; }
-  .lw-card.is-done .lw-iso .iso-dot { animation: lw-dot-on 520ms cubic-bezier(.34, 1.7, .64, 1) both; animation-delay: calc(260ms + var(--i) * 80ms); }
+  .lw-card.is-done .lw-iso .iso-cubo { animation: lw-iso-cubo 620ms 180ms cubic-bezier(.34, 1.6, .64, 1) both; }
+  .lw-card.is-done .lw-iso .iso-brillo { animation: lw-iso-brillo 1100ms 320ms ease-out both; }
+  .suite-link:hover .labg-iso .iso-brillo { animation: lw-iso-brillo 900ms ease-out both; }
   .lw-card.is-failed { animation: lw-shake 450ms var(--ease); }
   .lw-inline.is-failed .lw-imark, .lw-btn-failed { animation: lw-shake 450ms var(--ease); }
   .lw-dots i { animation: lw-hop 1s ease-in-out infinite; }
@@ -713,7 +717,8 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
 }
 @keyframes lw-indet { from { transform: translateX(-100%); } to { transform: translateX(270%); } }
 @keyframes lw-shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
-@keyframes lw-dot-on { from { transform: scale(0); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes lw-iso-cubo { from { transform: scale(.78); opacity: .35; } to { transform: none; opacity: 1; } }
+@keyframes lw-iso-brillo { from { transform: translateX(0) skewX(-18deg); } to { transform: translateX(1400px) skewX(-18deg); } }
 @keyframes lw-ripple { from { transform: scale(1); opacity: .7; } to { transform: scale(2.1); opacity: 0; } }
 @keyframes lw-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(2px); } }
 @keyframes lw-hop { 0%, 70%, 100% { transform: translateY(0); opacity: .45; } 35% { transform: translateY(-4px); opacity: 1; } }
