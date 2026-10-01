@@ -726,7 +726,8 @@
     progress.style.transform = 'scaleX(' + v.toFixed(4) + ')';
     floatBox.querySelector('.lnav-top').hidden = window.scrollY < 600;
   }
-  window.addEventListener('scroll', () => { if (!spyQueued) { spyQueued = true; raf(spy); } }, { passive: true });
+  /* el navegador del sistema puede restaurar el desplazamiento antes del arranque: sin la barra, no hay nada que pintar */
+  window.addEventListener('scroll', () => { if (S.on && !spyQueued) { spyQueued = true; raf(spy); } }, { passive: true });
 
   /* ---------------- moverse ---------------- */
   function goBlock(n, opts) {
