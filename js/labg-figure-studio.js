@@ -896,7 +896,7 @@
       if (cs.length) groups.push({ title: T('Ajustes', 'Settings'), ctrls: cs });
     }
     const more = CFG.controlsFor ? CFG.controlsFor(rec) : null;
-    if (more) groups.push({ title: T('Estilo de las figuras del bloque', 'Style of the block’s figures'), ctrls: controlsIn(more) });
+    if (more) groups.push({ title: T('Ajustes del bloque', 'Block settings'), ctrls: controlsIn(more) });
     /* los ajustes de la tarjeta donde vive la figura (fuera de otras figuras) */
     const card = host.closest('.card, .chart-card, .qc-section, section');
     if (card && card !== host) {
