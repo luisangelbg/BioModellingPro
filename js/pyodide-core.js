@@ -138,6 +138,7 @@ _UI = {'lang': 'es', 'theme': 'light',
        'pal': ['#1f7a4d', '#cf6a24', '#2a78b5', '#e0ac2b', '#7a5cc4', '#c4506e', '#3aa39a', '#8a6a4a', '#5f6b86', '#5aa03b'],
        'bg': '#ffffff', 'text': '#14261d', 'muted': '#5b7266', 'border': '#bccfc5', 'primary': '#1f7a4d', 'accent': '#cf6a24'}
 PAL = list(_UI['pal'])
+_UI_LIGHT = dict(_UI)   # the light look, for exports on a white or transparent background
 
 def tr(es, en):
     """Text in the active interface language."""
@@ -162,10 +163,94 @@ def set_ui(ui_json):
 set_ui(json.dumps(_UI))
 
 def fig_to_b64(fig):
+    fmt, kw = 'png', {}
+    if _XP:
+        # export from the LABG figure studio: other output measures, the same drawing
+        fmt = _XP.get('fmt') or 'png'
+        _xp_fit(fig)
+        if _XP.get('dpi'): kw['dpi'] = int(_XP['dpi'])
+        if _XP.get('transparent'): kw['transparent'] = True
     buf = io.BytesIO()
-    fig.savefig(buf, format='png', bbox_inches='tight')
+    fig.savefig(buf, format=fmt, bbox_inches='tight', **kw)
     plt.close(fig)
-    return 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()
+    mime = {'png': 'image/png', 'svg': 'image/svg+xml', 'pdf': 'application/pdf'}.get(fmt, 'image/png')
+    return 'data:' + mime + ';base64,' + base64.b64encode(buf.getvalue()).decode()
+
+# ---------- export at a given size (LABG figure studio) ----------
+# The studio runs again the very call that drew a figure, with other output measures:
+# width and height in inches, resolution, file format and a transparent background.
+# Nothing is computed differently: only the paper size, the dpi and the file type change.
+import ast, warnings
+_XP = {}
+
+def _xp_relayout(fig):
+    try:
+        eng = fig.get_layout_engine()
+    except Exception:
+        eng = None
+    if eng is not None and 'Constrained' in type(eng).__name__:
+        return
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            fig.tight_layout()
+    except Exception:
+        pass
+
+def _xp_fit(fig):
+    """Brings the figure to the requested width (and height), measured on the tight crop it is
+    saved with; the text keeps its size in points."""
+    W = _XP.get('w'); H = _XP.get('h')
+    if not W:
+        return
+    W = float(W); H = float(H) if H else None
+    try:
+        pad = float(plt.rcParams.get('savefig.pad_inches', 0.1))
+    except Exception:
+        pad = 0.1
+    w0, h0 = fig.get_size_inches()
+    fig.set_size_inches(W, H if H else W * h0 / w0)
+    _xp_relayout(fig)
+    for _ in range(4):
+        fig.canvas.draw()
+        bb = fig.get_tightbbox(fig.canvas.get_renderer())
+        tw, th = bb.width + 2 * pad, bb.height + 2 * pad
+        if abs(tw - W) <= W * 0.004 and (H is None or abs(th - H) <= H * 0.004):
+            break
+        fw, fh = fig.get_size_inches()
+        sx = W / tw
+        sy = (H / th) if H else sx
+        fig.set_size_inches(max(0.8, fw * sx), max(0.6, fh * sy))
+        _xp_relayout(fig)
+
+def _xp_begin(o_json):
+    _XP.clear()
+    _XP.update(json.loads(o_json) if o_json else {})
+    # a white or transparent background asks for the light look even if the page is dark
+    if _XP.get('light') and _UI.get('theme') == 'dark':
+        _XP['_restore'] = json.dumps(_UI)
+        set_ui(json.dumps(dict(_UI_LIGHT, lang=_UI.get('lang', 'es'))))
+
+def _xp_end():
+    r = _XP.get('_restore')
+    _XP.clear()
+    if r:
+        set_ui(r)
+
+def _xp_run(o_json, code):
+    """Runs the call that drew a figure with the studio's output measures."""
+    _xp_begin(o_json)
+    try:
+        tree = ast.parse(code, mode='exec')
+        last = None
+        if tree.body and isinstance(tree.body[-1], ast.Expr):
+            last = ast.Expression(tree.body.pop().value)
+        g = globals()
+        if tree.body:
+            exec(compile(tree, '<studio>', 'exec'), g)
+        return eval(compile(last, '<studio>', 'eval'), g) if last is not None else None
+    finally:
+        _xp_end()
 
 def load_df(json_str, var_keys, group_key='taxon'):
     rows = json.loads(json_str)

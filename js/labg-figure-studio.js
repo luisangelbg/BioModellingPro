@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.0.0 (módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.1.0 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -30,6 +30,11 @@
      · si la app trae un editor fino (✎) o un panel de estilo global, se acoplan
        dentro del inspector mientras el estudio está abierto.
 
+   Exportación nativa (1.1.0): si la app sabe volver a dibujar una figura (por ejemplo, las
+   que dibuja Python con matplotlib, por medio de labg-pyfig.js), el estudio le pide la figura
+   al tamaño, la resolución y el formato de salida —PNG con sus ppp, SVG y PDF vectoriales— en
+   lugar de ampliar la imagen de la pantalla, y muestra una vista previa a tamaño de salida.
+
    Lo propio del estudio: paletas científicas con simulación de daltonismo,
    tamaño del texto y grosor de las líneas pensados para el tamaño de salida,
    edición de un texto con doble clic, historial, comparación, preajustes de un
@@ -48,7 +53,7 @@
 (function () {
   'use strict';
   if (window.LABGFigureStudio && window.LABGFigureStudio.version) return;
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -169,7 +174,7 @@
     pollinationpro: { exclude: DEF.exclude + ', .ms-view' },                 /* el mapa ya tiene su estudio dividido */
     biomodellingpro: { exclude: DEF.exclude + ', .main-map, .leaflet-container' },
     statspro: {
-      exclude: DEF.exclude + ', .plot-studio',
+      hosts: DEF.hosts + ', .plot-canvas',
       controlsFor: f => { const p = f.host.closest('.step-panel, .subtab-panel'); return p ? p.querySelector('.style-bar, [id$="StyleBar"]') : null; },
     },
     leafpro: { controlsFor: f => (f.host.closest('.b6-stage') ? document.getElementById('b6Ctrl') : null) },
@@ -225,6 +230,46 @@
   ];
   const WIDTHS = [[85, ['1 columna', '1 column']], [114, ['1.5 columnas', '1.5 columns']], [180, ['2 columnas', '2 columns']]];
 
+  /* ---------------- exportación nativa ----------------
+     La app (o un puente como labg-pyfig.js) puede ofrecer, para una figura, volver a dibujarla a
+     las medidas de salida. Se registra con attach(el, { native }) o, para todas, con
+     window.LABG_FIGSTUDIO.nativeExport = rec => descripción | null. La descripción es
+       { label: 'Python', formats: ['png', 'svg', 'pdf'], preview: true,
+         render(fmt, o) → Blob o data URI (o una promesa de ellos) }
+     con o = { fmt, wmm, hmm, win, hin, dpi, bg, transparent, light } (hmm/hin = null: el alto
+     que dé la figura). El TIFF se arma con el PNG nativo; lo que la app no dibuje sale por la
+     exportación propia del estudio. */
+  function nativeFor(rec) {
+    if (!rec) return null;
+    const own = rec.opts && rec.opts.native;
+    if (own && typeof own.render === 'function') return own;
+    const hook = (window.LABG_FIGSTUDIO && window.LABG_FIGSTUDIO.nativeExport) || CFG.nativeExport;
+    if (typeof hook !== 'function') return null;
+    try { const d = hook(rec); return d && typeof d.render === 'function' ? d : null; } catch (e) { return null; }
+  }
+  const nativeCan = (N, fmt) => !!(N && (N.formats || ['png']).indexOf(fmt) >= 0);
+  function uriBlob(uri) {
+    const c = uri.indexOf(','), head = uri.slice(5, c), mime = head.split(';')[0] || 'application/octet-stream';
+    if (/;base64/.test(head)) {
+      const bin = atob(uri.slice(c + 1)), u = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+      return new Blob([u], { type: mime });
+    }
+    return new Blob([decodeURIComponent(uri.slice(c + 1))], { type: mime });
+  }
+  const asBlob = r => (r instanceof Blob ? r : (typeof r === 'string' && r.slice(0, 5) === 'data:' ? uriBlob(r) : null));
+  /* un PNG (por ejemplo, el nativo) en un lienzo de su tamaño */
+  async function blobCanvas(blob) {
+    const url = URL.createObjectURL(blob);
+    try {
+      const im = await loadImg(url);
+      const cv = document.createElement('canvas');
+      cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+      cv.getContext('2d').drawImage(im, 0, 0);
+      return cv;
+    } finally { URL.revokeObjectURL(url); }
+  }
+
   /* ---------------- figuras de la app ---------------- */
   const SKIP = 'button, a, .btn, .icon-btn, nav, .topbar, .stepper, .lnav-own, .lfs-own, .fig-editor, .fig-tools, .fe-panel, .fs-panel, .fig-menu, dialog, .toast-stack, .labg-iso, .brand, .suite-link, label, .seg, .lfs-before';
   const recs = new WeakMap();
@@ -253,6 +298,14 @@
   }
   function titleOf(rec) {
     if (rec.opts && rec.opts.title) return TT(rec.opts.title);
+    let own = null;
+    try { own = rec.host.querySelector(CFG.titles); } catch (e) { own = null; }
+    if (own && !rec.el.contains(own)) { const s = textOf(own); if (s) return s.slice(0, 120); }
+    /* el rótulo suelto justo antes del contenedor (un h3 y debajo la figura) */
+    for (let p = rec.host.previousElementSibling, k = 0; p && k < 4; p = p.previousElementSibling, k++) {
+      if (/^H[2-5]$/.test(p.tagName) || p.matches('.fig-title, .pg-title, figcaption')) { const s = textOf(p); if (s) return s.slice(0, 120); }
+      if (p.matches(CFG.hosts) || p.querySelector('svg, canvas, img')) break;   /* otra figura: ese rótulo es suyo */
+    }
     let n = rec.host;
     for (let i = 0; i < 3 && n && n !== document.body; i++, n = n.parentElement) {
       let t = null;
@@ -481,6 +534,7 @@
     cvd: '', exp: Object.assign({ w: 85, unit: 'mm', h: 0, dpi: 600, fmt: 'png', bg: 'white' }, load('exp', {})),
     fig: blankFig(), proxies: [], hist: [], hi: -1, secsOpen: load('secs', { app: true, palette: true, text: false, size: true, presets: false, history: false }),
     presets: load('presets', []),
+    native: null, nativeAspect: null, nativeUrl: null, pvOn: load('nativePreview', true), pvKey: null,
   };
   const hasPopover = typeof HTMLElement !== 'undefined' && HTMLElement.prototype && typeof HTMLElement.prototype.showPopover === 'function';
   let studio, stage, insp, body, over, live, figMo = null, syncTimer = null;
@@ -536,7 +590,7 @@
     /* capa de encima de la figura: cortina, guías, resaltes y edición en sitio */
     over = mk('div', 'lfs-over lfs-own');
     if (hasPopover) over.setAttribute('popover', 'manual');
-    over.innerHTML = '<div class="lfs-guides"></div><div class="lfs-ring"></div>' +
+    over.innerHTML = '<div class="lfs-guides"></div><img class="lfs-native" alt="" hidden><span class="lfs-native-tag" hidden></span><div class="lfs-ring"></div>' +
       '<div class="lfs-curtain" hidden><div class="lfs-before-wrap"><img class="lfs-before" alt=""></div><div class="lfs-handle" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100"><i></i></div><span class="lfs-tag lfs-tag-a"></span><span class="lfs-tag lfs-tag-b"></span></div>' +
       '<input type="text" class="lfs-inplace" hidden>';
     document.body.appendChild(over);
@@ -604,6 +658,7 @@
       ST.zoom = 'fit'; ST.pan = { x: 0, y: 0 };
       ST.aspect0 = ADAPTERS[rec.lib].aspect(el) || 0.62;
       ST.compare = false; ST.cvd = '';
+      ST.native = nativeFor(rec); ST.nativeAspect = null; ST.pvKey = null;
       document.documentElement.classList.add('lfs-is-open');
       studio.classList.add('on');
       if (hasPopover) { try { studio.showPopover(); } catch (e) { /* ya abierto */ } }
@@ -617,6 +672,7 @@
       place();
       snapshotBefore();
       dock(true);
+      schedulePreview(80);
       clearInterval(syncTimer); syncTimer = setInterval(syncProxies, 450);
       window.addEventListener('resize', onResize);
       document.addEventListener('keydown', onKey, true);
@@ -637,6 +693,11 @@
     window.removeEventListener('resize', onResize);
     document.removeEventListener('keydown', onKey, true);
     dock(false);
+    clearTimeout(pvT); pvSeq++;
+    showNative(false);
+    if (ST.nativeUrl) { try { URL.revokeObjectURL(ST.nativeUrl); } catch (e) { /* nada */ } ST.nativeUrl = null; }
+    if (over) { const ni = $('.lfs-native', over); ni.removeAttribute('src'); }
+    ST.native = null; ST.nativeAspect = null; ST.pvKey = null;
     unlift();
     if (studio) {
       studio.classList.remove('on');
@@ -714,9 +775,12 @@
       relocate();
       if (!ST.el) return;
       if (ADAPTERS[ST.rec.lib].styles && !isDefault(ST.fig) && !ST.el.hasAttribute('data-lfs-done')) styleSvg(ST.el, ST.fig);
+      ST.native = nativeFor(ST.rec);
+      if (ST.lift && over && !$('.lfs-native', over).hidden) ST.lift.classList.add('lfs-under-native');
       place();
       readout();
       ring();
+      schedulePreview();
     });
   }
   function relocate() {
@@ -770,7 +834,7 @@
 
   /* tamaño de exportación en mm */
   const expW = () => (ST.exp.unit === 'in' ? ST.exp.w * MM_IN : ST.exp.w);
-  const expH = () => (ST.exp.h ? (ST.exp.unit === 'in' ? ST.exp.h * MM_IN : ST.exp.h) : expW() * ST.aspect0);
+  const expH = () => (ST.exp.h ? (ST.exp.unit === 'in' ? ST.exp.h * MM_IN : ST.exp.h) : expW() * (ST.native && ST.nativeAspect ? ST.nativeAspect : ST.aspect0));
   const expPx = () => ({ w: Math.max(1, Math.round(expW() / MM_IN * ST.exp.dpi)), h: Math.max(1, Math.round(expH() / MM_IN * ST.exp.dpi)) });
 
   /* la figura sobre el «papel» del tamaño de salida */
@@ -810,7 +874,63 @@
       }
       guides(r, z);
       ringBox(r);
+      const ni = $('.lfs-native', over);
+      Object.assign(ni.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+      const nt = $('.lfs-native-tag', over);
+      Object.assign(nt.style, { left: (r.left + 8) + 'px', top: (r.top + 8) + 'px' });
     });
+  }
+
+  /* ---------------- vista previa a tamaño de salida (exportación nativa) ---------------- */
+  let pvT = null, pvSeq = 0;
+  function showNative(on) {
+    if (!over) return;
+    $('.lfs-native', over).hidden = !on;
+    if (ST.lift) ST.lift.classList.toggle('lfs-under-native', !!on);
+  }
+  function nativeTag(text, busy) {
+    if (!over) return;
+    const t = $('.lfs-native-tag', over);
+    t.hidden = !text; t.textContent = text || ''; t.classList.toggle('busy', !!busy);
+  }
+  function schedulePreview(delay) {
+    if (!ST.open) return;
+    if (!ST.native || ST.native.preview === false || !nativeCan(ST.native, 'png') || !ST.pvOn) { clearTimeout(pvT); showNative(false); nativeTag(''); return; }
+    clearTimeout(pvT); pvT = setTimeout(runPreview, delay == null ? 450 : delay);
+  }
+  async function runPreview() {
+    if (!ST.open || !ST.native || !ST.el) return;
+    const N = ST.native;
+    const wpx = ST.paper && ST.paper.width ? ST.paper.width : 800;
+    const dpi = Math.round(clamp(wpx * (window.devicePixelRatio || 1) / (expW() / MM_IN), 60, 300));
+    const key = (ST.el.getAttribute('src') || '').length + '|' + (ST.el.getAttribute('src') || '').slice(-80) + '|' + JSON.stringify([+expW().toFixed(2), ST.exp.h ? +expH().toFixed(2) : 0, ST.exp.bg, dpi]);
+    if (key === ST.pvKey && !$('.lfs-native', over).hidden) return;
+    const seq = ++pvSeq;
+    nativeTag(T('Dibujando a tamaño de salida…', 'Drawing at output size…'), true);
+    try {
+      const blob = asBlob(await N.render('png', nativeOpts('png', dpi)));
+      if (!blob) throw new Error('sin imagen');
+      if (seq !== pvSeq || !ST.open) return;
+      const url = URL.createObjectURL(blob);
+      const img = $('.lfs-native', over);
+      await new Promise((ok, bad) => { img.onload = ok; img.onerror = bad; img.src = url; });
+      if (seq !== pvSeq || !ST.open) { URL.revokeObjectURL(url); return; }
+      if (ST.nativeUrl) URL.revokeObjectURL(ST.nativeUrl);
+      ST.nativeUrl = url; ST.pvKey = key;
+      if (!ST.exp.h && img.naturalWidth) ST.nativeAspect = img.naturalHeight / img.naturalWidth;
+      showNative(true);
+      nativeTag(T('Así sale: dibujada de nuevo por ', 'This is the output: drawn again by ') + (N.label || T('la app', 'the app')), false);
+      place(); readout();
+    } catch (e) {
+      if (seq !== pvSeq) return;
+      showNative(false);
+      nativeTag(T('No se pudo dibujar la vista previa', 'The preview could not be drawn'), false);
+      console.warn('LABG Estudio: vista previa nativa', e);
+    }
+  }
+  function nativeOpts(fmt, dpi) {
+    const wmm = expW(), hmm = ST.exp.h ? expH() : null, bg = ST.exp.bg;
+    return { fmt, wmm, hmm, win: wmm / MM_IN, hin: hmm ? hmm / MM_IN : null, dpi: dpi || ST.exp.dpi, bg, transparent: bg === 'none', light: bg !== 'screen' };
   }
   /* siluetas de 85 y 180 mm alrededor del papel */
   function guides(r, z) {
@@ -875,6 +995,13 @@
   function controlsIn(root) {
     return $$('select, input, textarea, button', root).filter(c => !c.matches(CTRL_SKIP) && !c.closest('.lfs-own, .lnav-own, .fe-panel, .fs-panel, .fig-menu'));
   }
+  /* ¿la app escondió este control (o su fila) porque no aplica? */
+  function hiddenIn(c, root) {
+    for (let n = c; n && n !== root && n !== document.body; n = n.parentElement) {
+      if (n.hidden || (n.style && n.style.display === 'none') || getComputedStyle(n).display === 'none') return true;
+    }
+    return false;
+  }
   function appGroups(rec) {
     const groups = [];
     const host = rec.host;
@@ -896,13 +1023,13 @@
       if (cs.length) groups.push({ title: T('Ajustes', 'Settings'), ctrls: cs });
     }
     const more = CFG.controlsFor ? CFG.controlsFor(rec) : null;
-    if (more) groups.push({ title: T('Ajustes del bloque', 'Block settings'), ctrls: controlsIn(more) });
+    if (more) groups.push({ title: T('Ajustes del bloque', 'Block settings'), ctrls: controlsIn(more).filter(c => !hiddenIn(c, more)) });
     /* los ajustes de la tarjeta donde vive la figura (fuera de otras figuras) */
     const card = host.closest('.card, .chart-card, .qc-section, section');
     if (card && card !== host) {
       const own = new Set(groups.flatMap(g => g.ctrls).concat(tc));
       const others = $$(CFG.hosts, card).filter(h => h !== host && !h.contains(host) && !host.contains(h));
-      const cs = controlsIn(card).filter(c => !host.contains(c) && !own.has(c) && !others.some(h => h.contains(c)) && mine(c) && !c.closest('details.fig-editor, .fig-tools'));
+      const cs = controlsIn(card).filter(c => !host.contains(c) && !own.has(c) && !others.some(h => h.contains(c)) && mine(c) && !c.closest('details.fig-editor, .fig-tools') && !hiddenIn(c, card));
       if (cs.length && cs.length <= 60) groups.unshift({ title: T('Datos y opciones de la sección', 'Data and options of the section'), ctrls: cs });
     }
     if (tc.length) groups.push({ title: T('Descarga (la de la app)', 'Download (the app’s own)'), ctrls: tc, kind: 'export' });
@@ -921,11 +1048,12 @@
     if (!t) { const pv = c.previousElementSibling; if (pv && /^(SPAN|B|SMALL|LABEL|STRONG)$/.test(pv.tagName)) t = textOf(pv); }
     return (t || c.name || c.id || '').replace(/\s+/g, ' ').trim().slice(0, 80);
   }
-  function renderApp() {
+  function renderApp(pre) {
     const b = secB('app');
     if (!b) return;
     ST.proxies = [];
-    const groups = appGroups(ST.rec);
+    const groups = pre || appGroups(ST.rec);
+    ST.appSig = groups.map(g => g.ctrls.length + ':' + g.title).join('|');
     if (!groups.length) {
       b.innerHTML = '<p class="lfs-note">' + esc(T('Esta figura no trae opciones propias: usa las del estudio (paleta, texto, tamaño) o el editor de la app si lo tiene.', 'This figure has no options of its own: use the studio’s (palette, text, size) or the app’s editor if it has one.')) + '</p>';
       return;
@@ -961,7 +1089,9 @@
   function syncProxies(force) {
     if (!ST.open || !body) return;
     const gone = ST.proxies.some(p => !p.n.isConnected);
-    if (gone && !force) { const sc = body.scrollTop; renderApp(); body.scrollTop = sc; filter($('.lfs-search input', studio).value || ''); return; }
+    let fresh = null;
+    if (!gone && !force) { fresh = appGroups(ST.rec); if (fresh.map(g => g.ctrls.length + ':' + g.title).join('|') === ST.appSig) fresh = null; }
+    if ((gone || fresh) && !force) { const sc = body.scrollTop; renderApp(fresh || undefined); body.scrollTop = sc; filter($('.lfs-search input', studio).value || ''); return; }
     ST.proxies.forEach((p, k) => {
       const px = body.querySelector('[data-k="' + k + '"]');
       if (!px || px === document.activeElement) return;
@@ -1059,14 +1189,16 @@
     const isVec = E.fmt === 'svg';
     const lib = ST.rec.lib;
     b.innerHTML =
-      row(T('Formato', 'Format'), '<div class="lfs-seg" role="radiogroup">' + ['png', 'svg', 'pdf', 'tiff'].map(f => '<button type="button" data-exp="fmt" data-v="' + f + '" aria-pressed="' + (E.fmt === f) + '"' + (f === 'svg' && lib !== 'svg' ? ' title="' + esc(T('Esta figura es una imagen: el SVG la lleva incrustada', 'This figure is an image: the SVG carries it embedded')) + '"' : '') + '>' + f.toUpperCase() + '</button>').join('') + '</div>', 'lfs-r-seg') +
+      row(T('Formato', 'Format'), '<div class="lfs-seg" role="radiogroup">' + ['png', 'svg', 'pdf', 'tiff'].map(f => '<button type="button" data-exp="fmt" data-v="' + f + '" aria-pressed="' + (E.fmt === f) + '"' + (f === 'svg' && lib !== 'svg' && !nativeCan(ST.native, 'svg') ? ' title="' + esc(T('Esta figura es una imagen: el SVG la lleva incrustada', 'This figure is an image: the SVG carries it embedded')) + '"' : '') + '>' + f.toUpperCase() + '</button>').join('') + '</div>', 'lfs-r-seg') +
       row(T('Ancho', 'Width'), '<div class="lfs-seg lfs-seg-w">' + WIDTHS.map(([mm, nm]) => '<button type="button" data-exp="wmm" data-v="' + mm + '" aria-pressed="' + (Math.abs(expW() - mm) < 0.5) + '" title="' + esc(TT(nm)) + '">' + mm + '</button>').join('') + '</div>' +
         '<input type="number" data-exp="w" min="' + (u === 'in' ? 0.5 : 10) + '" max="' + (u === 'in' ? 40 : 1000) + '" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + wv + '"><select data-exp="unit"><option value="mm"' + (u === 'mm' ? ' selected' : '') + '>mm</option><option value="in"' + (u === 'in' ? ' selected' : '') + '>in</option></select>', 'lfs-r-w') +
       row(T('Alto', 'Height'), '<label class="lfs-inl"><input type="checkbox" data-exp="hauto"' + (E.h ? '' : ' checked') + '>' + esc(T('el de la figura', 'the figure’s')) + '</label><input type="number" data-exp="h" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + fmtN(u === 'in' ? expH() / MM_IN : expH(), u === 'in' ? 2 : 1) + '"' + (E.h ? '' : ' disabled') + '>', 'lfs-r-h') +
       row(T('Resolución', 'Resolution'), '<div class="lfs-seg">' + [300, 600, 1200].map(d => '<button type="button" data-exp="dpi" data-v="' + d + '" aria-pressed="' + (E.dpi === d) + '"' + (isVec ? ' disabled' : '') + '>' + d + '</button>').join('') + '</div><small class="lfs-unit">' + esc(T('ppp', 'dpi')) + '</small>', 'lfs-r-seg') +
       row(T('Fondo', 'Background'), '<div class="lfs-seg">' + [['white', ['Blanco', 'White']], ['screen', ['Como se ve', 'As shown']], ['none', ['Transparente', 'Transparent']]].map(([v, n]) => '<button type="button" data-exp="bg" data-v="' + v + '" aria-pressed="' + (E.bg === v) + '">' + esc(TT(n)) + '</button>').join('') + '</div>', 'lfs-r-seg') +
       '<div class="lfs-readout"></div>' +
-      (lib !== 'svg' ? '<p class="lfs-note">' + esc(T('Esta figura es una imagen de píxeles: exportarla a más ppp no agrega detalle. Para más resolución usa la descarga de la app.', 'This figure is a pixel image: exporting it at a higher dpi adds no detail. For more resolution use the app’s own download.')) + '</p>' : '') +
+      (ST.native ? '<p class="lfs-note lfs-note-native">' + ico('check') + '<span>' + esc(T('La dibuja ' + (ST.native.label || 'la app') + ': al exportar, el estudio le pide la figura a este tamaño y resolución, no la amplía. En SVG y PDF sale vectorial y el texto conserva su tamaño en puntos.', 'Drawn by ' + (ST.native.label || 'the app') + ': on export the studio asks for the figure at this size and resolution instead of enlarging it. SVG and PDF come out as vectors and the text keeps its size in points.')) + '</span></p>' +
+        (ST.native.preview !== false && nativeCan(ST.native, 'png') ? '<div class="lfs-row lfs-r-check"><label><input type="checkbox" data-exp="pv"' + (ST.pvOn ? ' checked' : '') + '><span>' + esc(T('Ver en el papel cómo sale a este tamaño', 'Show on the paper how it comes out at this size')) + '</span></label></div>' : '')
+        : (lib !== 'svg' ? '<p class="lfs-note">' + esc(T('Esta figura es una imagen de píxeles: exportarla a más ppp no agrega detalle. Para más resolución usa la descarga de la app.', 'This figure is a pixel image: exporting it at a higher dpi adds no detail. For more resolution use the app’s own download.')) + '</p>' : '')) +
       '<div class="lfs-actions"><button type="button" class="lfs-btn lfs-btn-pri" data-a="export">' + ico('download') + esc(T('Exportar', 'Export')) + '</button><button type="button" class="lfs-btn" data-a="copy">' + ico('copy') + esc(T('Copiar imagen', 'Copy image')) + '</button><button type="button" class="lfs-btn" data-a="real">' + ico('ruler') + esc(T('Ver a tamaño real', 'View at real size')) + '</button></div>';
     readout();
   }
@@ -1096,7 +1228,8 @@
     if (r) {
       r.innerHTML = '<b>' + esc(fmtSize()) + '</b>' +
         (pt != null ? '<span class="' + (pt < 6 ? 'lfs-warn' : 'lfs-ok') + '">' + ico(pt < 6 ? 'info' : 'check') + esc(T('Texto más chico: ', 'Smallest text: ') + pt.toFixed(1) + ' pt' + (pt < 6 ? T(' — las revistas suelen pedir 6 a 8 pt; sube el tamaño del texto o usa un preajuste', ' — journals usually ask for 6 to 8 pt; raise the text size or use a preset') : '')) + '</span>' : '') +
-        (darkTheme() && ST.exp.bg === 'white' ? '<span class="lfs-warn">' + ico('info') + esc(T('La app está en tema oscuro: sus figuras usan colores claros. Para fondo blanco, cámbiala a tema claro o elige «Como se ve».', 'The app is in dark theme: its figures use light colours. For a white background, switch it to light theme or choose “As shown”.')) + '</span>' : '') +
+        (ST.native ? '<span class="lfs-ok">' + ico('check') + esc(T('Se exporta dibujada de nuevo por ', 'Exported drawn again by ') + (ST.native.label || T('la app', 'the app')) + (nativeCan(ST.native, ST.exp.fmt === 'tiff' ? 'png' : ST.exp.fmt) ? '' : T(' (este formato sale de la imagen de la pantalla)', ' (this format comes from the screen image)'))) + '</span>' : '') +
+        (darkTheme() && ST.exp.bg === 'white' && !ST.native ? '<span class="lfs-warn">' + ico('info') + esc(T('La app está en tema oscuro: sus figuras usan colores claros. Para fondo blanco, cámbiala a tema claro o elige «Como se ve».', 'The app is in dark theme: its figures use light colours. For a white background, switch it to light theme or choose “As shown”.')) + '</span>' : '') +
         (big && ST.exp.fmt !== 'svg' ? '<span class="lfs-warn">' + ico('info') + esc(T('Muy grande para el navegador: baja los ppp o el tamaño.', 'Too large for the browser: lower the dpi or the size.')) + '</span>' : '');
     }
     const p = $('.lfs-pt', body);
@@ -1180,7 +1313,7 @@
   function setExp(next, label) {
     const before = Object.assign({}, ST.exp);
     const after = Object.assign({}, ST.exp, next);
-    const put = e => { ST.exp = Object.assign({}, e); save('exp', ST.exp); renderSize(); place(); readout(); emitChange(); };
+    const put = e => { ST.exp = Object.assign({}, e); save('exp', ST.exp); renderSize(); place(); readout(); emitChange(); schedulePreview(); };
     put(after);
     if (label) record(label, () => put(before), () => put(after));
   }
@@ -1368,6 +1501,7 @@
     if (ex === 'w') { const v = parseFloat(t.value); if (v > 0) setExp({ w: v }, T('Ancho: ', 'Width: ') + v + ' ' + ST.exp.unit); return; }
     if (ex === 'h') { const v = parseFloat(t.value); if (v > 0) setExp({ h: v }, T('Alto: ', 'Height: ') + v + ' ' + ST.exp.unit); return; }
     if (ex === 'hauto') { setExp({ h: t.checked ? 0 : +(ST.exp.unit === 'in' ? expH() / MM_IN : expH()).toFixed(2) }, t.checked ? T('Alto automático', 'Automatic height') : T('Alto propio', 'Own height')); return; }
+    if (ex === 'pv') { ST.pvOn = t.checked; save('nativePreview', ST.pvOn); if (ST.pvOn) { ST.pvKey = null; schedulePreview(0); } else { showNative(false); nativeTag(''); } return; }
     if (ex === 'unit') {
       const u = t.value, f = u === 'in' ? 1 / MM_IN : MM_IN;
       if (u === ST.exp.unit) return;
@@ -1788,6 +1922,18 @@
   async function pngWithDpi(blob, dpi) {
     const u8 = new Uint8Array(await blob.arrayBuffer());
     const ppm = Math.round(dpi / 0.0254);
+    for (let p = 8; p + 12 <= u8.length;) {
+      const len = ((u8[p] << 24) | (u8[p + 1] << 16) | (u8[p + 2] << 8) | u8[p + 3]) >>> 0;
+      const type = String.fromCharCode(u8[p + 4], u8[p + 5], u8[p + 6], u8[p + 7]);
+      if (type === 'pHYs' && len === 9) {
+        const out = u8.slice(), dv = new DataView(out.buffer);
+        dv.setUint32(p + 8, ppm); dv.setUint32(p + 12, ppm); out[p + 16] = 1;
+        dv.setUint32(p + 17, crc32(out.subarray(p + 4, p + 17)));
+        return new Blob([out], { type: 'image/png' });
+      }
+      if (type === 'IDAT' || type === 'IEND') break;
+      p += 12 + len;
+    }
     const ch = new Uint8Array(21), dv = new DataView(ch.buffer);
     dv.setUint32(0, 9); ch.set([0x70, 0x48, 0x59, 0x73], 4); dv.setUint32(8, ppm); dv.setUint32(12, ppm); ch[16] = 1;
     dv.setUint32(17, crc32(ch.subarray(4, 17)));
@@ -1928,6 +2074,21 @@
       const fmt = ST.exp.fmt, wmm = expW(), hmm = expH();
       const bg = bgColor();
       let blob, ext = fmt === 'tiff' ? 'tif' : fmt;
+      const N = ST.native, want = fmt === 'tiff' ? 'png' : fmt;
+      if (nativeCan(N, want)) {
+        /* la app vuelve a dibujar la figura a las medidas de salida */
+        say(T('Dibujando de nuevo con ', 'Drawing again with ') + (N.label || T('la app', 'the app')) + '…');
+        blob = asBlob(await N.render(want, nativeOpts(want)));
+        if (!blob) throw new Error(T('la app no devolvió la figura', 'the app did not return the figure'));
+        if (fmt === 'png') blob = await pngWithDpi(blob, ST.exp.dpi);
+        else if (fmt === 'tiff') blob = await tiffBlob(await blobCanvas(blob), ST.exp.dpi, ST.exp.bg === 'none');
+        const name = fileName(ext);
+        download(blob, name);
+        say(T('Exportada (dibujada de nuevo por ', 'Exported (drawn again by ') + (N.label || T('la app', 'the app')) + '): ' + name + ' (' + (blob.size / 1048576).toFixed(2) + ' MB)');
+        ring();
+        document.dispatchEvent(new CustomEvent('labg-figure-studio:export', { detail: { name, size: blob.size, format: fmt, native: true } }));
+        return;
+      }
       if (fmt === 'svg') {
         if (ST.rec.lib === 'svg') blob = new Blob([serialize(ST.el, { wmm, hmm, bg })], { type: 'image/svg+xml' });
         else {
@@ -1967,8 +2128,9 @@
     try {
       const k = Math.min(1, 4000 / expPx().w);
       const px = { w: Math.max(1, Math.round(expPx().w * Math.min(k, 300 / ST.exp.dpi))), h: Math.max(1, Math.round(expPx().h * Math.min(k, 300 / ST.exp.dpi))) };
-      const cv = await raster(px.w, px.h, bgColor() || '#ffffff');
-      const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+      let blob = null;
+      if (nativeCan(ST.native, 'png')) blob = asBlob(await ST.native.render('png', nativeOpts('png', Math.min(ST.exp.dpi, 300))));
+      if (!blob) { const cv = await raster(px.w, px.h, bgColor() || '#ffffff'); blob = await new Promise(r => cv.toBlob(r, 'image/png')); }
       if (!navigator.clipboard || !window.ClipboardItem) throw new Error(T('este navegador no deja copiar imágenes', 'this browser does not allow copying images'));
       await navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]);
       say(T('Imagen copiada (', 'Image copied (') + px.w + ' × ' + px.h + ' px)');
@@ -2048,7 +2210,7 @@
     open: el => open(el),
     close: () => close(),
     isOpen: () => ST.open,
-    figures: root => figures(root).map(r => ({ el: r.el, key: r.key, title: r.title, library: r.lib })),
+    figures: root => figures(root).map(r => ({ el: r.el, key: r.key, title: r.title, library: r.lib, native: !!nativeFor(r) })),
     adapters: ADAPTERS,
     palettes: PALETTES,
     presets: PRESETS,
