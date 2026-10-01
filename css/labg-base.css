@@ -326,15 +326,16 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
   background: var(--bg-soft); color: var(--text);
 }
 .step-btn:hover:not(:disabled) { background: var(--bg-soft); color: var(--text); }
+/* la barra de bloques va en el oro de la marca LABG, igual en todas las apps */
 .step-btn.active, .step-btn[aria-current="step"] {
-  background: var(--primary-soft); color: var(--primary-text); font-weight: 600;
-  border-color: rgba(var(--primary-rgb), 0.28);
+  background: var(--btn-oro-suave); color: var(--btn-oro-texto); font-weight: 600;
+  border-color: rgba(212, 168, 72, 0.45);
 }
-.step-btn.active .step-num, .step-btn[aria-current="step"] .step-num { background: var(--primary); color: var(--on-primary); }
-/* terminado: el número se vuelve una palomita */
-.step-btn.done .step-num { background: var(--success-soft); color: var(--success-text); font-size: 0; }
+.step-btn.active .step-num, .step-btn[aria-current="step"] .step-num { background: var(--btn-oro); color: var(--btn-oro-tinta); }
+/* terminado: el número se vuelve una palomita dorada */
+.step-btn.done .step-num { background: var(--btn-oro-suave); color: var(--btn-oro-texto); font-size: 0; box-shadow: inset 0 0 0 1px rgba(212, 168, 72, 0.45); }
 .step-btn.done .step-num::before { content: "✓"; font-size: var(--fs-xs); }
-.step-btn.done.active .step-num, .step-btn.done[aria-current="step"] .step-num { background: var(--primary); color: var(--on-primary); }
+.step-btn.done.active .step-num, .step-btn.done[aria-current="step"] .step-num { background: var(--btn-oro); color: var(--btn-oro-tinta); box-shadow: none; }
 /* con aviso: punto ámbar arriba a la derecha */
 .step-btn.warn::after {
   content: ""; position: absolute; top: 3px; left: 21px; width: 7px; height: 7px; border-radius: 50%;
