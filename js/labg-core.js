@@ -262,6 +262,61 @@
     },
   };
 
+  /* ---------------- «Reportar un problema» ----------------
+     Un ícono en la barra, junto a la ayuda: abre un reporte (issue) en el repositorio de la app en GitHub con una
+     plantilla y los datos que ayudan a repetir el problema (app, bloque, navegador, pantalla). No envía nada solo:
+     la persona lo revisa y decide publicarlo (GitHub pide una cuenta gratuita). LABG.REPO es el repositorio de esta app;
+     sin él se usa <meta name="labg-repo">, la dirección en GitHub Pages o, al final, el repositorio del portal. */
+  LABG.REPO = LABG.REPO || 'BioModellingPro';
+  LABG.reportUrl = function () {
+    const meta = document.querySelector('meta[name="labg-repo"]');
+    let repo = LABG.REPO || (meta && meta.content) || '';
+    if (!repo && /\.github\.io$/.test(location.hostname)) repo = location.pathname.split('/')[1] || '';
+    if (!repo) repo = 'luisangelbg.github.io';
+    const en = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
+    const app = (document.title.split(/\s+[—–·|-]\s+/)[0] || repo).trim();
+    const act = document.querySelector('.step-btn[aria-current="step"], .step-btn.active, .nav-link[aria-current="page"], [aria-current="step"]');
+    const blk = act ? (act.innerText || act.textContent).replace(/\s+/g, ' ').replace(/^[^\p{L}]+/u, '').trim() : '';
+    const datos = (en ? 'App: ' : 'App: ') + app + (blk ? (en ? ' · Block: ' : ' · Bloque: ') + blk : '') + '\n' +
+      (en ? 'Browser: ' : 'Navegador: ') + navigator.userAgent + '\n' +
+      (en ? 'Screen: ' : 'Pantalla: ') + screen.width + '×' + screen.height + (en ? ' · Language: ' : ' · Idioma: ') + (navigator.language || '');
+    const body = en
+      ? '**What happened?**\n\n\n**What did you expect to happen?**\n\n\n**Steps to reproduce** (block, example data or a short description of your data):\n1. \n\n---\n' + datos
+      : '**¿Qué pasó?**\n\n\n**¿Qué esperabas que pasara?**\n\n\n**Pasos para repetirlo** (bloque, datos de ejemplo o una descripción breve de tus datos):\n1. \n\n---\n' + datos;
+    return 'https://github.com/luisangelbg/' + repo + '/issues/new?title=' + encodeURIComponent('[' + app + '] ') + '&body=' + encodeURIComponent(body);
+  };
+  function addReportLink() {
+    if (document.querySelector('.labg-report')) return true;
+    const suite = document.querySelector('.suite-link');
+    if (!suite || !suite.parentElement) return false;
+    const tools = suite.parentElement;
+    const a = document.createElement('a');
+    a.className = 'icon-btn labg-report'; a.target = '_blank'; a.rel = 'noopener';
+    a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.6A2.6 2.6 0 0 1 6.6 3h10.8A2.6 2.6 0 0 1 20 5.6v7.8a2.6 2.6 0 0 1-2.6 2.6H11l-4.6 4v-4h0A2.6 2.6 0 0 1 4 13.4z"/><path d="M12 6.8v4.2M12 13.6h.01"/></svg>';
+    const label = () => {
+      const en = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
+      const t = en ? 'Report a problem' : 'Reportar un problema';
+      a.title = t; a.setAttribute('aria-label', t + (en ? ' (opens GitHub in a new tab)' : ' (abre GitHub en otra pestaña)'));
+    };
+    label();
+    new MutationObserver(label).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    /* el enlace se arma al usarlo: así lleva el bloque en el que está la persona */
+    const refresh = () => { a.href = LABG.reportUrl(); };
+    refresh();
+    a.addEventListener('pointerdown', refresh); a.addEventListener('focus', refresh); a.addEventListener('click', refresh);
+    const help = tools.querySelector('#helpBtn');
+    if (help && help.parentElement === tools) tools.insertBefore(a, help); else tools.appendChild(a);
+    return true;
+  }
+  /* algunas apps arman su barra con JavaScript: se espera a que aparezca el enlace «LABG Suite» */
+  function initReport() {
+    if (addReportLink()) return;
+    const mo = new MutationObserver(() => { if (addReportLink()) mo.disconnect(); });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+    setTimeout(() => mo.disconnect(), 15000);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initReport); else initReport();
+
   /* ---------------- isotipo LABG (el hexágono dorado con el cubo de datos) ----------------
      LABG.isotipo(clase) devuelve el ícono en vector, con ids propios en cada copia para que
      varias puedan convivir en la página. El cubo lleva la clase iso-cubo y el brillo que lo cruza, iso-brillo. */
