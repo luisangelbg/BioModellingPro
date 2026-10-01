@@ -57,6 +57,16 @@
   /* texto en color de acento: el acento oscurecido para llegar a 4.5:1 en claro */
   --accent-text: color-mix(in srgb, var(--accent) 68%, #000);
 
+  /* botones: el oro de la marca LABG, igual en todas las apps (el color propio de cada app sigue en lo demás) */
+  --btn-oro: #D4A848;               /* relleno del botón principal; con texto negro, 8.5:1 */
+  --btn-oro-hover: #E0B85C;
+  --btn-oro-tinta: #111111;         /* texto sobre el oro */
+  --btn-oro-texto: #7D5B14;         /* texto dorado sobre la tarjeta: 6:1 en claro */
+  --btn-oro-suave: rgba(212, 168, 72, 0.14);
+  --btn-negro: #111111;             /* segundo botón de relleno: negro con letras de oro */
+  --btn-negro-hover: #2A2620;
+  --btn-negro-texto: #E6C470;
+
   /* estados: el tono de relleno (bordes, iconos) y el de texto (≥ 4.5:1) */
   --success: #2f8f4a;  --success-text: #1d6b34;  --success-soft: #e7f5eb;
   --warning: #c27c0e;  --warning-text: #8a5300;  --warning-soft: #fdf3e1;
@@ -117,6 +127,8 @@
     --on-primary: #0e121c;
     --accent-rgb: 235, 169, 92; --accent: #eba95c;
     --accent-text: var(--accent);
+    --btn-oro-texto: #E6C470; --btn-oro-suave: rgba(230, 196, 112, 0.14);
+    --btn-negro: #2B2721; --btn-negro-hover: #3A342B; --btn-negro-texto: #F1D58E;
     --success: #5cc27a; --success-text: #7fd497; --success-soft: rgba(92, 194, 122, 0.13);
     --warning: #f0b24a; --warning-text: #f5c56f; --warning-soft: rgba(240, 178, 74, 0.13);
     --danger:  #f07166; --danger-text:  #f59189; --danger-soft:  rgba(240, 113, 102, 0.13);
@@ -137,6 +149,8 @@
   --on-primary: #0e121c;
   --accent-rgb: 235, 169, 92; --accent: #eba95c;
   --accent-text: var(--accent);
+  --btn-oro-texto: #E6C470; --btn-oro-suave: rgba(230, 196, 112, 0.14);
+  --btn-negro: #2B2721; --btn-negro-hover: #3A342B; --btn-negro-texto: #F1D58E;
   --success: #5cc27a; --success-text: #7fd497; --success-soft: rgba(92, 194, 122, 0.13);
   --warning: #f0b24a; --warning-text: #f5c56f; --warning-soft: rgba(240, 178, 74, 0.13);
   --danger:  #f07166; --danger-text:  #f59189; --danger-soft:  rgba(240, 113, 102, 0.13);
@@ -372,12 +386,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
 /* el atributo hidden manda aunque la regla de arriba fije display */
 .btn[hidden], .icon-btn[hidden], .seg[hidden], .suite-link[hidden], .step-btn[hidden] { display: none !important; }
 .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
-.btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 1px 2px rgba(var(--primary-rgb), .3); }
-.btn-primary:hover:not(:disabled) { background: var(--primary-dark); color: var(--on-primary); }
+.btn-primary { background: var(--btn-oro); color: var(--btn-oro-tinta); box-shadow: 0 1px 2px rgba(125, 91, 20, .3); }
+.btn-primary:hover:not(:disabled) { background: var(--btn-oro-hover); color: var(--btn-oro-tinta); }
 .btn-secondary { background: var(--card-bg); color: var(--text); border-color: var(--border-strong); }
-.btn-secondary:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-text); }
-.btn-ghost { background: transparent; color: var(--primary-text); }
-.btn-ghost:hover:not(:disabled) { background: var(--primary-soft); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--btn-oro); color: var(--btn-oro-texto); }
+.btn-ghost { background: transparent; color: var(--btn-oro-texto); }
+.btn-ghost:hover:not(:disabled) { background: var(--btn-oro-suave); }
+.btn-accent { background: var(--btn-negro); color: var(--btn-negro-texto); border-color: rgba(212, 168, 72, .5); }
+.btn-accent:hover:not(:disabled) { background: var(--btn-negro-hover); color: var(--btn-negro-texto); }
 .btn-danger { background: var(--danger-soft); color: var(--danger-text); border-color: rgba(196, 58, 47, .35); }
 .btn-danger:hover:not(:disabled) { background: var(--danger); color: var(--bg); }
 .btn-sm { min-height: 30px; padding: 4px 10px; font-size: var(--fs-sm); border-radius: 8px; }
