@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.3.0 (módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.3.1 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -62,7 +62,7 @@
 (function () {
   'use strict';
   if (window.LABGFigureStudio && window.LABGFigureStudio.version) return;
-  const VERSION = '1.3.0';
+  const VERSION = '1.3.1';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -820,19 +820,33 @@
       case 'below': {
         /* debajo de todo lo demás, en fila (y en varias si no cabe), centrada en la gráfica */
         const bottom = Math.max.apply(null, [P.y + P.h].concat(others().filter(o => o.y > P.y + P.h * 0.5).map(o => o.y + o.h)));
-        let ent = lg.entries && lg.entries.length > 1 ? lg.entries.slice() : null;
+        let ent = lg.entries && lg.entries.length > 1 ? lg.entries.slice() : null, frames = [];
         if (ent) {
-          /* el título va al principio de la fila, como en las revistas */
+          /* lo que no es una entrada (en una leyenda marcada, lo que hay dentro de su grupo): títulos, notas y marco */
           const inE = new Set(); ent.forEach(e => e.nodes.forEach(n => inE.add(n)));
-          const ttl = lg.els.filter(n => !inE.has(n) && n.tagName.toLowerCase() === 'text');
-          const tb = ttl.length ? uni(ttl.map(n => rootBox(svg, n, Mi))) : null;
-          if (tb) ent = [{ nodes: ttl, box: tb, title: true }].concat(ent);
+          const tag = n => n.tagName.toLowerCase(), ex = lg.extra || [];
+          const rest = (lg.tagged ? $$('text, ' + SHAPES, lg.els[0]) : lg.els)
+            .filter(n => !inE.has(n) && ex.indexOf(n) < 0 && tag(n) !== 'g' && !n.closest(LEG_SKIP))
+            .map(n => ({ n, b: rootBox(svg, n, Mi) })).filter(o => o.b);
+          /* el marco ya no la rodea en la fila: se esconde */
+          frames = rest.filter(o => tag(o.n) === 'rect' && o.b.w >= b.w * 0.8 && o.b.h >= b.h * 0.8).map(o => o.n).concat(ex);
+          if (rest.some(o => tag(o.n) !== 'text' && frames.indexOf(o.n) < 0)) ent = null;   /* trae algo más (una barra de color, por ejemplo): baja entera */
+          else {
+            /* el título va al principio de la fila, como en las revistas; una nota de debajo de las entradas, al final */
+            const top = Math.min.apply(null, ent.map(e => e.box.y)), left = Math.min.apply(null, ent.map(e => e.box.x));
+            const txt = rest.filter(o => tag(o.n) === 'text');
+            const head = txt.filter(o => o.b.y + o.b.h <= top + 1 || o.b.x + o.b.w <= left + 1), tail = txt.filter(o => head.indexOf(o) < 0);
+            if (head.length) ent = [{ nodes: head.map(o => o.n), box: uni(head.map(o => o.b)), title: true }].concat(ent);
+            if (tail.length) ent = ent.concat([{ nodes: tail.map(o => o.n), box: uni(tail.map(o => o.b)), title: true }]);
+          }
+        }
+        if (ent) {
           const fsz = Math.max.apply(null, ent.map(e => e.box.h)) || 10, gap = fsz * 1.2, maxW = Math.max(P.w, (V ? V.w : P.w) * 0.9);
           const lines = [[]];
           let cx = 0;
           ent.forEach(e => { if (cx > 0 && cx + e.box.w > maxW) { lines.push([]); cx = 0; } lines[lines.length - 1].push(e); cx += e.box.w + gap; });
           const lh = fsz * 1.5, widths = lines.map(l => l.reduce((s, e) => s + e.box.w, 0) + gap * (l.length - 1));
-          row = { lines, gap, lh, w: Math.max.apply(null, widths), h: lines.length * lh, widths };
+          row = { lines, gap, lh, w: Math.max.apply(null, widths), h: lines.length * lh, widths, frames };
           X = P.x + (P.w - row.w) / 2; Y = bottom + pad * 2;
         } else { X = P.x + (P.w - b.w) / 2; Y = bottom + pad * 2; }
         const h = row ? row.h : b.h;
@@ -844,10 +858,7 @@
     X += L.ox || 0; Y += L.oy || 0;
     if (row) {
       /* cada entrada a su lugar en la fila (el título, la primera); el marco ya no la rodea: se esconde */
-      const inEnt = new Set(); row.lines.forEach(l => l.forEach(e => e.nodes.forEach(n => inEnt.add(n))));
-      const rest = lg.els.filter(n => !inEnt.has(n) && n.tagName.toLowerCase() !== 'g');
-      const frames = rest.filter(n => n.tagName.toLowerCase() === 'rect').concat(lg.extra || []);
-      frames.forEach(n => { keep(n, 'display'); n.style.setProperty('display', 'none'); });
+      row.frames.forEach(n => { keep(n, 'display'); n.style.setProperty('display', 'none'); });
       row.lines.forEach((l, i) => {
         let cx = X + (row.w - row.widths[i]) / 2;
         l.forEach(e => { moveNodes(svg, Mi, e.nodes, cx - e.box.x, Y + i * row.lh + (row.lh - e.box.h) / 2 - e.box.y); cx += e.box.w + row.gap; });
