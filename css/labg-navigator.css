@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.0.2 (hoja de estilo del módulo compartido)
+/* LABG Suite — Navegador LABG v1.1.0 (hoja de estilo del módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán — GPL-3.0 (ver LICENSE).
 
    Identidad: oro y negro de la marca LABG. Títulos de bloque en «LABG Serif»
@@ -148,6 +148,12 @@ html.lnav-rail .lnav-sbtn { justify-content: center; padding: 6px 0; }
 .lnav-blocktitle em { font-style: normal; color: var(--lnav-oro-texto); }
 .lnav-c-sec { min-width: 0; }
 .lnav-c-sec span { color: var(--lnav-oro-texto); font-weight: 600; overflow: hidden; text-overflow: ellipsis; max-width: 38ch; }
+.lnav-c-tab { min-width: 0; flex: 0 1 auto; }
+.lnav-c-tab span { color: var(--lnav-ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; max-width: 26ch; }
+/* con pestaña, el nombre del bloque no se recorta y la sección cede primero */
+.lnav-c-block:has(+ .lnav-c-tab) { flex-shrink: 0; }
+.lnav-c-tab + .lnav-c-sec { flex-shrink: 3; }
+.lnav-c-tab + .lnav-c-sec span { max-width: 24ch; }
 .lnav-seg { display: inline-flex; padding: 2px; border-radius: 999px; border: 1px solid var(--lnav-line2); background: var(--lnav-soft); }
 .lnav-seg button {
   display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: var(--lnav-muted);
@@ -238,6 +244,18 @@ html.lnav-focus.lnav-has-secs .lnav-secbtn { display: none; }
 .lnav-tfold .lnav-i { transition: transform var(--dur, 180ms); }
 .lnav-ti.is-folded .lnav-tfold .lnav-i { transform: rotate(-90deg); }
 @media (hover: none) { .lnav-tbtn { opacity: 1; } }
+/* pestañas dentro del bloque: cada una en el índice y, debajo de la abierta, sus secciones */
+.lnav-tab-ico { width: 14px; height: 14px; flex: none; margin-top: 2px; color: var(--lnav-line2); }
+.lnav-tab-i .lnav-tlink { color: var(--lnav-ink); font-weight: 600; }
+.lnav-tab-i .lnav-tlink:hover { color: var(--lnav-oro-texto); }
+.lnav-tab-i.is-open .lnav-tab-ico { color: var(--lnav-oro); }
+.lnav-tab-i.is-open + .lnav-sub { margin-top: -2px; }
+.lnav-ti.lnav-sub .lnav-tlink { padding-left: 35px; font-size: 12.5px; }
+.lnav-ti.lnav-sub + .lnav-tab-i { margin-top: 4px; }
+.lnav-secmenu .lnav-tab-i button { font-weight: 600; }
+.lnav-secmenu .lnav-tab-i .lnav-i { width: 15px; height: 15px; flex: none; color: var(--lnav-muted); }
+.lnav-secmenu .lnav-tab-i.is-open .lnav-i { color: var(--lnav-oro); }
+.lnav-secmenu .lnav-sub button { padding-left: 34px; font-size: 13px; }
 
 /* ---------------- secciones: modo enfocado y plegadas ---------------- */
 .lnav-sec-head { scroll-margin-top: calc(var(--lnav-top) + var(--lnav-bar-h) + 14px); }
@@ -306,6 +324,8 @@ html.lnav-has-toc .lnav-float { right: calc(var(--lnav-toc-w) + 30px); }
   .lnav-crumbs .lnav-c-app { display: none; }
   .lnav-crumbs .lnav-c-block .lnav-sep:first-child { display: none; }
   .lnav-c-sec span { max-width: 24ch; }
+  .lnav-c-tab span { max-width: 18ch; }
+  .lnav-crumbs .lnav-c-tab + .lnav-c-sec { display: none; }
 }
 .lnav-tab {
   flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; max-width: 96px; height: 52px; padding: 4px 6px;
@@ -319,7 +339,7 @@ html.lnav-has-toc .lnav-float { right: calc(var(--lnav-toc-w) + 30px); }
 .lnav-tab.is-lock .lnav-num { background: transparent; border: 1px dashed var(--lnav-line2); color: var(--lnav-muted); }
 @media (max-width: 560px) {
   .lnav-blocktitle { font-size: 15px; }
-  .lnav-crumbs .lnav-c-sec { display: none; }
+  .lnav-crumbs .lnav-c-sec, .lnav-crumbs .lnav-c-tab { display: none; }
   .lnav-pend span { display: none; }
   .lnav-pend { padding: 0 9px; }
   .lnav-secbtn-t { display: none; }

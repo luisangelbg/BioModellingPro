@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.0.2 (módulo compartido)
+/* LABG Suite — Navegador LABG v1.1.0 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -25,6 +25,9 @@
                   siempre a la vista en la ruta de arriba;
                   «Enfocado»: una sección a la vez, con Anterior / Siguiente
                   y Alt+← / Alt+→.
+                  Si la app tiene pestañas dentro de un bloque (opción tabs),
+                  el índice muestra las pestañas y, debajo de la abierta, sus
+                  secciones; la ruta y la paleta también las nombran.
      3. Comandos  paleta con Ctrl+K: busca bloques, secciones, controles,
                   figuras y acciones, con los recientes primero.
 
@@ -48,7 +51,7 @@
 (function () {
   'use strict';
   if (window.LABGNavigator && window.LABGNavigator.version) return;
-  const VERSION = '1.0.2';
+  const VERSION = '1.1.0';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -111,6 +114,7 @@
     "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/>",
     "zap": "<path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"/>",
     "table-of-contents": "<path d=\"M16 5H3\"/><path d=\"M16 12H3\"/><path d=\"M16 19H3\"/><path d=\"M21 5h.01\"/><path d=\"M21 12h.01\"/><path d=\"M21 19h.01\"/>",
+    "panel-top": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M3 9h18\"/>",
   };
   const ico = (n, cls) => '<svg class="lnav-i' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (ICONOS[n] || '') + '</svg>';
 
@@ -159,6 +163,11 @@
     hash: true,         /* enlaces #bN/seccion */
     noToc: [],          /* bloques sin índice de secciones (tienen su propio índice) */
     minSections: 2,
+    /* pestañas dentro de un bloque (la app dibuja solo la abierta): */
+    tabs: null,         /* selector de su lista [role="tablist"] dentro del panel; null: el bloque no tiene pestañas */
+    tabsOf: null,       /* n => [{ id, label }]: las pestañas de cualquier bloque, para la paleta (opcional) */
+    goTab: null,        /* (n, id) => abre esa pestaña de ese bloque (opcional) */
+    tabLink: null,      /* (n, id) => '#…': el enlace directo a una pestaña (opcional) */
   };
   /* lo propio de cada app (lo demás lo encuentra solo) */
   const PERFILES = {
@@ -166,6 +175,11 @@
       sidebar: false, hash: false,
       panel: () => document.getElementById('view'),
       blockHead: '.page-head, .crumb',
+      /* cada módulo tiene pestañas; la app da sus nombres, cómo abrirlas y el enlace #/módulo/pestaña */
+      tabs: '.module-body [role="tablist"]',
+      tabsOf: n => (window.App && App.tabs ? App.tabs(n) : null),
+      goTab: (n, id) => { if (window.App && App.goTab) App.goTab(n, id); },
+      tabLink: (n, id) => (window.App && App.tabHash ? App.tabHash(n, id) : null),
     },
     leafpro: { noToc: ['5'] },                  /* el atlas ya tiene su índice de categorías */
     biomodellingpro: {},
@@ -184,7 +198,10 @@
     mode: load('mode', 'doc') === 'focus' ? 'focus' : 'doc',
     rail: load('rail', null),          /* null: lo decide el ancho de la pantalla */
     block: null,                       /* data-step del bloque activo */
-    secs: [],                          /* secciones del bloque activo */
+    tabs: [],                          /* pestañas del bloque activo (si la app las tiene) */
+    tabKey: null,                      /* bloque y pestaña abiertos, para saber cuándo cambian */
+    tabScroll: false,                  /* al cambiar de pestaña desde el índice, subir a la lista de pestañas */
+    secs: [],                          /* secciones del bloque activo (de su pestaña abierta) */
     cur: 0,                            /* sección activa (índice) */
     focusIdx: {},                      /* sección elegida por bloque en modo enfocado */
     folded: load('fold', {}),          /* { bloque: [id de sección, …] } */
@@ -314,6 +331,56 @@
     if (!F || !F.figures) return [];
     try { return F.figures().filter(f => sec.nodes.some(n => n.contains(f.el))); } catch (e) { return []; }
   };
+
+  /* ---------------- pestañas dentro del bloque ---------------- */
+  /* las pestañas que da la app para un bloque (para nombres y para la paleta) */
+  function tabsOf(n) {
+    if (typeof CFG.tabsOf !== 'function') return null;
+    try { const l = CFG.tabsOf(n); return Array.isArray(l) ? l.filter(x => x && x.id != null) : null; } catch (e) { return null; }
+  }
+  /* las del bloque activo, leídas de su lista: id (data-tab o el final del id del botón), nombre y la abierta */
+  function detectTabs(p) {
+    if (!CFG.tabs || !p) return [];
+    let list = null;
+    try { list = $$(CFG.tabs, p).find(shown) || null; } catch (e) { list = null; }
+    if (!list) return [];
+    const named = tabsOf(S.block) || [];
+    return $$('[role="tab"]', list).filter(shown).map((b, i) => {
+      const id = b.dataset.tab || (b.id ? b.id.replace(/^[a-z]*tab-/i, '') : '') || String(i);
+      const own = named.find(x => String(x.id) === id);
+      return { id, label: (own && own.label) || textOf(b), el: b, on: b.getAttribute('aria-selected') === 'true' };
+    });
+  }
+  const curTab = () => S.tabs.find(x => x.on) || null;
+  const hasTabs = () => S.tabs.length >= 2;
+  /* ¿hay índice que mostrar? (secciones de sobra, o pestañas) */
+  const tocWorthy = () => (hasTabs() || S.secs.length >= CFG.minSections) && CFG.noToc.indexOf(String(S.block)) < 0;
+  /* abre una pestaña: la del bloque activo con su propio botón; la de otro bloque, como diga la app */
+  function goTab(n, id) {
+    n = String(n);
+    if (n === String(S.block)) {
+      const tb = S.tabs.find(x => x.id === String(id));
+      if (tb) {
+        if (tb.on) { scrollToTabs(); return true; }
+        S.tabScroll = true;
+        tb.el.click();
+        return true;
+      }
+    }
+    if (typeof CFG.goTab === 'function') { try { CFG.goTab(n, id); return true; } catch (e) { console.error(e); } }
+    if (!goBlock(n)) return false;
+    setTimeout(() => { const tb = S.tabs.find(x => x.id === String(id)); if (tb && !tb.on) { S.tabScroll = true; tb.el.click(); } }, 420);
+    return true;
+  }
+  /* sube hasta la lista de pestañas si quedó arriba de la vista */
+  function scrollToTabs() {
+    const tb = curTab() || S.tabs[0];
+    const list = tb && tb.el.closest('[role="tablist"]');
+    if (!list) return;
+    const top = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--lnav-top'), 10) || 0;
+    const y = window.scrollY + list.getBoundingClientRect().top - top - (bar ? bar.offsetHeight : 44) - 12;
+    if (list.getBoundingClientRect().top < top + (bar ? bar.offsetHeight : 44)) window.scrollTo({ top: Math.max(0, y), behavior: reduced() ? 'auto' : 'smooth' });
+  }
 
   /* ---------------- construcción de la interfaz ---------------- */
   let side, bar, crumbs, toc, tocList, floatBox, tabs, pager, pal, pendingBtn, chips, progress;
@@ -492,46 +559,65 @@
     const sec = S.secs[S.cur];
     const parts = ['<li class="lnav-c-app"><span>' + esc(APP_NAME) + '</span></li>'];
     if (s) parts.push('<li class="lnav-c-block">' + ico('chevron-right', 'lnav-sep') + '<span class="lnav-blocktitle">' + (s.num && /\d/.test(s.num) ? '<em>' + esc(s.num) + '</em> ' : '') + esc(s.label) + '</span></li>');
-    if (sec && S.secs.length > 1) parts.push('<li class="lnav-c-sec" aria-current="location">' + ico('chevron-right', 'lnav-sep') + '<span>' + esc(sec.title) + '</span></li>');
+    const tb = hasTabs() ? curTab() : null;
+    if (tb) parts.push('<li class="lnav-c-tab">' + ico('chevron-right', 'lnav-sep') + '<span>' + esc(tb.label) + '</span></li>');
+    /* la sección (si no se llama igual que la pestaña) */
+    if (sec && S.secs.length > 1 && !(tb && fold(sec.title) === fold(tb.label))) parts.push('<li class="lnav-c-sec" aria-current="location">' + ico('chevron-right', 'lnav-sep') + '<span>' + esc(sec.title) + '</span></li>');
     const html = parts.join('');
     if (crumbs.innerHTML !== html) crumbs.innerHTML = html;
   }
 
   function paintToc() {
-    const many = S.secs.length >= CFG.minSections && CFG.noToc.indexOf(String(S.block)) < 0;
+    const secsOk = S.secs.length >= CFG.minSections && CFG.noToc.indexOf(String(S.block)) < 0;
+    const many = tocWorthy();
     const folded = S.folded[S.block] || [];
-    const html = many ? S.secs.map((s, i) => {
+    const secLi = (s, i) => {
       const st = stateOf(s);
       const figs = figsIn(s).length;
       const f = folded.indexOf(s.id) >= 0;
-      return '<li class="lnav-ti' + (i === S.cur ? ' on' : '') + (st ? ' is-' + st : '') + (f ? ' is-folded' : '') + '" data-i="' + i + '">' +
+      return '<li class="lnav-ti' + (hasTabs() ? ' lnav-sub' : '') + (i === S.cur ? ' on' : '') + (st ? ' is-' + st : '') + (f ? ' is-folded' : '') + '" data-i="' + i + '">' +
         '<button type="button" class="lnav-tlink" data-act="go"' + (i === S.cur ? ' aria-current="location"' : '') + '><span class="lnav-dot" aria-hidden="true"></span><span class="lnav-tt">' + esc(s.title) + '</span>' +
         (st === 'pending' ? '<span class="sr-only">' + esc(T(' (espera un paso anterior)', ' (waits for an earlier step)')) + '</span>' : '') + '</button>' +
         (figs ? '<button type="button" class="lnav-tbtn" data-act="studio" title="' + esc(T('Abrir en el estudio de figuras', 'Open in the figure studio')) + '" aria-label="' + esc(T('Abrir en el estudio de figuras: ', 'Open in the figure studio: ') + s.title) + '">' + ico('pencil-ruler') + '</button>' : '') +
         '<button type="button" class="lnav-tbtn lnav-tfold" data-act="fold" aria-expanded="' + (!f) + '" title="' + esc(f ? T('Expandir esta sección', 'Expand this section') : T('Contraer esta sección', 'Collapse this section')) + '" aria-label="' + esc((f ? T('Expandir: ', 'Expand: ') : T('Contraer: ', 'Collapse: ')) + s.title) + '">' + ico('chevron-down') + '</button></li>';
-    }).join('') : '';
+    };
+    /* con pestañas: cada una en el índice y, debajo de la abierta, sus secciones */
+    const tabLi = tb => '<li class="lnav-ti lnav-tab-i' + (tb.on ? ' is-open' : '') + '" data-tab="' + esc(tb.id) + '">' +
+      '<button type="button" class="lnav-tlink" data-act="tab"' + (tb.on ? ' aria-current="true"' : '') + ' title="' + esc(tb.on ? T('Pestaña abierta: ', 'Open tab: ') + tb.label : T('Abrir la pestaña ', 'Open the tab ') + tb.label) + '">' +
+      ico('panel-top', 'lnav-tab-ico') + '<span class="lnav-tt">' + esc(tb.label) + '</span></button></li>' +
+      (tb.on && secsOk ? S.secs.map(secLi).join('') : '');
+    const html = !many ? '' : hasTabs() ? S.tabs.map(tabLi).join('') : S.secs.map(secLi).join('');
     if (tocList.innerHTML !== html) tocList.innerHTML = html;
-    $('.lnav-toc-count', toc).textContent = many ? String(S.secs.length) : '';
+    const cnt = $('.lnav-toc-count', toc);
+    cnt.textContent = many ? String(hasTabs() ? S.tabs.length : S.secs.length) : '';
+    cnt.title = !many ? '' : hasTabs() ? T(S.tabs.length + ' pestañas', S.tabs.length + ' tabs') : T(S.secs.length + ' secciones', S.secs.length + ' sections');
     document.documentElement.classList.toggle('lnav-has-secs', many);
     /* fichas del modo enfocado y menú de secciones (pantallas angostas) */
-    const ch = many ? S.secs.map((s, i) => '<button type="button" role="tab" class="lnav-chip' + (i === S.cur ? ' on' : '') + (stateOf(s) === 'pending' ? ' is-pending' : '') + '" data-i="' + i + '" aria-selected="' + (i === S.cur) + '"><b>' + (i + 1) + '</b>' + esc(s.title.replace(/^\d+(?:[.,]\d+)*[a-z]?\s*[·.:\-–]\s*/i, '')) + '</button>').join('') : '';
+    const ch = secsOk ? S.secs.map((s, i) => '<button type="button" role="tab" class="lnav-chip' + (i === S.cur ? ' on' : '') + (stateOf(s) === 'pending' ? ' is-pending' : '') + '" data-i="' + i + '" aria-selected="' + (i === S.cur) + '"><b>' + (i + 1) + '</b>' + esc(s.title.replace(/^\d+(?:[.,]\d+)*[a-z]?\s*[·.:\-–]\s*/i, '')) + '</button>').join('') : '';
     if (chips.innerHTML !== ch) chips.innerHTML = ch;
     chips.setAttribute('aria-label', T('Secciones del bloque', 'Sections of the block'));
     const menu = $('.lnav-secmenu', bar);
-    menu.innerHTML = many ? '<ol>' + S.secs.map((s, i) => '<li><button type="button" data-i="' + i + '"' + (i === S.cur ? ' aria-current="location"' : '') + '><span class="lnav-dot is-' + (stateOf(s) || 'none') + '"></span>' + esc(s.title) + '</button></li>').join('') + '</ol>' : '';
-    $('.lnav-secbtn', bar).hidden = !many;
+    const mSec = (s, i) => '<li' + (hasTabs() ? ' class="lnav-sub"' : '') + '><button type="button" data-i="' + i + '"' + (i === S.cur ? ' aria-current="location"' : '') + '><span class="lnav-dot is-' + (stateOf(s) || 'none') + '"></span>' + esc(s.title) + '</button></li>';
+    const mTab = tb => '<li class="lnav-tab-i' + (tb.on ? ' is-open' : '') + '"><button type="button" data-tab="' + esc(tb.id) + '"' + (tb.on ? ' aria-current="true"' : '') + '>' + ico('panel-top', 'lnav-tab-ico') + esc(tb.label) + '</button></li>' +
+      (tb.on && secsOk ? S.secs.map(mSec).join('') : '');
+    menu.innerHTML = many ? '<ol>' + (hasTabs() ? S.tabs.map(mTab).join('') : S.secs.map(mSec).join('')) + '</ol>' : '';
+    const sb = $('.lnav-secbtn', bar);
+    sb.hidden = !many;
+    $('.lnav-secbtn-t', bar).textContent = hasTabs() ? T('Pestañas', 'Tabs') : T('Secciones', 'Sections');
+    sb.title = hasTabs() ? T('Pestañas y secciones de este bloque', 'Tabs and sections of this block') : T('Secciones de este bloque', 'Sections of this block');
+    sb.setAttribute('aria-label', sb.title);
     paintFold();
   }
 
   function paintActive() {
-    $$('.lnav-ti', tocList).forEach((li, i) => {
-      const on = i === S.cur;
+    $$('.lnav-ti[data-i]', tocList).forEach(li => {
+      const on = +li.dataset.i === S.cur;
       li.classList.toggle('on', on);
       const a = li.querySelector('.lnav-tlink');
       if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
     });
     $$('.lnav-chip', chips).forEach((c, i) => { c.classList.toggle('on', i === S.cur); c.setAttribute('aria-selected', String(i === S.cur)); });
-    const on = $('.lnav-ti.on', tocList);
+    const on = $('.lnav-ti.on', tocList) || $('.lnav-tab-i.is-open', tocList);
     if (on && toc.scrollHeight > toc.clientHeight) {
       const r = on.getBoundingClientRect(), tr = toc.getBoundingClientRect();
       if (r.top < tr.top + 40 || r.bottom > tr.bottom - 10) toc.scrollTop += r.top - tr.top - tr.height / 3;
@@ -570,8 +656,8 @@
   function paintFold() {
     const b = $('[data-lnav="foldall"]', bar);
     if (!b) return;
-    const f = (S.folded[S.block] || []).length;
-    const all = S.secs.length && f >= S.secs.length;
+    const fl = S.folded[S.block] || [];
+    const all = S.secs.length && S.secs.every(s => fl.indexOf(s.id) >= 0);
     b.innerHTML = ico(all ? 'chevrons-up-down' : 'chevrons-down-up');
     const t = all ? T('Expandir todas las secciones', 'Expand every section') : T('Contraer todas las secciones', 'Collapse every section');
     b.title = t; b.setAttribute('aria-label', t);
@@ -656,6 +742,12 @@
   function refresh(keepCur) {
     const p = activePanel();
     const prevId = S.secs[S.cur] && S.secs[S.cur].id;
+    S.tabs = detectTabs(p);
+    /* otra pestaña: sus secciones empiezan desde la primera */
+    const tk = S.block + '|' + (curTab() ? curTab().id : '');
+    const tabMoved = S.tabKey != null && S.tabKey !== tk && String(S.tabKey).split('|')[0] === String(S.block);
+    S.tabKey = tk;
+    if (tabMoved) { keepCur = false; S.focusIdx[S.block] = 0; emit('tab', { block: S.block, tab: curTab() ? curTab().id : null }); }
     S.secs = detect(p);
     let i = keepCur && prevId ? S.secs.findIndex(s => s.id === prevId) : -1;
     if (S.mode === 'focus' && i < 0) i = Math.min(S.focusIdx[S.block] || 0, Math.max(0, S.secs.length - 1));
@@ -677,6 +769,7 @@
       mo.observe(p, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'hidden', 'open'] });
     }
     if (S.pendingSec) { const id = S.pendingSec; if (gotoSection(id, true)) S.pendingSec = null; }
+    if (S.tabScroll && tabMoved) { S.tabScroll = false; scrollToTabs(); }
   }
 
   function onBlockChange(n) {
@@ -698,7 +791,7 @@
     const w = window.innerWidth;
     const mobile = w < 1024;
     root.classList.toggle('lnav-mobile', mobile);
-    const hasToc = !mobile && w >= 1200 && S.mode === 'doc' && S.secs.length >= CFG.minSections && CFG.noToc.indexOf(String(S.block)) < 0;
+    const hasToc = !mobile && w >= 1200 && S.mode === 'doc' && tocWorthy();
     root.classList.toggle('lnav-has-toc', hasToc);
     paintRail();
     measure();
@@ -843,9 +936,11 @@
     announce(k >= 0 ? T('Sección expandida: ', 'Section expanded: ') + s.title : T('Sección contraída: ', 'Section collapsed: ') + s.title);
   }
   function foldAll() {
-    const fl = S.folded[S.block] || [];
-    const all = S.secs.length && fl.length >= S.secs.length;
-    S.folded[S.block] = all ? [] : S.secs.map(s => s.id);
+    /* solo las secciones a la vista (con pestañas, las de las otras se quedan como estaban) */
+    const ids = S.secs.map(s => s.id);
+    const fl = (S.folded[S.block] || []).filter(id => ids.indexOf(id) < 0);
+    const all = ids.length && ids.every(id => (S.folded[S.block] || []).indexOf(id) >= 0);
+    S.folded[S.block] = all ? fl : fl.concat(ids);
     save('fold', S.folded);
     applyLayout(); paintToc(); paintActive();
     announce(all ? T('Todas las secciones expandidas', 'Every section expanded') : T('Todas las secciones contraídas', 'Every section collapsed'));
@@ -888,6 +983,8 @@
     if (chip) { showSection(+chip.dataset.i); return; }
     const mi = e.target.closest('.lnav-secmenu [data-i]');
     if (mi) { closeSecMenu(); showSection(+mi.dataset.i); return; }
+    const mt = e.target.closest('.lnav-secmenu [data-tab]');
+    if (mt) { closeSecMenu(); goTab(S.block, mt.dataset.tab); return; }
     const b = e.target.closest('[data-lnav]');
     if (!b) return;
     const a = b.dataset.lnav;
@@ -908,6 +1005,7 @@
   function onTocClick(e) {
     const li = e.target.closest('.lnav-ti');
     if (!li) return;
+    if (li.dataset.tab != null) { goTab(S.block, li.dataset.tab); return; }
     const i = +li.dataset.i;
     const act = e.target.closest('[data-act]');
     const a = act ? act.dataset.act : 'go';
@@ -983,10 +1081,21 @@
     const items = [];
     const add = (o) => { o.k = o.g + ':' + (o.id || o.label); items.push(o); };
     steps().forEach(s => add({ g: 'block', id: s.n, num: s.num && /\d/.test(s.num) ? s.num : '', label: s.label, hint: s.disabled ? T('bloqueado', 'locked') : s.done ? T('terminado', 'done') : '', icon: s.disabled ? 'lock' : 'chevron-right', run: () => goBlock(s.n) }));
-    /* secciones y controles de todos los bloques */
-    steps().forEach(s => {
+    /* pestañas: las de todos los bloques si la app las da; si no, las del bloque activo */
+    if (CFG.tabs) {
+      steps().forEach(s => {
+        const list = String(s.n) === String(S.block) && S.tabs.length ? S.tabs : (tabsOf(s.n) || []);
+        if (list.length < 2) return;
+        list.forEach(tb => add({ g: 'tab', id: s.n + '/' + tb.id, label: tb.label, hint: s.label + (String(s.n) === String(S.block) && tb.on ? T(' · abierta', ' · open') : ''), icon: 'panel-top', run: () => goTab(s.n, tb.id) }));
+      });
+    }
+    /* secciones y controles de todos los bloques (un panel que comparten varios bloques, una sola vez: el del activo) */
+    const seenP = new Set();
+    const order = steps().slice().sort((a, b) => (String(b.n) === String(S.block)) - (String(a.n) === String(S.block)));
+    order.forEach(s => {
       const p = panelOf(s.n);
-      if (!p) return;
+      if (!p || seenP.has(p)) return;
+      seenP.add(p);
       const seen = {};
       $$('h2, h3, .section-title', p).forEach(h => {
         if (h.closest('.lnav-own, dialog, .fig-editor, .fe-panel, .fs-panel, svg') || h.matches(CFG.blockHead) || h.closest(CFG.blockHead)) return;
@@ -997,6 +1106,7 @@
       const seenC = {};
       $$('select, input:not([type="hidden"]):not([type="file"]), textarea, button', p).forEach(c => {
         if (c.closest('.lnav-own, dialog, .fe-panel, .fs-panel, .fig-ed, .fig-dl, .lfs-open, .step-footer, .next-bar') || c.matches('.step-btn')) return;
+        if (CFG.tabs && c.getAttribute('role') === 'tab') return;   /* las pestañas ya van en su grupo */
         const t = labelOf(c);
         if (!t || t.length < 2 || t.length > 90 || seenC[t]) return; seenC[t] = 1;
         add({ g: 'control', id: s.n + '/' + t, label: t, hint: s.label, icon: c.tagName === 'BUTTON' ? 'zap' : 'pencil-line', run: () => goToNode(s.n, c, true) });
@@ -1017,7 +1127,8 @@
     const lb = $$('[data-lang="' + other + '"], #lang' + other.toUpperCase() + ', .lang-' + other).find(x => x.tagName === 'BUTTON' || x.tagName === 'A');
     if (lb) A('lang', other === 'en' ? 'Cambiar el idioma a inglés (English)' : 'Switch the language to Spanish (Español)', 'languages', () => lb.click());
     if (window.LABG && LABG.showShortcuts) A('keys', T('Atajos de teclado y ayuda de esta sección', 'Keyboard shortcuts and help for this section'), 'keyboard', help, '?');
-    if (CFG.hash) A('link', T('Copiar el enlace a esta sección', 'Copy the link to this section'), 'link', copyLink);
+    if (typeof CFG.tabLink === 'function' && hasTabs() && curTab()) A('tablink', T('Copiar el enlace a esta pestaña', 'Copy the link to this tab'), 'link', copyTabLink);
+    else if (CFG.hash) A('link', T('Copiar el enlace a esta sección', 'Copy the link to this section'), 'link', copyLink);
     if (window.LABG && LABG.reportUrl) A('report', T('Reportar un problema', 'Report a problem'), 'message-circle-warning', () => window.open(LABG.reportUrl(), '_blank', 'noopener'));
     if (window.LABG && LABG.SUITE_URL) A('suite', T('Ir a la LABG Suite', 'Go to the LABG Suite'), 'house', () => { location.href = LABG.SUITE_URL; });
     return items;
@@ -1084,7 +1195,7 @@
     if (open) out.push('</mark>');
     return out.join('');
   }
-  const GROUPS = () => ({ recent: T('Recientes', 'Recent'), block: T('Bloques', 'Blocks'), section: T('Secciones', 'Sections'), figure: T('Figuras', 'Figures'), control: T('Controles', 'Controls'), action: T('Acciones', 'Actions') });
+  const GROUPS = () => ({ recent: T('Recientes', 'Recent'), block: T('Bloques', 'Blocks'), tab: T('Pestañas', 'Tabs'), section: T('Secciones', 'Sections'), figure: T('Figuras', 'Figures'), control: T('Controles', 'Controls'), action: T('Acciones', 'Actions') });
   function renderPalette() {
     const inp = $('input', pal);
     const q = fold(inp.value.trim());
@@ -1096,9 +1207,9 @@
       groups.push(['block', palItems.filter(i => i.g === 'block')]);
       groups.push(['action', palItems.filter(i => i.g === 'action')]);
     } else {
-      const W = { block: 40, section: 12, figure: 10, action: 6, control: 0 };
+      const W = { block: 40, tab: 26, section: 12, figure: 10, action: 6, control: 0 };
       const scored = palItems.map(i => { const v = score(q, i.label); return { i, s: v > 0 ? v + (W[i.g] || 0) : v }; }).filter(x => x.s > 0);
-      ['block', 'section', 'figure', 'control', 'action'].forEach(g => {
+      ['block', 'tab', 'section', 'figure', 'control', 'action'].forEach(g => {
         const list = scored.filter(x => x.i.g === g).sort((a, b) => b.s - a.s).slice(0, g === 'control' ? 6 : 8).map(x => x.i);
         if (list.length) groups.push([g, list]);
       });
@@ -1148,8 +1259,13 @@
     if (pal.showModal) pal.showModal(); else pal.setAttribute('open', '');
     inp.focus();
   }
-  function copyLink() {
-    const url = location.href.split('#')[0] + hashFor(S.block, S.secs[S.cur] && S.cur > 0 ? S.secs[S.cur].id : null);
+  function copyLink() { copyUrl(location.href.split('#')[0] + hashFor(S.block, S.secs[S.cur] && S.cur > 0 ? S.secs[S.cur].id : null)); }
+  function copyTabLink() {
+    let h = null;
+    try { h = CFG.tabLink(S.block, curTab().id); } catch (e) { h = null; }
+    if (h) copyUrl(location.href.split('#')[0] + h);
+  }
+  function copyUrl(url) {
     const ok = () => toast(T('Enlace copiado: ', 'Link copied: ') + url);
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, () => toast(url));
     else toast(url);
@@ -1180,7 +1296,7 @@
     const st = sec ? stateOf(sec) : '';
     const box = mk('section', 'lnav-help lnav-own');
     box.innerHTML = '<h3>' + esc(T('Dónde estás', 'Where you are')) + '</h3>' +
-      '<p class="lnav-help-where">' + (s ? '<b>' + esc((s.num && /\d/.test(s.num) ? s.num + ' · ' : '') + s.label) + '</b>' : '') + (sec && S.secs.length > 1 ? ' › ' + esc(sec.title) : '') + '</p>' +
+      '<p class="lnav-help-where">' + (s ? '<b>' + esc((s.num && /\d/.test(s.num) ? s.num + ' · ' : '') + s.label) + '</b>' : '') + (hasTabs() && curTab() ? ' › ' + esc(curTab().label) : '') + (sec && S.secs.length > 1 ? ' › ' + esc(sec.title) : '') + '</p>' +
       (desc ? '<p>' + esc(desc) + '</p>' : '') + (secDesc && secDesc !== desc ? '<p>' + esc(secDesc) + '</p>' : '') +
       (st === 'pending' && !pendingBtn.hidden ? '<p><button type="button" class="lnav-help-go">' + ico('corner-down-right') + esc(T('Ir al paso pendiente', 'Go to the pending step')) + '</button></p>' : '') +
       '<h3>' + esc(T('Navegación', 'Navigation')) + '</h3>';
@@ -1319,6 +1435,9 @@
     palette: openPalette,
     blocks: () => steps().map(s => ({ n: s.n, label: s.label, done: s.done, disabled: s.disabled, active: s.active })),
     sections: () => S.secs.map(s => ({ id: s.id, title: s.title, state: stateOf(s), head: s.head })),
+    /* las pestañas del bloque activo (si la app las tiene) y abrir una, de este bloque o de otro */
+    tabs: () => S.tabs.map(x => ({ id: x.id, label: x.label, active: x.on })),
+    tab: (id, block) => goTab(block == null ? S.block : String(block), String(id)),
     on: (ev, fn) => { (listeners[ev] = listeners[ev] || []).push(fn); },
   };
 
