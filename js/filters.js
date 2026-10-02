@@ -168,7 +168,7 @@ function drawBboxLayer() {
 }
 function invalidateMiniMap() { if (miniMap) miniMap.invalidateSize(); }
 
-el('toStep3Btn').addEventListener('click', () => { goToStep(3); if (window.buildCleanRules) window.buildCleanRules(); });
+el('toStep3Btn').addEventListener('click', () => goToStep(3));   /* the rules are built on entering step 3 (js/clean.js) */
 
 window.buildFilters = buildFilters;
 window.invalidateMiniMap = invalidateMiniMap;

@@ -232,5 +232,10 @@ function runClean() {
 
 el('toStep4Btn').addEventListener('click', () => goToStep(4));
 
+/* Step 3 opens from «Continue» in step 2, the step bar, the side navigator, the footers or the keyboard:
+   whatever the way in, the rules are built on arrival, with the ticks kept in state.cleanRules and the
+   flag counts worked out on the records filtered at that moment. */
+document.addEventListener('stepchange', e => { if (e.detail && +e.detail.step === 3) buildCleanRules(); });
+
 window.buildCleanRules = buildCleanRules;
 window.CLEAN_RULES = CLEAN_RULES;
