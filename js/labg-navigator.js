@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.0.1 (módulo compartido)
+/* LABG Suite — Navegador LABG v1.0.2 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -48,7 +48,7 @@
 (function () {
   'use strict';
   if (window.LABGNavigator && window.LABGNavigator.version) return;
-  const VERSION = '1.0.1';
+  const VERSION = '1.0.2';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -242,13 +242,35 @@
     return ht - top < 140 ? h : null;
   }
   const hasHeads = el => !!el.querySelector('h2, h3, .section-title');
+  const level = h => /^H[1-6]$/.test(h.tagName) ? +h.tagName[1] : 3;
+  /* ¿el envoltorio trae dos o más títulos sueltos del mismo rango? Entonces son sus secciones (un cuerpo con
+     «1 · …», «2 · …»). Una tarjeta con su h2 arriba y subtítulos h3 sigue siendo una sola sección. */
+  function splits(el) {
+    if (el.matches('details, table, form, .fig-block, .pg-pane')) return false;
+    const hs = Array.from(el.children).filter(c => isHead(c) && !isSkip(c) && shown(c));
+    return hs.length >= 2 && level(hs[0]) >= Math.min.apply(null, hs.slice(1).map(level));
+  }
+  /* ¿trae el envoltorio dos o más tarjetas tituladas como hijos directos? Con «nested», cuenta también los
+     envoltorios de tarjetas sin título propio (una tarjeta titulada seguida de un #resultados con las suyas). */
+  function isBox(el, nested) {
+    let n = 0;
+    for (const c of el.children) {
+      if (isSkip(c) || !shown(c) || isHead(c)) continue;
+      if ((headOf(c) || (nested && !/^(TABLE|UL|OL|SELECT|svg|CANVAS)$/i.test(c.tagName) && isBox(c, false))) && ++n >= 2) return true;
+    }
+    return false;
+  }
+  /* ¿tiene título propio? (un h2/h3 suelto arriba o una cabecera; así una tarjeta titulada no se parte) */
+  const OWN_HEAD = ':scope > h2, :scope > h3, :scope > header, :scope > .card-head, :scope > .results-header, :scope > .chart-head, :scope > summary';
+  const ownHead = el => { let h = null; try { h = el.querySelector(OWN_HEAD); } catch (e) { h = null; } return !!h && shown(h); };
   function collect(root, out, depth) {
     let range = null;
     for (const el of Array.from(root.children)) {
       if (isSkip(el) || !shown(el)) { continue; }
       if (isHead(el)) { range = { head: el, nodes: [el], wrap: null }; out.push(range); continue; }
       /* un envoltorio con varias tarjetas tituladas adentro es un contenedor, no una sección */
-      if (depth < 4 && Array.from(el.children).filter(c => !isSkip(c) && shown(c) && !isHead(c) && headOf(c)).length >= 2) { collect(el, out, depth + 1); range = null; continue; }
+      if (depth < 4 && (isBox(el, false) || (!ownHead(el) && isBox(el, true)))) { collect(el, out, depth + 1); range = null; continue; }
+      if (depth < 4 && splits(el)) { collect(el, out, depth + 1); range = null; continue; }
       const h = headOf(el);
       if (h) { out.push({ head: h, nodes: [el], wrap: el }); range = null; continue; }
       if (depth < 4 && hasHeads(el) && !el.matches('details, table, form, .fig-block, .pg-pane')) { collect(el, out, depth + 1); range = null; continue; }
