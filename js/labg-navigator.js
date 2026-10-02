@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.0.0 (módulo compartido)
+/* LABG Suite — Navegador LABG v1.0.1 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -48,7 +48,7 @@
 (function () {
   'use strict';
   if (window.LABGNavigator && window.LABGNavigator.version) return;
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -1243,7 +1243,14 @@
       const host = stepper || (stepBtns()[0] && stepBtns()[0].parentElement);
       if (host) sm.observe(host, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'aria-current', 'disabled', 'aria-disabled'] });
       document.addEventListener('stepchange', () => setTimeout(sync, 0));
-      new MutationObserver(() => { labels(); paintSide(); refresh(true); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+      /* el idioma: solo si cambia de verdad (algunas apps vuelven a escribir el mismo lang al traducir un panel) */
+      let langNow = document.documentElement.lang;
+      new MutationObserver(() => {
+        const L = document.documentElement.lang;
+        if (L === langNow) return;
+        langNow = L;
+        labels(); paintSide(); refresh(true);
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
       if (window.ResizeObserver && topbar) new ResizeObserver(() => measure()).observe(topbar);
       let rt = null;
       window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { layout(); spy(); }, 120); });
