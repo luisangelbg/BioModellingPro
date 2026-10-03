@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.3.1 (módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.4.0 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -62,7 +62,7 @@
 (function () {
   'use strict';
   if (window.LABGFigureStudio && window.LABGFigureStudio.version) return;
-  const VERSION = '1.3.1';
+  const VERSION = '1.4.0';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -488,6 +488,7 @@
   const SHAPES = 'path, line, polyline, polygon, rect, circle, ellipse';
   const hexOf = c => {
     if (!c || c === 'none' || c === 'transparent' || /^url\(/.test(c)) return null;
+    if (c.indexOf('color(srgb') >= 0) c = normColor(c);   /* una mezcla con color-mix() */
     const m = /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+%?))?/.exec(c);
     if (m) { if (m[4] != null && parseFloat(m[4]) === 0) return null; return '#' + [m[1], m[2], m[3]].map(v => (+v).toString(16).padStart(2, '0')).join(''); }
     if (/^#[0-9a-f]{6}$/i.test(c)) return c.toLowerCase();
@@ -884,7 +885,7 @@
     layout: load('layout', 'right'), inspW: load('inspW', 384), float: load('float', null), sheet: 1,
     zoom: 'fit', pan: { x: 0, y: 0 }, aspect0: 0.62,
     compare: false, curtain: load('curtain', 50), before: null,
-    cvd: '', exp: Object.assign({ w: 85, unit: 'mm', h: 0, dpi: 600, fmt: 'png', bg: 'white' }, load('exp', {})),
+    cvd: '', exp: Object.assign({ w: 85, unit: 'mm', h: 0, dpi: 600, fmt: 'png', bg: 'white', colors: 'light' }, load('exp', {})),
     fig: blankFig(), proxies: [], hist: [], hi: -1, secsOpen: load('secs', { app: true, palette: true, text: false, size: true, presets: false, history: false }),
     presets: load('presets', []),
     native: null, nativeAspect: null, nativeUrl: null, pvOn: load('nativePreview', true), pvKey: null,
@@ -1104,9 +1105,11 @@
       figMo.observe(w, { childList: true, subtree: true, attributes: true, attributeFilter: ['viewBox', 'width', 'height', 'src'] });
       figMo.observe(document.body, { childList: true, subtree: true });
     }
+    paintLight();
   }
   function unlift() {
     if (figMo) { figMo.disconnect(); figMo = null; }
+    unpaintLight();
     const w = ST.lift;
     if (!w) return;
     w.removeEventListener('pointerdown', onFigDown);
@@ -1680,6 +1683,8 @@
       row(T('Alto', 'Height'), '<label class="lfs-inl"><input type="checkbox" data-exp="hauto"' + (E.h ? '' : ' checked') + '>' + esc(T('el de la figura', 'the figure’s')) + '</label><input type="number" data-exp="h" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + fmtN(u === 'in' ? expH() / MM_IN : expH(), u === 'in' ? 2 : 1) + '"' + (E.h ? '' : ' disabled') + '>', 'lfs-r-h') +
       row(T('Resolución', 'Resolution'), '<div class="lfs-seg">' + [300, 600, 1200].map(d => '<button type="button" data-exp="dpi" data-v="' + d + '" aria-pressed="' + (E.dpi === d) + '"' + (isVec ? ' disabled' : '') + '>' + d + '</button>').join('') + '</div><small class="lfs-unit">' + esc(T('ppp', 'dpi')) + '</small>', 'lfs-r-seg') +
       row(T('Fondo', 'Background'), '<div class="lfs-seg">' + [['white', ['Blanco', 'White']], ['screen', ['Como se ve', 'As shown']], ['none', ['Transparente', 'Transparent']]].map(([v, n]) => '<button type="button" data-exp="bg" data-v="' + v + '" aria-pressed="' + (E.bg === v) + '">' + esc(TT(n)) + '</button>').join('') + '</div>', 'lfs-r-seg') +
+      /* la app en tema oscuro: la figura puede salir con los colores del tema claro */
+      (darkTheme() && lib === 'svg' && !nativeFmt() ? row(T('Colores', 'Colours'), '<div class="lfs-seg">' + [['light', ['Del tema claro', 'Light theme'], ['Como en el tema claro de la app, para papel', 'As in the app’s light theme, for paper']], ['screen', ['Como se ven', 'As shown'], ['Como se ven ahora, en tema oscuro', 'As they look now, in dark theme']]].map(([v, n, tip]) => '<button type="button" data-exp="colors" data-v="' + v + '" aria-pressed="' + ((E.colors || 'light') === v) + '" title="' + esc(TT(tip)) + '">' + esc(TT(n)) + '</button>').join('') + '</div>', 'lfs-r-seg lfs-r-colors') : '') +
       '<div class="lfs-readout"></div>' +
       (ST.native ? '<p class="lfs-note lfs-note-native">' + ico('check') + '<span>' + esc(T('La dibuja ' + (ST.native.label || 'la app') + ': al exportar, el estudio le pide la figura a este tamaño y resolución, no la amplía. En SVG y PDF sale vectorial y el texto conserva su tamaño en puntos.', 'Drawn by ' + (ST.native.label || 'the app') + ': on export the studio asks for the figure at this size and resolution instead of enlarging it. SVG and PDF come out as vectors and the text keeps its size in points.')) + '</span></p>' +
         (ST.native.preview !== false && nativeCan(ST.native, 'png') && !ST.noLift ? '<div class="lfs-row lfs-r-check"><label><input type="checkbox" data-exp="pv"' + (ST.pvOn ? ' checked' : '') + '><span>' + esc(T('Ver en el papel cómo sale a este tamaño', 'Show on the paper how it comes out at this size')) + '</span></label></div>' : '')
@@ -1688,6 +1693,51 @@
     readout();
   }
   const darkTheme = () => { const t = document.documentElement.getAttribute('data-theme'); return t === 'dark' || (t !== 'light' && !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)); };
+  /* ----- la app en tema oscuro: exportar con los colores del tema claro ----- */
+  /* figuras SVG de la página; vale para lo que dibuja el estudio (lo nativo, como Python, los mapas o el PDF de
+     SigmaPro, lo dibuja la app a su manera) */
+  const lightOn = () => darkTheme() && ST.exp.colors !== 'screen' && !!ST.rec && ST.rec.lib === 'svg';
+  /* ¿este formato lo dibuja la app? */
+  const nativeFmt = () => !!ST.native && (nativeCan(ST.native, ST.exp.fmt) || (ST.exp.fmt === 'tiff' && nativeCan(ST.native, 'png')) || (ST.noLift && nativeCan(ST.native, 'png')));
+  /* fn con el tema claro puesto un instante: no se pinta nada ni se avisa a nadie (no hay evento themechange) */
+  function inLight(fn) {
+    const html = document.documentElement, prev = html.getAttribute('data-theme');
+    html.setAttribute('data-theme', 'light');
+    try { return fn(); } finally { if (prev == null) html.removeAttribute('data-theme'); else html.setAttribute('data-theme', prev); }
+  }
+  /* las variables de la página que cambian en el tema claro, con su valor claro */
+  function lightVars() {
+    const cs = getComputedStyle(document.documentElement), names = [], dark = {}, out = {};
+    for (let i = 0; i < cs.length; i++) { const p = cs[i]; if (p.slice(0, 2) === '--' && p.slice(0, 5) !== '--lfs') names.push(p); }
+    names.forEach(n => { dark[n] = cs.getPropertyValue(n); });
+    inLight(() => { const c2 = getComputedStyle(document.documentElement); names.forEach(n => { const v = c2.getPropertyValue(n); if (v !== dark[n]) out[n] = v; }); });
+    return out;
+  }
+  /* la vista previa también en claros: esas variables, sobre la figura elevada y solo mientras está en el estudio */
+  function paintLight() {
+    const w = ST.lift, want = !!w && lightOn();
+    if (ST.lightEl && (!want || ST.lightEl !== w)) unpaintLight();
+    if (!want || ST.lightEl === w) return;
+    const vars = lightVars();
+    Object.keys(vars).forEach(n => w.style.setProperty(n, vars[n]));
+    w.style.setProperty('color-scheme', 'light');
+    ST.lightEl = w; ST.lightNames = Object.keys(vars);
+  }
+  function unpaintLight() {
+    const w = ST.lightEl;
+    if (!w) return;
+    (ST.lightNames || []).forEach(n => w.style.removeProperty(n));
+    w.style.removeProperty('color-scheme');
+    ST.lightEl = null; ST.lightNames = null;
+  }
+  /* lo que dice la lectura del tamaño con la app en tema oscuro */
+  function themeNote() {
+    if (lightOn()) return '<span class="lfs-ok">' + ico('check') + esc(T('Sale con los colores del tema claro de la app; la pantalla sigue en oscuro.', 'Exported with the app’s light-theme colours; the screen stays dark.')) + '</span>';
+    if (ST.exp.bg !== 'white') return '';
+    return '<span class="lfs-warn">' + ico('info') + esc(ST.rec && ST.rec.lib === 'svg'
+      ? T('Con los colores como se ven (tema oscuro), el texto claro casi no se lee sobre blanco: elige colores «Del tema claro» o el fondo «Como se ve».', 'With the colours as shown (dark theme), light text barely shows on white: choose “Light theme” colours or the “As shown” background.')
+      : T('La app está en tema oscuro y esta figura es una imagen: sus colores no cambian al exportar. Para fondo blanco, cambia la app a tema claro o elige «Como se ve».', 'The app is in dark theme and this figure is an image: its colours do not change on export. For a white background, switch the app to light theme or choose “As shown”.')) + '</span>';
+  }
   /* el texto más chico, en puntos, al tamaño de salida */
   function minPt(svg) {
     if (!svg || svg.tagName.toLowerCase() !== 'svg') return null;
@@ -1715,7 +1765,7 @@
         (pt != null ? '<span class="' + (pt < 6 ? 'lfs-warn' : 'lfs-ok') + '">' + ico(pt < 6 ? 'info' : 'check') + esc(T('Texto más chico: ', 'Smallest text: ') + pt.toFixed(1) + ' pt' + (pt < 6 ? T(' — las revistas suelen pedir 6 a 8 pt; sube el tamaño del texto o usa un preajuste', ' — journals usually ask for 6 to 8 pt; raise the text size or use a preset') : '')) + '</span>' : '') +
         (ST.native ? '<span class="lfs-ok">' + ico('check') + esc(T('Se exporta dibujada de nuevo por ', 'Exported drawn again by ') + (ST.native.label || T('la app', 'the app')) + (nativeCan(ST.native, ST.exp.fmt) || nativeCan(ST.native, 'png') && (ST.exp.fmt === 'tiff' || ST.exp.fmt === 'pdf' || ST.noLift) ? '' : T(' (este formato sale de la imagen de la pantalla)', ' (this format comes from the screen image)'))) + '</span>' : '') +
         (fmtNote(ST.exp.fmt) ? '<span class="lfs-note-s">' + ico('info') + esc(fmtNote(ST.exp.fmt)) + '</span>' : '') +
-        (darkTheme() && ST.exp.bg === 'white' && !ST.native ? '<span class="lfs-warn">' + ico('info') + esc(T('La app está en tema oscuro: sus figuras usan colores claros. Para fondo blanco, cámbiala a tema claro o elige «Como se ve».', 'The app is in dark theme: its figures use light colours. For a white background, switch it to light theme or choose “As shown”.')) + '</span>' : '') +
+        (darkTheme() && !nativeFmt() ? themeNote() : '') +
         (big && ST.exp.fmt !== 'svg' ? '<span class="lfs-warn">' + ico('info') + esc(T('Muy grande para el navegador: baja los ppp o el tamaño.', 'Too large for the browser: lower the dpi or the size.')) + '</span>' : '');
     }
     const p = $('.lfs-pt', body);
@@ -1814,7 +1864,7 @@
   function setExp(next, label) {
     const before = Object.assign({}, ST.exp);
     const after = Object.assign({}, ST.exp, next);
-    const put = e => { ST.exp = Object.assign({}, e); save('exp', ST.exp); renderSize(); place(); readout(); emitChange(); schedulePreview(); };
+    const put = e => { ST.exp = Object.assign({}, e); save('exp', ST.exp); paintLight(); renderSize(); place(); readout(); emitChange(); schedulePreview(); };
     put(after);
     if (label) record(label, () => put(before), () => put(after));
   }
@@ -1918,6 +1968,7 @@
       if (k === 'fmt') setExp({ fmt: v }, T('Formato: ', 'Format: ') + v.toUpperCase());
       else if (k === 'dpi') setExp({ dpi: +v }, v + ' ' + T('ppp', 'dpi'));
       else if (k === 'bg') setExp({ bg: v }, T('Fondo: ', 'Background: ') + ex.textContent);
+      else if (k === 'colors') setExp({ colors: v }, T('Colores: ', 'Colours: ') + ex.textContent);
       else if (k === 'wmm') setExp({ w: ST.exp.unit === 'in' ? +(+v / MM_IN).toFixed(2) : +v, h: 0 }, T('Ancho: ', 'Width: ') + v + ' mm');
       return;
     }
@@ -2131,7 +2182,7 @@
     if (ST.noLift) { $('.lfs-before', over).removeAttribute('src'); return; }
     try {
       if (el.tagName.toLowerCase() === 'svg') {
-        const s = serialize(el, { forView: true });
+        const s = serialize(el, { forView: true, light: lightOn() });
         ST.before = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
       } else if (el.tagName === 'CANVAS') ST.before = el.toDataURL('image/png');
       else if (el.tagName === 'IMG') ST.before = el.currentSrc || el.src;
@@ -2382,6 +2433,7 @@
   function bgColor() {
     if (ST.exp.bg === 'none') return null;
     if (ST.exp.bg === 'white') return '#ffffff';
+    if (lightOn()) return inLight(bgColor);   /* dentro, el tema ya es claro: no se repite */
     let n = ST.rec && ST.rec.host;
     while (n && n !== document.documentElement) {
       const c = getComputedStyle(n).backgroundColor;
@@ -2390,9 +2442,17 @@
     }
     return '#ffffff';
   }
-  /* el SVG con sus estilos calculados escritos dentro, para que se vea igual fuera de la app */
+  /* un color mezclado con color-mix() se calcula como color(srgb r g b / a); se escribe como rgb(), que leen todos los programas */
+  const normColor = v => v.indexOf('color(srgb') < 0 ? v : v.replace(/color\(srgb\s+([-\d.e]+)\s+([-\d.e]+)\s+([-\d.e]+)(?:\s*\/\s*([\d.]+%?))?\)/g, (m, r, g, b, a) => {
+    const c = x => Math.round(Math.max(0, Math.min(1, +x)) * 255);
+    if (a == null) return 'rgb(' + c(r) + ', ' + c(g) + ', ' + c(b) + ')';
+    return 'rgba(' + c(r) + ', ' + c(g) + ', ' + c(b) + ', ' + (/%$/.test(a) ? parseFloat(a) / 100 : +a) + ')';
+  });
+  /* el SVG con sus estilos calculados escritos dentro, para que se vea igual fuera de la app
+     (con o.light, los del tema claro aunque la app esté en oscuro) */
   function serialize(svg, o) {
     o = o || {};
+    if (o.light) { const o2 = Object.assign({}, o, { light: false }); return inLight(() => serialize(svg, o2)); }
     const clone = svg.cloneNode(true);
     const a = [svg].concat($$('*', svg)), b = [clone].concat($$('*', clone));
     for (let i = 0; i < a.length && i < b.length; i++) {
@@ -2405,7 +2465,7 @@
         if (!v || v === DEF_VAL[p]) return;
         if (p === 'display' && v !== 'none') return;
         if (p === 'transform-origin' || p === 'transform-box') return;
-        out.push(p + ':' + v);
+        out.push(p + ':' + normColor(v));
       });
       if (out.length) dst.setAttribute('style', out.join(';'));
       ['class', 'data-lfs-o', 'data-lfs-t0', 'data-lfs-done', 'data-lfs-vb'].forEach(at => dst.removeAttribute(at));
@@ -2445,7 +2505,7 @@
     }
     if (ADAPTERS[lib].raster) { const im = await ADAPTERS[lib].raster(el, pxW, pxH); drawContain(ctx, im, pxW, pxH); return cv; }
     if (lib === 'svg') {
-      const s = serialize(el, { pxW, pxH });
+      const s = serialize(el, { pxW, pxH, light: lightOn() });
       const url = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }));
       try { const im = await loadImg(url); ctx.drawImage(im, 0, 0, pxW, pxH); } finally { URL.revokeObjectURL(url); }
       return cv;
@@ -2652,7 +2712,7 @@
         return;
       }
       if (fmt === 'svg') {
-        if (ST.rec.lib === 'svg') blob = new Blob([serialize(ST.el, { wmm, hmm, bg })], { type: 'image/svg+xml' });
+        if (ST.rec.lib === 'svg') blob = new Blob([serialize(ST.el, { wmm, hmm, bg, light: lightOn() })], { type: 'image/svg+xml' });
         else {
           const px = expPx();
           const cv = await raster(Math.min(px.w, 8000), Math.min(px.h, 8000), bg);
@@ -2741,6 +2801,8 @@
       $$('.lfs-open').forEach(b => { b.title = openTitle(); });
       if (ST.open) { labels(); const sc = body.scrollTop; render(); dock(false); dock(true); body.scrollTop = sc; }
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    /* la persona cambió el tema de la app con el estudio abierto: la vista previa y la opción «Colores» lo siguen */
+    document.addEventListener('themechange', () => { if (ST.open) setTimeout(() => { if (ST.open) { paintLight(); renderSize(); readout(); } }, 60); });
     document.addEventListener('stepchange', () => setTimeout(decorate, 120));
     /* fuera del estudio: con el menú de la figura abierto, la figura se queda a la vista mientras se recorren sus opciones */
     document.addEventListener('toggle', e => {
