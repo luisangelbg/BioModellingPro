@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.4.0 (módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.5.0 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -44,6 +44,11 @@
    lugares), fuera a la derecha, debajo en fila u oculta, y se arrastra sobre la figura. La encuentra marcada
    por el kit de dibujo (data-role="legend"), con nombre de leyenda, o suelta: cada texto con su muestra.
 
+   Tema oscuro (1.4.0): con la app en oscuro, la figura se exporta con los colores del tema claro (opción «Colores»).
+
+   PDF vectorial (1.5.0): el PDF de una figura SVG sale con trazos y texto, no como imagen: se amplía sin perder
+   nitidez, pesa poco y el texto se puede buscar. El texto va con las letras estándar de PDF, como en el pdf() de R.
+
    Lo propio del estudio: paletas científicas con simulación de daltonismo,
    tamaño del texto y grosor de las líneas pensados para el tamaño de salida,
    edición de un texto con doble clic, historial, comparación, preajustes de un
@@ -62,7 +67,7 @@
 (function () {
   'use strict';
   if (window.LABGFigureStudio && window.LABGFigureStudio.version) return;
-  const VERSION = '1.4.0';
+  const VERSION = '1.5.0';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -885,7 +890,7 @@
     layout: load('layout', 'right'), inspW: load('inspW', 384), float: load('float', null), sheet: 1,
     zoom: 'fit', pan: { x: 0, y: 0 }, aspect0: 0.62,
     compare: false, curtain: load('curtain', 50), before: null,
-    cvd: '', exp: Object.assign({ w: 85, unit: 'mm', h: 0, dpi: 600, fmt: 'png', bg: 'white', colors: 'light' }, load('exp', {})),
+    cvd: '', exp: Object.assign({ w: 85, unit: 'mm', h: 0, dpi: 600, fmt: 'png', bg: 'white', colors: 'light', pdf: 'vec' }, load('exp', {})),
     fig: blankFig(), proxies: [], hist: [], hi: -1, secsOpen: load('secs', { app: true, palette: true, text: false, size: true, presets: false, history: false }),
     presets: load('presets', []),
     native: null, nativeAspect: null, nativeUrl: null, pvOn: load('nativePreview', true), pvKey: null,
@@ -1343,7 +1348,7 @@
   function fmtSize() {
     const px = expPx();
     const w = expW(), h = expH();
-    return fmtN(w, 1) + ' × ' + fmtN(h, 1) + ' mm  ·  ' + fmtN(w / MM_IN, 2) + ' × ' + fmtN(h / MM_IN, 2) + ' in' + (ST.exp.fmt === 'svg' ? '  ·  ' + T('vectorial', 'vector') : '  ·  ' + ST.exp.dpi + ' ' + T('ppp', 'dpi') + ' → ' + px.w + ' × ' + px.h + ' px');
+    return fmtN(w, 1) + ' × ' + fmtN(h, 1) + ' mm  ·  ' + fmtN(w / MM_IN, 2) + ' × ' + fmtN(h / MM_IN, 2) + ' in' + (ST.exp.fmt === 'svg' || pdfVec() ? '  ·  ' + T('vectorial', 'vector') : '  ·  ' + ST.exp.dpi + ' ' + T('ppp', 'dpi') + ' → ' + px.w + ' × ' + px.h + ' px');
   }
   function ringBox(r) { const g = $('.lfs-ring', over); Object.assign(g.style, { left: (r.left - 3) + 'px', top: (r.top - 3) + 'px', width: (r.width + 6) + 'px', height: (r.height + 6) + 'px' }); }
   /* un destello dorado alrededor de lo que cambió */
@@ -1674,10 +1679,12 @@
     if (['png', 'svg', 'pdf', 'tiff'].indexOf(ST.exp.fmt) < 0 && !extraFmts().some(x => x[0] === ST.exp.fmt)) ST.exp.fmt = 'png';
     const E = ST.exp, u = E.unit;
     const wv = fmtN(E.w, u === 'in' ? 2 : 1);
-    const isVec = E.fmt === 'svg';
+    const isVec = E.fmt === 'svg' || pdfVec();
     const lib = ST.rec.lib;
     b.innerHTML =
       row(T('Formato', 'Format'), '<div class="lfs-seg" role="radiogroup">' + ['png', 'svg', 'pdf', 'tiff'].concat(extraFmts().map(x => x[0])).map(f => '<button type="button" data-exp="fmt" data-v="' + f + '" aria-pressed="' + (E.fmt === f) + '"' + (fmtNote(f) ? ' title="' + esc(fmtNote(f)) + '"' : (f === 'svg' && lib !== 'svg' && !nativeCan(ST.native, 'svg') ? ' title="' + esc(T('Esta figura es una imagen: el SVG la lleva incrustada', 'This figure is an image: the SVG carries it embedded')) + '"' : '')) + '>' + esc(fmtLabel(f)) + '</button>').join('') + '</div>', 'lfs-r-seg') +
+      /* el PDF de una figura SVG: trazos y texto, o la imagen a la resolución elegida */
+      (E.fmt === 'pdf' && lib === 'svg' && !nativeFmt() ? row('PDF', '<div class="lfs-seg">' + [['vec', ['Vectorial', 'Vector'], ['Trazos y texto: se amplía sin perder nitidez, pesa poco y el texto se puede buscar', 'Paths and text: it scales without losing sharpness, it is light and the text can be searched']], ['img', ['Imagen', 'Image'], ['La figura como imagen, a la resolución elegida', 'The figure as an image, at the chosen resolution']]].map(([v, n, tip]) => '<button type="button" data-exp="pdf" data-v="' + v + '" aria-pressed="' + ((E.pdf || 'vec') === v) + '" title="' + esc(TT(tip)) + '">' + esc(TT(n)) + '</button>').join('') + '</div>', 'lfs-r-seg lfs-r-pdf') : '') +
       row(T('Ancho', 'Width'), '<div class="lfs-seg lfs-seg-w">' + WIDTHS.map(([mm, nm]) => '<button type="button" data-exp="wmm" data-v="' + mm + '" aria-pressed="' + (Math.abs(expW() - mm) < 0.5) + '" title="' + esc(TT(nm)) + '">' + mm + '</button>').join('') + '</div>' +
         '<input type="number" data-exp="w" min="' + (u === 'in' ? 0.5 : 10) + '" max="' + (u === 'in' ? 40 : 1000) + '" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + wv + '"><select data-exp="unit"><option value="mm"' + (u === 'mm' ? ' selected' : '') + '>mm</option><option value="in"' + (u === 'in' ? ' selected' : '') + '>in</option></select>', 'lfs-r-w') +
       row(T('Alto', 'Height'), '<label class="lfs-inl"><input type="checkbox" data-exp="hauto"' + (E.h ? '' : ' checked') + '>' + esc(T('el de la figura', 'the figure’s')) + '</label><input type="number" data-exp="h" step="' + (u === 'in' ? 0.01 : 0.5) + '" value="' + fmtN(u === 'in' ? expH() / MM_IN : expH(), u === 'in' ? 2 : 1) + '"' + (E.h ? '' : ' disabled') + '>', 'lfs-r-h') +
@@ -1699,6 +1706,8 @@
   const lightOn = () => darkTheme() && ST.exp.colors !== 'screen' && !!ST.rec && ST.rec.lib === 'svg';
   /* ¿este formato lo dibuja la app? */
   const nativeFmt = () => !!ST.native && (nativeCan(ST.native, ST.exp.fmt) || (ST.exp.fmt === 'tiff' && nativeCan(ST.native, 'png')) || (ST.noLift && nativeCan(ST.native, 'png')));
+  /* ¿el PDF sale vectorial? Una figura SVG que exporta el estudio, con «PDF: Vectorial» */
+  const pdfVec = () => ST.exp.fmt === 'pdf' && ST.exp.pdf !== 'img' && !!ST.rec && ST.rec.lib === 'svg' && !nativeFmt();
   /* fn con el tema claro puesto un instante: no se pinta nada ni se avisa a nadie (no hay evento themechange) */
   function inLight(fn) {
     const html = document.documentElement, prev = html.getAttribute('data-theme');
@@ -1764,9 +1773,10 @@
       r.innerHTML = '<b>' + esc(fmtSize()) + '</b>' +
         (pt != null ? '<span class="' + (pt < 6 ? 'lfs-warn' : 'lfs-ok') + '">' + ico(pt < 6 ? 'info' : 'check') + esc(T('Texto más chico: ', 'Smallest text: ') + pt.toFixed(1) + ' pt' + (pt < 6 ? T(' — las revistas suelen pedir 6 a 8 pt; sube el tamaño del texto o usa un preajuste', ' — journals usually ask for 6 to 8 pt; raise the text size or use a preset') : '')) + '</span>' : '') +
         (ST.native ? '<span class="lfs-ok">' + ico('check') + esc(T('Se exporta dibujada de nuevo por ', 'Exported drawn again by ') + (ST.native.label || T('la app', 'the app')) + (nativeCan(ST.native, ST.exp.fmt) || nativeCan(ST.native, 'png') && (ST.exp.fmt === 'tiff' || ST.exp.fmt === 'pdf' || ST.noLift) ? '' : T(' (este formato sale de la imagen de la pantalla)', ' (this format comes from the screen image)'))) + '</span>' : '') +
+        (pdfVec() ? '<span class="lfs-ok">' + ico('check') + esc(T('PDF vectorial: trazos y texto. El texto va con las letras estándar del PDF (sans, serif o mono).', 'Vector PDF: paths and text. The text uses the standard PDF fonts (sans, serif or mono).')) + '</span>' : '') +
         (fmtNote(ST.exp.fmt) ? '<span class="lfs-note-s">' + ico('info') + esc(fmtNote(ST.exp.fmt)) + '</span>' : '') +
         (darkTheme() && !nativeFmt() ? themeNote() : '') +
-        (big && ST.exp.fmt !== 'svg' ? '<span class="lfs-warn">' + ico('info') + esc(T('Muy grande para el navegador: baja los ppp o el tamaño.', 'Too large for the browser: lower the dpi or the size.')) + '</span>' : '');
+        (big && ST.exp.fmt !== 'svg' && !pdfVec() ? '<span class="lfs-warn">' + ico('info') + esc(T('Muy grande para el navegador: baja los ppp o el tamaño.', 'Too large for the browser: lower the dpi or the size.')) + '</span>' : '');
     }
     const p = $('.lfs-pt', body);
     if (p) p.innerHTML = pt != null ? '<span class="' + (pt < 6 ? 'lfs-warn' : 'lfs-ok') + '">' + esc(T('Al tamaño de salida, el texto más chico mide ', 'At the output size, the smallest text measures ') + pt.toFixed(1) + ' pt') + '</span>' : '';
@@ -1969,6 +1979,7 @@
       else if (k === 'dpi') setExp({ dpi: +v }, v + ' ' + T('ppp', 'dpi'));
       else if (k === 'bg') setExp({ bg: v }, T('Fondo: ', 'Background: ') + ex.textContent);
       else if (k === 'colors') setExp({ colors: v }, T('Colores: ', 'Colours: ') + ex.textContent);
+      else if (k === 'pdf') setExp({ pdf: v }, 'PDF: ' + ex.textContent);
       else if (k === 'wmm') setExp({ w: ST.exp.unit === 'in' ? +(+v / MM_IN).toFixed(2) : +v, h: 0 }, T('Ancho: ', 'Width: ') + v + ' mm');
       return;
     }
@@ -2621,6 +2632,1005 @@
     strips.forEach((s, i) => u8.set(s, stripOffs[i]));
     return new Blob([buf], { type: 'image/tiff' });
   }
+  /* ---------------- PDF vectorial (1.5.0) ---------------- */
+  /* La figura SVG pasa al PDF como trazos y texto, no como imagen. Se escribe lo que el navegador ya resolvió: los
+     estilos calculados, la transformación de cada elemento y la posición de cada carácter.
+     El texto va con las letras estándar de PDF (sans, serif y mono, y Symbol para el griego y los signos), como en el
+     dispositivo pdf() de R: no se incrustan, porque todo lector de PDF las trae. Cada tramo de texto ocupa justo el
+     ancho que tiene en la pantalla. Un carácter que ninguna de esas letras trae (♀, ▼) sale como una imagen pequeña
+     de ese carácter.
+     Reproduce recortes, marcadores (flechas), degradados, tramas, transparencias, SVG anidados y halos de texto; los
+     filtros (sombras), las máscaras y el HTML dentro del SVG no pasan, y el estudio lo avisa. */
+  const vecPdf = (() => {
+    /* letras estándar de PDF: anchos WinAnsi 32–255 (milésimas de em; de las métricas AFM públicas de las 14 letras) */
+    const PDF_WIN = {
+      'Helvetica': '7q,7q,9v,fg,fg,op,ij,5b,99,99,at,g8,7q,99,7q,7q,fg,fg,fg,fg,fg,fg,fg,fg,fg,fg,7q,7q,g8,g8,g8,fg,s7,ij,ij,k2,k2,ij,gz,lm,k2,7q,dw,ij,fg,n5,k2,lm,ij,lm,k2,ij,gz,k2,ij,q8,ij,ij,gz,7q,7q,7q,d1,fg,99,fg,fg,dw,fg,fg,7q,fg,fg,66,66,dw,66,n5,fg,fg,fg,fg,99,dw,7q,fg,dw,k2,dw,dw,dw,9a,78,9a,g8,0,fg,0,66,fg,99,rs,fg,fg,99,rs,ij,99,rs,0,gz,0,0,66,66,99,99,9q,fg,rs,99,rs,dw,99,q8,0,dw,ij,7q,99,fg,fg,fg,fg,78,fg,99,kh,aa,fg,g8,99,kh,99,b4,g8,99,99,99,fg,ex,7q,99,99,a5,fg,n6,n6,n6,gz,ij,ij,ij,ij,ij,ij,rs,k2,ij,ij,ij,ij,7q,7q,7q,7q,k2,k2,lm,lm,lm,lm,lm,g8,lm,k2,k2,k2,k2,ij,ij,gz,fg,fg,fg,fg,fg,fg,op,dw,fg,fg,fg,fg,7q,7q,7q,7q,fg,fg,fg,fg,fg,fg,fg,g8,gz,fg,fg,fg,fg,dw,fg,dw',
+      'Helvetica-Bold': '7q,99,d6,fg,fg,op,k2,6m,99,99,at,g8,7q,99,7q,7q,fg,fg,fg,fg,fg,fg,fg,fg,fg,fg,99,99,g8,g8,g8,gz,r3,k2,k2,k2,k2,ij,gz,lm,k2,7q,fg,k2,gz,n5,k2,lm,ij,lm,k2,ij,gz,k2,ij,q8,ij,ij,gz,99,7q,99,g8,fg,99,fg,gz,fg,gz,fg,99,gz,gz,7q,7q,fg,7q,op,gz,gz,gz,gz,at,fg,99,gz,fg,lm,fg,fg,dw,at,7s,at,g8,0,fg,0,7q,fg,dw,rs,fg,fg,99,rs,ij,99,rs,0,gz,0,0,7q,7q,dw,dw,9q,fg,rs,99,rs,fg,99,q8,0,dw,ij,7q,99,fg,fg,fg,fg,7s,fg,99,kh,aa,fg,g8,99,kh,99,b4,g8,99,99,99,gz,fg,7q,99,99,a5,fg,n6,n6,n6,gz,k2,k2,k2,k2,k2,k2,rs,k2,ij,ij,ij,ij,7q,7q,7q,7q,k2,k2,lm,lm,lm,lm,lm,g8,lm,k2,k2,k2,k2,ij,ij,gz,fg,fg,fg,fg,fg,fg,op,fg,fg,fg,fg,fg,7q,7q,7q,7q,gz,gz,gz,gz,gz,gz,gz,g8,gz,gz,gz,gz,gz,fg,gz,fg',
+      'Times-Roman': '6y,99,bc,dw,dw,n5,lm,50,99,99,dw,fo,6y,99,6y,7q,dw,dw,dw,dw,dw,dw,dw,dw,dw,dw,7q,7q,fo,fo,fo,cc,pl,k2,ij,ij,k2,gz,fg,k2,k2,99,at,k2,gz,op,k2,k2,fg,k2,ij,fg,gz,k2,k2,q8,k2,k2,gz,99,7q,99,d1,dw,99,cc,dw,cc,dw,cc,99,dw,dw,7q,7q,dw,7q,lm,dw,dw,dw,dw,99,at,7q,dw,dw,k2,dw,dw,cc,dc,5k,dc,f1,0,dw,0,99,dw,cc,rs,dw,dw,99,rs,fg,99,op,0,gz,0,0,99,99,cc,cc,9q,dw,rs,99,r8,at,99,k2,0,cc,k2,6y,99,dw,dw,dw,dw,5k,dw,99,l4,7o,dw,fo,99,l4,99,b4,fo,8c,8c,99,dw,cl,6y,99,8c,8m,dw,ku,ku,ku,cc,k2,k2,k2,k2,k2,k2,op,ij,gz,gz,gz,gz,99,99,99,99,k2,k2,k2,k2,k2,k2,k2,fo,k2,k2,k2,k2,k2,k2,fg,dw,cc,cc,cc,cc,cc,cc,ij,cc,cc,cc,cc,cc,7q,7q,7q,7q,dw,dw,dw,dw,dw,dw,dw,fo,dw,dw,dw,dw,dw,dw,dw,dw',
+      'Times-Bold': '6y,99,ff,dw,dw,rs,n5,7q,99,99,dw,fu,6y,99,6y,7q,dw,dw,dw,dw,dw,dw,dw,dw,dw,dw,99,99,fu,fu,fu,dw,pu,k2,ij,k2,k2,ij,gz,lm,lm,at,dw,lm,ij,q8,k2,lm,gz,lm,k2,fg,ij,k2,k2,rs,k2,k2,ij,99,7q,99,g5,dw,99,dw,fg,cc,fg,cc,99,dw,fg,7q,99,fg,7q,n5,fg,dw,fg,fg,cc,at,99,fg,dw,k2,dw,dw,cc,ay,64,ay,eg,0,dw,0,99,dw,dw,rs,dw,dw,99,rs,fg,99,rs,0,ij,0,0,99,99,dw,dw,9q,dw,rs,99,rs,at,99,k2,0,cc,k2,6y,99,dw,dw,dw,dw,64,dw,99,kr,8c,dw,fu,99,kr,99,b4,fu,8c,8c,99,fg,f0,6y,99,8c,96,dw,ku,ku,ku,dw,k2,k2,k2,k2,k2,k2,rs,k2,ij,ij,ij,ij,at,at,at,at,k2,k2,lm,lm,lm,lm,lm,fu,lm,k2,k2,k2,k2,k2,gz,fg,dw,dw,dw,dw,dw,dw,k2,cc,cc,cc,cc,cc,7q,7q,7q,7q,dw,fg,dw,dw,dw,dw,dw,fu,dw,fg,fg,fg,fg,dw,fg,dw',
+      'Times-Italic': '6y,99,bo,dw,dw,n5,lm,5y,99,99,dw,ir,6y,99,6y,7q,dw,dw,dw,dw,dw,dw,dw,dw,dw,dw,99,99,ir,ir,ir,dw,pk,gz,gz,ij,k2,gz,gz,k2,k2,99,cc,ij,fg,n5,ij,k2,gz,k2,gz,dw,fg,k2,gz,n5,gz,fg,fg,at,7q,at,bq,dw,99,dw,dw,cc,dw,cc,7q,dw,dw,7q,7q,cc,7q,k2,dw,dw,dw,dw,at,at,7q,dw,cc,ij,cc,cc,at,b4,7n,b4,f1,0,dw,0,99,dw,fg,op,dw,dw,99,rs,dw,99,q8,0,fg,0,0,99,99,fg,fg,9q,dw,op,99,r8,at,99,ij,0,at,fg,6y,at,dw,dw,dw,dw,7n,dw,99,l4,7o,dw,ir,99,l4,99,b4,ir,8c,8c,99,dw,ej,6y,99,8c,8m,dw,ku,ku,ku,dw,gz,gz,gz,gz,gz,gz,op,ij,gz,gz,gz,gz,99,99,99,99,k2,ij,k2,k2,k2,k2,k2,ir,k2,k2,k2,k2,k2,fg,gz,dw,dw,dw,dw,dw,dw,dw,ij,cc,cc,cc,cc,cc,7q,7q,7q,7q,dw,dw,dw,dw,dw,dw,dw,ir,dw,dw,dw,dw,dw,cc,dw,cc',
+      'Times-BoldItalic': '6y,at,ff,dw,dw,n5,lm,7q,99,99,dw,fu,6y,99,6y,7q,dw,dw,dw,dw,dw,dw,dw,dw,dw,dw,99,99,fu,fu,fu,dw,n4,ij,ij,ij,k2,ij,ij,k2,lm,at,dw,ij,gz,op,k2,k2,gz,k2,ij,fg,gz,k2,ij,op,ij,gz,gz,99,7q,99,fu,dw,99,dw,dw,cc,dw,cc,99,dw,fg,7q,7q,dw,7q,lm,fg,dw,dw,dw,at,at,7q,fg,cc,ij,dw,cc,at,9o,64,9o,fu,0,dw,0,99,dw,dw,rs,dw,dw,99,rs,fg,99,q8,0,gz,0,0,99,99,dw,dw,9q,dw,rs,99,rs,at,99,k2,0,at,gz,6y,at,dw,dw,dw,dw,64,dw,99,kr,7e,dw,gu,99,kr,99,b4,fu,8c,8c,99,g0,dw,6y,99,8c,8c,dw,ku,ku,ku,dw,ij,ij,ij,ij,ij,ij,q8,ij,ij,ij,ij,ij,at,at,at,at,k2,k2,k2,k2,k2,k2,k2,fu,k2,k2,k2,k2,k2,gz,gz,dw,dw,dw,dw,dw,dw,dw,k2,cc,cc,cc,cc,cc,7q,7q,7q,7q,dw,fg,dw,dw,dw,dw,dw,fu,dw,fg,fg,fg,fg,cc,dw,cc',
+    };
+    /* glifos que esas letras traen fuera de WinAnsi: carácter, nombre y ancho en cada letra (Courier: 600) */
+    const PDF_XU = '6dg:fraction,1dkx:fi,1dky:fl,k8:breve,k9:dotaccent,ka:ring,kd:hungarumlaut,kb:ogonek,jr:caron,8x:Lslash,8h:dotlessi,8y:lslash,77:abreve,a9:uhungarumlaut,7v:ecaron,ex:scommaaccent,a6:Uring,79:aogonek,ab:uogonek,7k:Dcroat,7m:Emacron,7h:ccaron,91:Ncommaaccent,8q:lacute,9u:Tcommaaccent,7a:Cacute,7q:Edotaccent,9r:scedilla,7gq:lozenge,9k:Rcaron,82:Gcommaaccent,74:Amacron,9l:rcaron,aj:Zdotaccent,98:Omacron,9g:Racute,9m:Sacute,7j:dcaron,a2:Umacron,a7:uring,76:Abreve,9w:Tcaron,6pu:partialdiff,8z:Nacute,7b:cacute,90:nacute,a3:umacron,93:Ncaron,7y:Gbreve,8g:Idotaccent,6q9:summation,9h:racute,99:omacron,ah:Zacute,6sl:greaterequal,8s:lcommaaccent,9x:tcaron,7t:eogonek,aa:Uogonek,ai:zacute,8f:iogonek,75:amacron,9n:sacute,6py:Delta,9d:ohungarumlaut,7s:Eogonek,7l:dcroat,9q:Scedilla,8u:lcaron,8m:Kcommaaccent,8p:Lacute,7r:edotaccent,8a:Imacron,8t:Lcaron,6sk:lessequal,a8:Uhungarumlaut,7n:emacron,7z:gbreve,ew:Scommaaccent,9c:Ohungarumlaut,7g:Ccaron,6qi:radical,7i:Dcaron,9j:rcommaaccent,9i:Rcommaaccent,8r:Lcommaaccent,78:Aogonek,ak:zdotaccent,7u:Ecaron,8e:Iogonek,8n:kcommaaccent,6qa:minus,94:ncaron,9v:tcommaaccent,6sg:notequal,83:gcommaaccent,92:ncommaaccent,8b:imacron';
+    const PDF_XW = {
+      'Helvetica': '4n,dw,dw,99,99,99,99,99,99,fg,7q,66,fg,fg,fg,dw,k2,fg,fg,k2,ij,dw,k2,66,gz,k2,ij,dw,d3,k2,lm,ij,99,gz,lm,k2,ij,hv,k2,fg,ij,gz,d8,k2,dw,fg,fg,k2,lm,7q,go,99,fg,gz,f9,66,8t,fg,k2,dw,66,fg,dw,h0,fg,ij,fg,ij,8b,ij,fg,fg,7q,fg,f9,k2,fg,fg,ij,lm,k2,cl,k2,99,k2,fg,ij,dw,ij,7q,dw,g8,fg,7q,f9,fg,fg,7q',
+      'Helvetica-Bold': '4n,gz,gz,99,99,99,99,99,99,gz,7q,7q,fg,gz,fg,fg,k2,fg,gz,k2,ij,fg,k2,7q,gz,k2,ij,fg,dq,k2,lm,k2,at,gz,lm,k2,ij,kn,k2,gz,k2,gz,dq,k2,fg,gz,gz,k2,lm,7q,go,at,gz,gz,f9,7q,at,fg,k2,dw,7q,fg,fg,h0,gz,ij,gz,ij,b4,k2,gz,fg,7q,gz,f9,k2,fg,gz,ij,lm,k2,f9,k2,at,k2,gz,k2,dw,ij,7q,fg,g8,gz,99,f9,gz,gz,7q',
+      'Times-Roman': '4n,fg,fg,99,99,99,99,99,99,gz,7q,7q,cc,dw,cc,at,k2,cc,dw,k2,gz,cc,k2,7q,gz,ij,gz,at,d3,ij,k2,k2,99,gz,k2,ij,fg,gc,k2,dw,k2,gz,d8,k2,cc,dw,dw,k2,k2,99,go,99,dw,gz,f9,7q,92,cc,k2,cc,7q,cc,at,h0,dw,gz,dw,fg,9k,k2,gz,cc,99,gz,f9,k2,cc,dw,fg,k2,ij,cl,k2,99,ij,gz,k2,cc,gz,99,dw,fo,dw,7q,f9,dw,dw,7q',
+      'Times-Bold': '4n,fg,fg,99,99,99,99,99,99,ij,7q,7q,dw,fg,cc,at,k2,dw,fg,k2,ij,cc,k2,7q,ij,k2,ij,at,dq,k2,lm,k2,cc,ij,lm,k2,fg,io,k2,fg,k2,ij,dq,k2,cc,fg,fg,k2,lm,at,go,cc,dw,ij,f9,7q,bk,cc,k2,cc,7q,dw,at,h0,dw,ij,fg,fg,ay,lm,ij,cc,at,ij,f9,k2,cc,dw,fg,lm,k2,f9,k2,cc,k2,ij,k2,cc,ij,at,fg,fu,fg,99,f9,dw,fg,7q',
+      'Times-Italic': '4n,dw,dw,99,99,99,99,99,99,fg,7q,7q,dw,dw,cc,at,k2,dw,dw,k2,gz,cc,ij,7q,fg,ij,gz,at,d3,gz,k2,gz,at,fg,k2,gz,dw,f4,k2,dw,gz,fg,d8,ij,cc,dw,dw,ij,k2,99,go,at,dw,fg,f9,7q,8c,cc,k2,at,7q,dw,at,h0,dw,gz,dw,dw,8c,ij,fg,cc,99,gz,f9,k2,cc,dw,dw,k2,ij,cl,k2,at,gz,fg,gz,at,gz,99,cc,ir,dw,7q,f9,dw,dw,7q',
+      'Times-BoldItalic': '4n,fg,fg,99,99,99,99,99,99,gz,7q,7q,dw,fg,cc,at,k2,dw,fg,k2,ij,cc,k2,7q,gz,ij,ij,at,dq,ij,k2,ij,at,gz,k2,ij,fg,gw,k2,fg,ij,gz,dq,k2,cc,fg,fg,k2,k2,at,go,at,dw,gz,f9,7q,a6,cc,k2,at,7q,dw,at,h0,dw,ij,dw,fg,am,ij,gz,cc,at,gz,f9,k2,cc,dw,fg,k2,ij,f9,k2,at,ij,gz,ij,at,ij,at,dw,gu,fg,7q,f9,dw,fg,7q',
+    };
+    /* la letra Symbol: carácter, código y ancho */
+    const PDF_SYM = 'pd:1t:k2,pe:1u:ij,pf:1z:gr,pg:1w:h0,ph:1x:gz,pi:2i:gz,pj:20:k2,pk:29:kl,pl:21:99,pm:23:k2,pn:24:j2,po:25:op,pp:26:k2,pq:2g:hx,pr:27:k2,ps:28:lc,pt:2a:fg,pv:2b:gg,pw:2c:gz,px:2d:j6,py:1y:l7,pz:1v:k2,q0:2h:m3,q1:2f:lc,q9:2p:hj,qa:2q:f9,qb:2v:bf,qc:2s:dq,qd:2t:c7,qe:3e:dq,qf:2w:gr,qg:35:eh,qh:2x:95,qi:2z:f9,qj:30:f9,qk:31:g0,ql:32:eh,qm:3c:dp,qn:33:f9,qo:34:f9,qp:36:f9,qq:2e:c7,qr:37:gr,qs:38:c7,qt:39:g0,qu:2u:eh,qv:2r:f9,qw:3d:j2,qx:3b:j2,r5:22:hj,r6:4h:h8,r9:2y:gr,ra:3a:jt,6cy:4i:6v,6cz:4y:bf,6dg:4k:4n,6j5:5d:j2,6jc:5f:rf,6jg:5e:m3,6k5:5c:mv,6mo:4s:rf,6mp:4t:gr,6mq:4u:rf,6mr:4v:gr,6ms:4r:sy,6np:5b:ia,6og:64:rf,6oh:65:gr,6oi:66:rf,6oj:67:gr,6ok:63:sy,6ps:y:jt,6pu:52:dq,6pv:10:f9,6px:5i:mv,6pz:5t:jt,6q0:5q:jt,6q1:5r:jt,6q3:13:c7,6q7:5x:mv,6q9:6d:jt,6qa:19:f9,6qf:16:dw,6qi:5y:f9,6ql:51:jt,6qm:4l:jt,6qo:5s:lc,6qv:61:gr,6qw:62:gr,6qx:5j:lc,6qy:5k:lc,6qz:6q:7m,6r8:2k:nz,6rg:3i:f9,6rp:1s:f9,6rs:57:f9,6sg:55:f9,6sh:56:f9,6sk:4j:f9,6sl:4z:f9,6te:5o:jt,6tf:5l:jt,6tg:5n:jt,6ti:5p:jt,6tj:5m:jt,6tx:5h:lc,6tz:5g:lc,6ud:2m:ia,6v9:5z:6y,6y1:69:95,6y2:6p:95,7gq:68:dq,7kw:4q:kx,7kz:4n:kx,7l1:4p:kx,7l2:4o:kx';
+    /* descriptores: caja, alto de mayúsculas y de minúsculas, ascendente, descendente, inclinación y trazo vertical */
+    const PDF_DESC = {
+      'Helvetica': [-166, -225, 1000, 931, 718, 523, 718, -207, 0, 88],
+      'Helvetica-Bold': [-170, -228, 1003, 962, 718, 532, 718, -207, 0, 140],
+      'Times-Roman': [-168, -218, 1000, 898, 662, 450, 683, -217, 0, 84],
+      'Times-Bold': [-168, -218, 1000, 935, 676, 461, 683, -217, 0, 139],
+      'Times-Italic': [-169, -217, 1010, 883, 653, 441, 683, -217, -15.5, 76],
+      'Times-BoldItalic': [-200, -218, 996, 921, 669, 462, 683, -217, -15, 121],
+      'Courier': [-23, -250, 715, 805, 562, 426, 629, -157, 0, 51],
+      'Symbol': [-180, -293, 1090, 1010, 0, 0, 0, 0, 0, 85],
+    };
+    const POOL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 127, 129, 141, 143, 144, 157];
+    let FT = null;
+    /* las tablas, descomprimidas la primera vez */
+    function tables() {
+      if (FT) return FT;
+      const n36 = s => s.split(',').map(x => parseInt(x, 36));
+      const win = {}, xw = {};
+      Object.keys(PDF_WIN).forEach(k => { win[k] = n36(PDF_WIN[k]); });
+      Object.keys(PDF_XW).forEach(k => { xw[k] = n36(PDF_XW[k]); });
+      const u2w = new Map();
+      for (let c = 32; c < 127; c++) u2w.set(c, c);
+      for (let c = 0xA0; c <= 0xFF; c++) u2w.set(c, c);
+      [0x20AC, 0, 0x201A, 0x192, 0x201E, 0x2026, 0x2020, 0x2021, 0x2C6, 0x2030, 0x160, 0x2039, 0x152, 0, 0x17D, 0, 0, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014, 0x2DC, 0x2122, 0x161, 0x203A, 0x153, 0, 0x17E, 0x178]
+        .forEach((u, i) => { if (u) u2w.set(u, 0x80 + i); });
+      const xu = PDF_XU.split(',').map(p => { const i = p.indexOf(':'); return [parseInt(p.slice(0, i), 36), p.slice(i + 1)]; });
+      const u2x = new Map(); xu.forEach((x, i) => u2x.set(x[0], i));
+      const sym = new Map(), symW = new Map();
+      PDF_SYM.split(',').forEach(p => { const v = p.split(':').map(x => parseInt(x, 36)); sym.set(v[0], [v[1], v[2]]); symW.set(v[1], v[2]); });
+      FT = { win, xw, u2w, xu, u2x, sym, symW };
+      return FT;
+    }
+    /* la letra estándar que corresponde a la del SVG, y la que da sus anchos */
+    function baseFont(cs) {
+      const first = String(cs.fontFamily || '').split(',')[0].replace(/["']/g, '').trim().toLowerCase();
+      const kind = /mono|courier|consol|menlo|monaco|code|cascadia|jetbrains/.test(first) ? 'mono'
+        : (/serif/.test(first) && !/sans/.test(first)) || /times|georgia|garamond|cambria|palatino|book|baskerville|minion|charter|merriweather|crimson|lora|playfair|didot|bodoni|caslon|constantia|tinos|spectral|alegreya|vollkorn/.test(first) ? 'serif' : 'sans';
+      const bold = (parseInt(cs.fontWeight, 10) || 400) >= 600, ital = /italic|oblique/.test(cs.fontStyle || '');
+      if (kind === 'serif') return bold ? (ital ? 'Times-BoldItalic' : 'Times-Bold') : (ital ? 'Times-Italic' : 'Times-Roman');
+      const b = kind === 'mono' ? 'Courier' : 'Helvetica';
+      return b + (bold ? (ital ? '-BoldOblique' : '-Bold') : (ital ? '-Oblique' : ''));
+    }
+    const metricsOf = b => (/^Courier/.test(b) ? 'Courier' : b.replace('-BoldOblique', '-Bold').replace('-Oblique', ''));
+
+    /* ----- geometría ----- */
+    const ID = [1, 0, 0, 1, 0, 0];
+    const mul = (m, n) => [m[0] * n[0] + m[2] * n[1], m[1] * n[0] + m[3] * n[1], m[0] * n[2] + m[2] * n[3], m[1] * n[2] + m[3] * n[3], m[0] * n[4] + m[2] * n[5] + m[4], m[1] * n[4] + m[3] * n[5] + m[5]];
+    const inv = m => { const d = m[0] * m[3] - m[1] * m[2]; return d ? [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d, (m[2] * m[5] - m[3] * m[4]) / d, (m[1] * m[4] - m[0] * m[5]) / d] : ID.slice(); };
+    const ap = (m, x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
+    const dm = d => [d.a, d.b, d.c, d.d, d.e, d.f];
+    const tr = (x, y) => [1, 0, 0, 1, x, y];
+    const nf = v => { const r = Math.round(v * 10000) / 10000; return String(r === 0 || !isFinite(r) ? 0 : r); };
+    const mat = m => m.map(nf).join(' ');
+    /* las transformaciones del atributo, sin consolidate() (que reescribiría la lista) */
+    const listM = l => { let m = ID; if (l) for (let i = 0; i < l.numberOfItems; i++) m = mul(m, dm(l.getItem(i).matrix)); return m; };
+    const localT = el => (el.transform && el.transform.animVal ? listM(el.transform.animVal) : ID);
+    /* un rectángulo de viewBox dentro de otro de w × h, con su preserveAspectRatio */
+    function fitM(vb, par, w, h) {
+      let sx = w / vb.width, sy = h / vb.height, tx = 0, ty = 0;
+      const al = par ? par.align : 6;
+      if (al !== 1) {
+        const s = par && par.meetOrSlice === 2 ? Math.max(sx, sy) : Math.min(sx, sy);
+        sx = sy = s;
+        const ax = (al - 2) % 3, ay = Math.floor((al - 2) / 3);
+        tx = (w - vb.width * s) * ax / 2; ty = (h - vb.height * s) * ay / 2;
+      }
+      return [sx, 0, 0, sy, tx - sx * vb.x, ty - sy * vb.y];
+    }
+    const KA = 0.5522847498307936;
+    function ellS(cx, cy, rx, ry) {
+      const kx = rx * KA, ky = ry * KA;
+      return [['M', cx + rx, cy], ['C', cx + rx, cy + ky, cx + kx, cy + ry, cx, cy + ry], ['C', cx - kx, cy + ry, cx - rx, cy + ky, cx - rx, cy],
+        ['C', cx - rx, cy - ky, cx - kx, cy - ry, cx, cy - ry], ['C', cx + kx, cy - ry, cx + rx, cy - ky, cx + rx, cy], ['Z']];
+    }
+    function rectS(x, y, w, h, rx, ry) {
+      if (!(w > 0 && h > 0)) return null;
+      rx = Math.min(Math.max(rx || 0, 0), w / 2); ry = Math.min(Math.max(ry || 0, 0), h / 2);
+      if (!rx || !ry) return [['M', x, y], ['L', x + w, y], ['L', x + w, y + h], ['L', x, y + h], ['Z']];
+      const kx = rx * KA, ky = ry * KA;
+      return [['M', x + rx, y], ['L', x + w - rx, y], ['C', x + w - rx + kx, y, x + w, y + ry - ky, x + w, y + ry], ['L', x + w, y + h - ry],
+        ['C', x + w, y + h - ry + ky, x + w - rx + kx, y + h, x + w - rx, y + h], ['L', x + rx, y + h], ['C', x + rx - kx, y + h, x, y + h - ry + ky, x, y + h - ry],
+        ['L', x, y + ry], ['C', x, y + ry - ky, x + rx - kx, y, x + rx, y], ['Z']];
+    }
+    /* un arco elíptico de SVG como curvas de Bézier (notas de implementación de SVG, F.6) */
+    function arcS(x1, y1, rx, ry, phi, fa, fs, x2, y2) {
+      if (x1 === x2 && y1 === y2) return [];
+      rx = Math.abs(rx); ry = Math.abs(ry);
+      if (!rx || !ry) return [['L', x2, y2]];
+      const p = phi * Math.PI / 180, cp = Math.cos(p), sp = Math.sin(p);
+      const dx = (x1 - x2) / 2, dy = (y1 - y2) / 2;
+      const x1p = cp * dx + sp * dy, y1p = -sp * dx + cp * dy;
+      const lam = x1p * x1p / (rx * rx) + y1p * y1p / (ry * ry);
+      if (lam > 1) { const s = Math.sqrt(lam); rx *= s; ry *= s; }
+      const rx2 = rx * rx, ry2 = ry * ry;
+      const num = Math.max(0, rx2 * ry2 - rx2 * y1p * y1p - ry2 * x1p * x1p);
+      let co = Math.sqrt(num / (rx2 * y1p * y1p + ry2 * x1p * x1p)) * (fa === fs ? -1 : 1);
+      if (!isFinite(co)) co = 0;
+      const cxp = co * rx * y1p / ry, cyp = -co * ry * x1p / rx;
+      const cx = cp * cxp - sp * cyp + (x1 + x2) / 2, cy = sp * cxp + cp * cyp + (y1 + y2) / 2;
+      const ang = (ux, uy, vx, vy) => Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy);
+      const t1 = ang(1, 0, (x1p - cxp) / rx, (y1p - cyp) / ry);
+      let dt = ang((x1p - cxp) / rx, (y1p - cyp) / ry, (-x1p - cxp) / rx, (-y1p - cyp) / ry);
+      if (!fs && dt > 0) dt -= 2 * Math.PI; else if (fs && dt < 0) dt += 2 * Math.PI;
+      const n = Math.max(1, Math.ceil(Math.abs(dt) / (Math.PI / 2) - 1e-9)), d = dt / n, k = 4 / 3 * Math.tan(d / 4);
+      const pt = (u, v) => [cx + rx * u * cp - ry * v * sp, cy + rx * u * sp + ry * v * cp];
+      const out = [];
+      let t = t1;
+      for (let i = 0; i < n; i++) {
+        const c1 = Math.cos(t), s1 = Math.sin(t), c2 = Math.cos(t + d), s2 = Math.sin(t + d);
+        const a = pt(c1 - k * s1, s1 + k * c1), b = pt(c2 + k * s2, s2 - k * c2), e = i === n - 1 ? [x2, y2] : pt(c2, s2);
+        out.push(['C', a[0], a[1], b[0], b[1], e[0], e[1]]);
+        t += d;
+      }
+      return out;
+    }
+    /* el atributo d de un trazado, en segmentos absolutos M, L, C y Z */
+    const NUM = /[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/y;
+    function parsePath(d) {
+      const out = [], n = d.length;
+      let i = 0, cx = 0, cy = 0, sx = 0, sy = 0, lc = null, lq = null, cmd = null;
+      const ws = () => { while (i < n) { const c = d.charCodeAt(i); if (c === 32 || c === 44 || (c >= 9 && c <= 13)) i++; else break; } };
+      const num = () => { ws(); NUM.lastIndex = i; const m = NUM.exec(d); if (!m) return null; i = NUM.lastIndex; return +m[0]; };
+      const flag = () => { ws(); const c = d[i]; if (c === '0' || c === '1') { i++; return +c; } return null; };
+      const nums = k => { const a = []; for (let j = 0; j < k; j++) { const v = num(); if (v == null) return null; a.push(v); } return a; };
+      for (;;) {
+        ws();
+        if (i >= n) break;
+        const ch = d[i];
+        if (/[MmZzLlHhVvCcSsQqTtAa]/.test(ch)) { cmd = ch; i++; } else if (!cmd) break;
+        const rel = cmd >= 'a', C = cmd.toUpperCase();
+        if (C === 'Z') { out.push(['Z']); cx = sx; cy = sy; lc = lq = null; cmd = null; continue; }
+        if (C === 'M') { const a = nums(2); if (!a) break; cx = rel ? cx + a[0] : a[0]; cy = rel ? cy + a[1] : a[1]; sx = cx; sy = cy; out.push(['M', cx, cy]); cmd = rel ? 'l' : 'L'; lc = lq = null; }
+        else if (C === 'L') { const a = nums(2); if (!a) break; cx = rel ? cx + a[0] : a[0]; cy = rel ? cy + a[1] : a[1]; out.push(['L', cx, cy]); lc = lq = null; }
+        else if (C === 'H') { const v = num(); if (v == null) break; cx = rel ? cx + v : v; out.push(['L', cx, cy]); lc = lq = null; }
+        else if (C === 'V') { const v = num(); if (v == null) break; cy = rel ? cy + v : v; out.push(['L', cx, cy]); lc = lq = null; }
+        else if (C === 'C' || C === 'S') {
+          const a = nums(C === 'C' ? 6 : 4); if (!a) break;
+          const o = rel ? [cx, cy] : [0, 0];
+          let x1, y1, x2, y2, x, y;
+          if (C === 'C') { x1 = a[0] + o[0]; y1 = a[1] + o[1]; x2 = a[2] + o[0]; y2 = a[3] + o[1]; x = a[4] + o[0]; y = a[5] + o[1]; }
+          else { x1 = lc ? 2 * cx - lc[0] : cx; y1 = lc ? 2 * cy - lc[1] : cy; x2 = a[0] + o[0]; y2 = a[1] + o[1]; x = a[2] + o[0]; y = a[3] + o[1]; }
+          out.push(['C', x1, y1, x2, y2, x, y]); lc = [x2, y2]; lq = null; cx = x; cy = y;
+        }
+        else if (C === 'Q' || C === 'T') {
+          const a = nums(C === 'Q' ? 4 : 2); if (!a) break;
+          const o = rel ? [cx, cy] : [0, 0];
+          let qx, qy, x, y;
+          if (C === 'Q') { qx = a[0] + o[0]; qy = a[1] + o[1]; x = a[2] + o[0]; y = a[3] + o[1]; }
+          else { qx = lq ? 2 * cx - lq[0] : cx; qy = lq ? 2 * cy - lq[1] : cy; x = a[0] + o[0]; y = a[1] + o[1]; }
+          out.push(['C', cx + 2 / 3 * (qx - cx), cy + 2 / 3 * (qy - cy), x + 2 / 3 * (qx - x), y + 2 / 3 * (qy - y), x, y]);
+          lq = [qx, qy]; lc = null; cx = x; cy = y;
+        }
+        else if (C === 'A') {
+          const r = nums(3); if (!r) break;
+          const fa = flag(), fs = flag(); if (fa == null || fs == null) break;
+          const e = nums(2); if (!e) break;
+          const x = rel ? cx + e[0] : e[0], y = rel ? cy + e[1] : e[1];
+          arcS(cx, cy, r[0], r[1], r[2], fa, fs, x, y).forEach(s => out.push(s));
+          cx = x; cy = y; lc = lq = null;
+        }
+      }
+      return out;
+    }
+    function rxy(el) {
+      const cs = getComputedStyle(el);
+      const g = p => { const v = cs.getPropertyValue(p); if (!v || v === 'auto' || /%/.test(v)) return null; return parseFloat(v); };
+      let rx = g('rx'), ry = g('ry');
+      if (rx == null && ry == null) {
+        rx = el.hasAttribute('rx') ? el.rx.animVal.value : null; ry = el.hasAttribute('ry') ? el.ry.animVal.value : null;
+      }
+      if (rx == null) rx = ry; if (ry == null) ry = rx;
+      return [rx || 0, ry || 0];
+    }
+    const SHAPES = { rect: 1, circle: 1, ellipse: 1, line: 1, polyline: 1, polygon: 1, path: 1 };
+    function geom(el, tag) {
+      const v = a => el[a].animVal.value;
+      try {
+        if (tag === 'rect') { const r = rxy(el); return rectS(v('x'), v('y'), v('width'), v('height'), r[0], r[1]); }
+        if (tag === 'circle') { const r = v('r'); return r > 0 ? ellS(v('cx'), v('cy'), r, r) : null; }
+        if (tag === 'ellipse') { const rx = v('rx'), ry = v('ry'); return rx > 0 && ry > 0 ? ellS(v('cx'), v('cy'), rx, ry) : null; }
+        if (tag === 'line') return [['M', v('x1'), v('y1')], ['L', v('x2'), v('y2')]];
+        if (tag === 'polyline' || tag === 'polygon') {
+          const P = el.animatedPoints || el.points;
+          if (!P || !P.numberOfItems) return null;
+          const s = [];
+          for (let i = 0; i < P.numberOfItems; i++) { const p = P.getItem(i); s.push([i ? 'L' : 'M', p.x, p.y]); }
+          if (tag === 'polygon') s.push(['Z']);
+          return s;
+        }
+        if (tag === 'path') {
+          let d = el.getAttribute('d');
+          if (!d) { const c = getComputedStyle(el).getPropertyValue('d'); const m = /path\(\s*["']([^"']*)["']\s*\)/.exec(c || ''); d = m ? m[1] : ''; }
+          const s = d ? parsePath(d) : null;
+          return s && s.length ? s : null;
+        }
+      } catch (e) { return null; }
+      return null;
+    }
+    /* el trazado en operadores de PDF; con m, ya llevado a la página */
+    function pathOps(segs, m) {
+      const o = [];
+      const P = (x, y) => { if (!m) return nf(x) + ' ' + nf(y); const p = ap(m, x, y); return nf(p[0]) + ' ' + nf(p[1]); };
+      for (const s of segs) {
+        if (s[0] === 'M') o.push(P(s[1], s[2]) + ' m');
+        else if (s[0] === 'L') o.push(P(s[1], s[2]) + ' l');
+        else if (s[0] === 'C') o.push(P(s[1], s[2]) + ' ' + P(s[3], s[4]) + ' ' + P(s[5], s[6]) + ' c');
+        else o.push('h');
+      }
+      return o.join('\n');
+    }
+
+    /* ----- color y pintura ----- */
+    let cc = null;
+    const cCache = new Map();
+    function rgba(v) {
+      if (!v || v === 'none' || v === 'transparent') return null;
+      if (cCache.has(v)) return cCache.get(v);
+      let r = null;
+      const m = /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)$/.exec(v);
+      if (m) r = [+m[1] / 255, +m[2] / 255, +m[3] / 255, m[4] == null ? 1 : (/%$/.test(m[4]) ? parseFloat(m[4]) / 100 : +m[4])];
+      else {
+        /* color-mix(), oklch()…: el navegador lo pinta en un píxel y se lee */
+        try {
+          if (!cc) { const c = document.createElement('canvas'); c.width = c.height = 1; cc = c.getContext('2d', { willReadFrequently: true }); }
+          cc.clearRect(0, 0, 1, 1); cc.fillStyle = '#000'; cc.fillStyle = v; cc.fillRect(0, 0, 1, 1);
+          const d = cc.getImageData(0, 0, 1, 1).data;
+          r = [d[0] / 255, d[1] / 255, d[2] / 255, d[3] / 255];
+        } catch (e) { r = [0, 0, 0, 1]; }
+      }
+      if (r[3] <= 0) r = null;
+      cCache.set(v, r);
+      return r;
+    }
+    const byId = id => (id ? document.getElementById(id) || document.getElementById(decodeURIComponent(id)) : null);
+    const urlId = v => { const m = /url\(\s*["']?#([^"')]+)["']?\s*\)/.exec(v || ''); return m ? m[1] : null; };
+    const solid = c => ({ a: c[3], set: k => nf(c[0]) + ' ' + nf(c[1]) + ' ' + nf(c[2]) + ' ' + k, rgb: c });
+    const clamp01 = v => (isFinite(v) ? Math.max(0, Math.min(1, v)) : 1);
+
+    /* ----- el documento: letras, transparencias, patrones e imágenes que se van usando ----- */
+    function mkRes(root) {
+      const R = { fonts: new Map(), gsm: new Map(), pats: [], xos: [], notes: new Set(), stc: new Map(), root };
+      R.font = base => { let f = R.fonts.get(base); if (!f) { f = { name: 'F' + (R.fonts.size + 1), base, slots: new Map() }; R.fonts.set(base, f); } return f.name; };
+      R.slot = (base, xi) => { R.font(base); const f = R.fonts.get(base); if (f.slots.has(xi)) return f.slots.get(xi); if (f.slots.size >= POOL.length) return null; const c = POOL[f.slots.size]; f.slots.set(xi, c); return c; };
+      R.gs = (ca, CA, bm) => { const k = nf(ca) + '|' + nf(CA) + '|' + (bm || ''); let n = R.gsm.get(k); if (!n) { n = 'G' + (R.gsm.size + 1); R.gsm.set(k, n); } return n; };
+      R.pat = o => { R.pats.push(o); return 'P' + R.pats.length; };
+      R.xo = o => { R.xos.push(o); return 'X' + R.xos.length; };
+      return R;
+    }
+    /* un tramo con la transparencia que pide (fill, trazo y fusión) */
+    const gsOp = (R, fa, sa, bm) => (fa < 0.999 || sa < 0.999 || bm ? '/' + R.gs(fa, sa, bm) + ' gs' : '');
+    const BLEND = { multiply: 'Multiply', screen: 'Screen', overlay: 'Overlay', darken: 'Darken', lighten: 'Lighten', 'color-dodge': 'ColorDodge', 'color-burn': 'ColorBurn', 'hard-light': 'HardLight', 'soft-light': 'SoftLight', difference: 'Difference', exclusion: 'Exclusion', hue: 'Hue', saturation: 'Saturation', color: 'Color', luminosity: 'Luminosity' };
+    const blendOf = cs => BLEND[cs.mixBlendMode] || '';
+
+    /* degradados: un patrón de sombreado con su función de color */
+    function lenOf(v, obb, ref) {
+      if (v == null || v === '') return null;
+      const s = String(v).trim();
+      if (/%$/.test(s)) return parseFloat(s) / 100 * (obb ? 1 : ref);
+      return parseFloat(s);
+    }
+    function gradPaint(g, el, M, R) {
+      const A = {}, seen = new Set();
+      let stops = null, n = g, gt = null;
+      while (n && !seen.has(n)) {
+        seen.add(n);
+        ['x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'fx', 'fy', 'fr', 'gradientUnits', 'spreadMethod'].forEach(a => { if (A[a] == null && n.hasAttribute(a)) A[a] = n.getAttribute(a); });
+        if (!gt && n.hasAttribute('gradientTransform') && n.gradientTransform) gt = listM(n.gradientTransform.animVal);
+        if (!stops) { const s = Array.from(n.children).filter(c => c.tagName === 'stop'); if (s.length) stops = s; }
+        const h = n.getAttribute('href') || n.getAttribute('xlink:href');
+        n = h && h[0] === '#' ? byId(h.slice(1)) : null;
+        if (n && !/Gradient$/.test(n.tagName)) n = null;
+      }
+      if (!stops) return null;
+      const st = [];
+      let last = 0;
+      stops.forEach(s => {
+        const cs = getComputedStyle(s);
+        let o = String(s.getAttribute('offset') || '0').trim();
+        o = /%$/.test(o) ? parseFloat(o) / 100 : parseFloat(o);
+        o = Math.max(last, clamp01(isFinite(o) ? o : 0)); last = o;
+        const c = rgba(cs.stopColor) || [0, 0, 0, 0];
+        st.push({ o, c, a: c[3] * clamp01(+cs.stopOpacity) });
+      });
+      if (st.length === 1) return solid([st[0].c[0], st[0].c[1], st[0].c[2], st[0].a]);
+      const obb = A.gradientUnits !== 'userSpaceOnUse';
+      let bb = null;
+      if (obb) { try { bb = el.getBBox(); } catch (e) { bb = null; } if (!bb || !bb.width || !bb.height) return solid([st[st.length - 1].c[0], st[st.length - 1].c[1], st[st.length - 1].c[2], st[st.length - 1].a]); }
+      const vb = R.root.viewBox && R.root.viewBox.baseVal && R.root.viewBox.baseVal.width ? R.root.viewBox.baseVal : { width: R.root.clientWidth || 300, height: R.root.clientHeight || 150 };
+      const W = vb.width, H = vb.height, D = Math.sqrt((W * W + H * H) / 2);
+      let m = M;
+      if (obb) m = mul(m, [bb.width, 0, 0, bb.height, bb.x, bb.y]);
+      if (gt) m = mul(m, gt);
+      let shade;
+      if (g.tagName === 'linearGradient') {
+        const x1 = lenOf(A.x1, obb, W) ?? 0, y1 = lenOf(A.y1, obb, H) ?? 0, x2 = lenOf(A.x2, obb, W) ?? (obb ? 1 : W), y2 = lenOf(A.y2, obb, H) ?? 0;
+        shade = '/ShadingType 2 /Coords [' + [x1, y1, x2, y2].map(nf).join(' ') + ']';
+      } else {
+        const cx = lenOf(A.cx, obb, W) ?? (obb ? 0.5 : W / 2), cy = lenOf(A.cy, obb, H) ?? (obb ? 0.5 : H / 2), r = lenOf(A.r, obb, D) ?? (obb ? 0.5 : D / 2);
+        const fx = lenOf(A.fx, obb, W) ?? cx, fy = lenOf(A.fy, obb, H) ?? cy, fr = lenOf(A.fr, obb, D) ?? 0;
+        shade = '/ShadingType 3 /Coords [' + [fx, fy, fr, cx, cy, r].map(nf).join(' ') + ']';
+      }
+      if (A.spreadMethod && A.spreadMethod !== 'pad') R.notes.add('spread');
+      /* la función: tramos lineales entre paradas; los de largo cero marcan un salto de color */
+      const s2 = st.slice();
+      if (s2[0].o > 0) s2.unshift(Object.assign({}, s2[0], { o: 0 }));
+      if (s2[s2.length - 1].o < 1) s2.push(Object.assign({}, s2[s2.length - 1], { o: 1 }));
+      const seg = [];
+      for (let i = 0; i < s2.length - 1; i++) if (s2[i + 1].o > s2[i].o) seg.push([s2[i], s2[i + 1]]);
+      if (!seg.length) seg.push([s2[0], s2[s2.length - 1]]);
+      const f2 = (a, b) => '<< /FunctionType 2 /Domain [0 1] /C0 [' + a.c.slice(0, 3).map(nf).join(' ') + '] /C1 [' + b.c.slice(0, 3).map(nf).join(' ') + '] /N 1 >>';
+      const fn = seg.length === 1 ? f2(seg[0][0], seg[0][1])
+        : '<< /FunctionType 3 /Domain [0 1] /Functions [' + seg.map(x => f2(x[0], x[1])).join(' ') + '] /Bounds [' + seg.slice(1).map(x => nf(x[0].o)).join(' ') + '] /Encode [' + seg.map(() => '0 1').join(' ') + '] >>';
+      const alphas = st.map(x => x.a);
+      const aMin = Math.min.apply(null, alphas), aMax = Math.max.apply(null, alphas);
+      if (aMax - aMin > 0.02) R.notes.add('stop-opacity');
+      const name = R.pat({ dict: '<< /PatternType 2 /Shading << ' + shade + ' /ColorSpace /DeviceRGB /Function ' + fn + ' /Extend [true true] >> /Matrix [' + mat(m) + '] >>' });
+      return { a: (aMin + aMax) / 2, set: k => (k === 'rg' ? '/Pattern cs /' + name + ' scn' : '/Pattern CS /' + name + ' SCN') };
+    }
+    /* tramas (<pattern>): un patrón de mosaico con su propio dibujo */
+    function patPaint(p, el, M, R, depth) {
+      if (depth > 2) return null;
+      const A = {}, seen = new Set();
+      let n = p, kids = null, pt = null, vbEl = null;
+      while (n && !seen.has(n)) {
+        seen.add(n);
+        ['x', 'y', 'width', 'height', 'patternUnits', 'patternContentUnits', 'preserveAspectRatio'].forEach(a => { if (A[a] == null && n.hasAttribute(a)) A[a] = n.getAttribute(a); });
+        if (!pt && n.hasAttribute('patternTransform') && n.patternTransform) pt = listM(n.patternTransform.animVal);
+        if (!vbEl && n.hasAttribute('viewBox')) vbEl = n;
+        if (!kids && n.children.length) kids = n;
+        const h = n.getAttribute('href') || n.getAttribute('xlink:href');
+        n = h && h[0] === '#' ? byId(h.slice(1)) : null;
+        if (n && n.tagName !== 'pattern') n = null;
+      }
+      if (!kids) return null;
+      const obb = A.patternUnits !== 'userSpaceOnUse', cobb = A.patternContentUnits === 'objectBoundingBox';
+      let bb = { x: 0, y: 0, width: 0, height: 0 };
+      if (obb || cobb) { try { bb = el.getBBox(); } catch (e) { return null; } }
+      const L = (v, o, ref, b0, bs) => { const x = lenOf(v, o, ref); return x == null ? 0 : (o ? b0 + x * bs : x); };
+      const X = L(A.x, obb, 1, bb.x, bb.width), Y = L(A.y, obb, 1, bb.y, bb.height);
+      const Wt = obb ? (lenOf(A.width, true, 1) || 0) * bb.width : (lenOf(A.width, false, 1) || 0);
+      const Ht = obb ? (lenOf(A.height, true, 1) || 0) * bb.height : (lenOf(A.height, false, 1) || 0);
+      if (!(Wt > 0 && Ht > 0)) return null;
+      let C = ID;
+      if (vbEl && vbEl.viewBox.animVal && vbEl.viewBox.animVal.width > 0) C = fitM(vbEl.viewBox.animVal, vbEl.preserveAspectRatio && vbEl.preserveAspectRatio.animVal, Wt, Ht);
+      else if (cobb) C = [bb.width, 0, 0, bb.height, 0, 0];
+      const PM = mul(mul(M, pt || ID), tr(X, Y));
+      const sub = [];
+      defsWalk(kids, C, sub, R, { noClip: true, alpha: 1, depth: (depth || 0) + 1 });
+      const name = R.pat({ tile: sub.join('\n'), dict: '/PatternType 1 /PaintType 1 /TilingType 1 /BBox [0 0 ' + nf(Wt) + ' ' + nf(Ht) + '] /XStep ' + nf(Wt) + ' /YStep ' + nf(Ht) + ' /Matrix [' + mat(PM) + ']' });
+      return { a: 1, set: k => (k === 'rg' ? '/Pattern cs /' + name + ' scn' : '/Pattern CS /' + name + ' SCN') };
+    }
+    function paintOf(v, el, M, R, ctx, depth) {
+      if (!v || v === 'none') return null;
+      if (/^context-fill/.test(v)) return ctx && ctx.cFill || null;
+      if (/^context-stroke/.test(v)) return ctx && ctx.cStroke || null;
+      const id = urlId(v);
+      if (id) {
+        const g = byId(id);
+        let p = null;
+        if (g && /Gradient$/.test(g.tagName)) p = gradPaint(g, el, M, R);
+        else if (g && g.tagName === 'pattern') p = patPaint(g, el, M, R, depth || 0);
+        if (p) return p;
+        const fb = v.replace(/url\([^)]*\)/, '').trim();
+        const c = fb && fb !== 'none' ? rgba(fb) : null;
+        return c ? solid(c) : null;
+      }
+      const c = rgba(v);
+      return c ? solid(c) : null;
+    }
+    function strokeW(cs, R) {
+      const v = cs.strokeWidth || '1';
+      const n = parseFloat(v);
+      if (!/%$/.test(v)) return n;
+      const vb = R.root.viewBox && R.root.viewBox.baseVal && R.root.viewBox.baseVal.width ? R.root.viewBox.baseVal : { width: R.root.clientWidth, height: R.root.clientHeight };
+      return n / 100 * Math.sqrt((vb.width * vb.width + vb.height * vb.height) / 2);
+    }
+    function lineStyle(cs, sw) {
+      const cap = { round: 1, square: 2 }[cs.strokeLinecap] || 0;
+      const join = { round: 1, bevel: 2, arcs: 1 }[cs.strokeLinejoin] || 0;
+      let s = nf(sw) + ' w ' + cap + ' J ' + join + ' j ' + nf(Math.max(1, parseFloat(cs.strokeMiterlimit) || 4)) + ' M';
+      const da = String(cs.strokeDasharray || 'none');
+      if (da !== 'none') {
+        let a = da.split(/[\s,]+/).filter(Boolean).map(parseFloat);
+        if (a.length && a.every(x => isFinite(x) && x >= 0) && a.some(x => x > 0)) {
+          if (a.length % 2) a = a.concat(a);
+          s += ' [' + a.map(nf).join(' ') + '] ' + nf(parseFloat(cs.strokeDashoffset) || 0) + ' d';
+        }
+      }
+      return s;
+    }
+    /* recorte (clip-path): el trazado de cada hijo de <clipPath>, ya en la página */
+    function clipOps(el, cs, M, R, depth) {
+      const id = urlId(cs.clipPath);
+      if (!id) return '';
+      const cp = byId(id);
+      if (!cp || cp.tagName !== 'clipPath' || (depth || 0) > 3) return '';
+      let base = mul(M, localT(cp));
+      if (cp.clipPathUnits && cp.clipPathUnits.animVal === 2) {
+        let bb = null; try { bb = el.getBBox(); } catch (e) { bb = null; }
+        if (!bb) return '';
+        base = mul(base, [bb.width, 0, 0, bb.height, bb.x, bb.y]);
+      }
+      const parts = [];
+      let rule = 'W';
+      const add = (node, m) => {
+        for (const ch of node.children) {
+          const tag = ch.tagName;
+          const ccs = getComputedStyle(ch);
+          if (ccs.display === 'none' || ccs.visibility === 'hidden') continue;
+          const mc = mul(m, localT(ch));
+          let segs = null;
+          if (tag === 'use') {
+            const h = ch.getAttribute('href') || ch.getAttribute('xlink:href'), t = h && h[0] === '#' ? byId(h.slice(1)) : null;
+            if (t && SHAPES[t.tagName]) { const m2 = mul(mul(mc, tr(ch.x.animVal.value, ch.y.animVal.value)), localT(t)); const s = geom(t, t.tagName); if (s) parts.push(pathOps(s, m2)); }
+            continue;
+          }
+          if (tag === 'text') { try { const b = ch.getBBox(); segs = rectS(b.x, b.y, b.width, b.height); } catch (e) { segs = null; } }
+          else if (SHAPES[tag]) segs = geom(ch, tag);
+          if (!segs) continue;
+          if (ccs.clipRule === 'evenodd') rule = 'W*';
+          parts.push(pathOps(segs, mc));
+        }
+      };
+      add(cp, base);
+      /* un clipPath con su propio recorte: se cortan los dos */
+      const inner = clipOps(el, getComputedStyle(cp), M, R, (depth || 0) + 1);
+      return (inner ? inner + '\n' : '') + (parts.length ? parts.join('\n') + '\n' + rule + ' n' : '0 0 m 0 0 l h W n');
+    }
+
+    /* ----- marcadores (las flechas de un trazado) ----- */
+    function vertices(segs) {
+      const V = [];
+      let px = 0, py = 0, sx = 0, sy = 0;
+      const dir = (x0, y0, x1, y1) => Math.atan2(y1 - y0, x1 - x0) * 180 / Math.PI;
+      for (const s of segs) {
+        if (s[0] === 'M') { V.push({ x: s[1], y: s[2], inA: null, outA: null }); px = sx = s[1]; py = sy = s[2]; continue; }
+        let x, y, a0, a1;
+        if (s[0] === 'L' || s[0] === 'Z') { x = s[0] === 'L' ? s[1] : sx; y = s[0] === 'L' ? s[2] : sy; a0 = a1 = dir(px, py, x, y); }
+        else {
+          x = s[5]; y = s[6];
+          a0 = (s[1] !== px || s[2] !== py) ? dir(px, py, s[1], s[2]) : (s[3] !== px || s[4] !== py) ? dir(px, py, s[3], s[4]) : dir(px, py, x, y);
+          a1 = (x !== s[3] || y !== s[4]) ? dir(s[3], s[4], x, y) : (x !== s[1] || y !== s[2]) ? dir(s[1], s[2], x, y) : dir(px, py, x, y);
+        }
+        const prev = V[V.length - 1];
+        if (prev && prev.outA == null) prev.outA = a0;
+        V.push({ x, y, inA: a1, outA: null });
+        px = x; py = y;
+      }
+      return V;
+    }
+    const angAt = v => {
+      if (v.inA == null) return v.outA || 0;
+      if (v.outA == null) return v.inA;
+      let d = v.outA - v.inA;
+      while (d > 180) d -= 360;
+      while (d <= -180) d += 360;
+      return v.inA + d / 2;
+    };
+    function markers(el, cs, segs, M, sw, cFill, cStroke, out, R, alpha) {
+      const ids = [urlId(cs.markerStart), urlId(cs.markerMid), urlId(cs.markerEnd)];
+      if (!ids[0] && !ids[1] && !ids[2]) return;
+      const V = vertices(segs);
+      if (!V.length) return;
+      V.forEach((v, i) => {
+        const which = i === 0 ? 0 : i === V.length - 1 ? 2 : 1;
+        const mk = byId(ids[which]);
+        if (!mk || mk.tagName !== 'marker') return;
+        const mw = mk.markerWidth.animVal.value, mh = mk.markerHeight.animVal.value;
+        if (!(mw > 0 && mh > 0)) return;
+        const o = mk.getAttribute('orient') || '0';
+        let a = angAt(v);
+        if (o === 'auto-start-reverse') { if (which === 0) a += 180; }
+        else if (o !== 'auto') {
+          const m2 = /^\s*([-+\d.eE]+)\s*(deg|rad|grad|turn)?/.exec(o);
+          a = m2 ? +m2[1] * ({ rad: 180 / Math.PI, grad: 0.9, turn: 360 }[m2[2]] || 1) : 0;
+        }
+        const vb = mk.viewBox.animVal;
+        const VB = vb && vb.width > 0 && vb.height > 0 ? fitM(vb, mk.preserveAspectRatio.animVal, mw, mh) : ID;
+        const ref = ap(VB, mk.refX.animVal.value, mk.refY.animVal.value);
+        const s = mk.markerUnits.animVal === 1 ? 1 : sw;
+        const r = a * Math.PI / 180;
+        const Mm = mul(M, mul(tr(v.x, v.y), mul([Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0], mul([s, 0, 0, s, 0, 0], tr(-ref[0], -ref[1])))));
+        const sub = [];
+        defsWalk(mk, mul(Mm, VB), sub, R, { noClip: true, alpha, cFill, cStroke, noMarkers: true, depth: 1 });
+        if (!sub.length) return;
+        const mcs = getComputedStyle(mk);
+        out.push('q');
+        if (!/visible|auto/.test(mcs.overflow || 'hidden')) out.push(pathOps(rectS(0, 0, mw, mh), Mm) + '\nW n');
+        out.push(sub.join('\n'), 'Q');
+      });
+    }
+
+    /* ----- figuras ----- */
+    function shape(el, cs, segs, M, out, R, ctx) {
+      if (cs.visibility === 'hidden' || cs.visibility === 'collapse') return;
+      const tag = el.tagName;
+      const op = clamp01(+cs.opacity) * (ctx && ctx.alpha != null ? ctx.alpha : 1);
+      if (op <= 0) return;
+      let fp = tag === 'line' ? null : paintOf(cs.fill, el, M, R, ctx, ctx && ctx.depth);
+      const sw = strokeW(cs, R);
+      let sp = sw > 0 ? paintOf(cs.stroke, el, M, R, ctx, ctx && ctx.depth) : null;
+      const hasMk = !(ctx && ctx.noMarkers) && /path|line|polyline|polygon/.test(tag) && [cs.markerStart, cs.markerMid, cs.markerEnd].some(v => v && v !== 'none');
+      if (!fp && !sp && !hasMk) return;
+      let group = op < 0.999 && ((fp && sp) || hasMk);
+      const k = group ? 1 : op;
+      const fa = fp ? fp.a * clamp01(+cs.fillOpacity) * k : 1, sa = sp ? sp.a * clamp01(+cs.strokeOpacity) * k : 1;
+      if (fp && fa <= 0.001) fp = null;
+      if (sp && sa <= 0.001) sp = null;
+      if (!fp && !sp && !hasMk) return;
+      group = group && ((fp && sp) || hasMk);
+      const bm = blendOf(cs);
+      const clip = ctx && ctx.noClip ? '' : clipOps(el, cs, M, R);
+      if (cs.filter && cs.filter !== 'none') R.notes.add('filter');
+      if ((cs.maskImage && cs.maskImage !== 'none') || (cs.mask && cs.mask !== 'none')) R.notes.add('mask');
+      const body = [];
+      const nonScaling = cs.vectorEffect === 'non-scaling-stroke';
+      const P = pathOps(segs, nonScaling ? M : null);
+      const fillOp = cs.fillRule === 'evenodd' ? 'f*' : 'f';
+      if (!nonScaling) body.push(mat(M) + ' cm');
+      if (sp) body.push(lineStyle(cs, nonScaling ? sw * 0.75 : sw), sp.set('RG'));
+      if (fp) body.push(fp.set('rg'));
+      const strokeFirst = /^\s*(stroke|markers\s+stroke)/.test(cs.paintOrder || '');
+      if (fp && sp && !strokeFirst) body.push(P, cs.fillRule === 'evenodd' ? 'B*' : 'B');
+      else if (fp && sp) body.push(P, 'S', P, fillOp);
+      else if (fp) body.push(P, fillOp);
+      else if (sp) body.push(P, 'S');
+      const paintIt = o2 => {
+        if (fp || sp) { o2.push('q'); const g = gsOp(R, fp ? fa : 1, sp ? sa : 1, group ? '' : bm); if (g) o2.push(g); o2.push(body.join('\n'), 'Q'); }
+        if (hasMk) markers(el, cs, segs, M, sw, fp, sp, o2, R, group ? 1 : op);
+      };
+      if (group) {
+        const sub = [];
+        paintIt(sub);
+        if (!sub.length) return;
+        out.push('q'); if (clip) out.push(clip);
+        out.push('/' + R.gs(op, op, bm) + ' gs /' + R.xo({ form: sub.join('\n') }) + ' Do', 'Q');
+        return;
+      }
+      if (!clip) { paintIt(out); return; }
+      out.push('q', clip); paintIt(out); out.push('Q');
+    }
+    /* lo de <marker> y <pattern>: no se dibuja en su lugar, así que sus transformaciones se calculan aquí */
+    function defsWalk(node, M, out, R, ctx) {
+      for (const el of node.children) {
+        const tag = el.tagName;
+        if (NOREND[tag]) continue;
+        const cs = getComputedStyle(el);
+        if (cs.display === 'none') continue;
+        const Me = mul(M, localT(el));
+        if (tag === 'g' || tag === 'a') { defsWalk(el, Me, out, R, Object.assign({}, ctx, { alpha: (ctx.alpha == null ? 1 : ctx.alpha) * clamp01(+cs.opacity) })); continue; }
+        if (SHAPES[tag]) { const s = geom(el, tag); if (s) shape(el, cs, s, Me, out, R, ctx); continue; }
+        if (tag === 'text') R.notes.add('defs-text');
+      }
+    }
+    const NOREND = { defs: 1, clipPath: 1, mask: 1, marker: 1, pattern: 1, linearGradient: 1, radialGradient: 1, symbol: 1, style: 1, title: 1, desc: 1, metadata: 1, script: 1, filter: 1, stop: 1, view: 1, animate: 1, animateMotion: 1, animateTransform: 1, set: 1, mpath: 1 };
+
+    /* ----- texto ----- */
+    const ZW = u => (u >= 0x200B && u <= 0x200F) || u === 0x2028 || u === 0x2029 || (u >= 0x2060 && u <= 0x2064) || u === 0xFEFF;
+    const SPC = u => (u >= 0x2000 && u <= 0x200A) || u === 0x202F || u === 0x205F || u === 0x3000;
+    /* acentos sueltos (combinantes) → el acento de la letra estándar que los dibuja */
+    const ACC = { 0x300: 0x60, 0x301: 0xB4, 0x302: 0x2C6, 0x303: 0x2DC, 0x304: 0xAF, 0x305: 0xAF, 0x306: 0x2D8, 0x307: 0x2D9, 0x308: 0xA8, 0x30A: 0x2DA, 0x30B: 0x2DD, 0x30C: 0x2C7, 0x327: 0xB8, 0x328: 0x2DB };
+    const BELOW = { 0x327: 1, 0x328: 1 };
+    /* superíndices y subíndices de Unicode: se dibujan con la letra normal, más chica y arriba o abajo */
+    const SCRIPT = u => ((u >= 0x2070 && u <= 0x207F) || (u >= 0x1D2C && u <= 0x1D61) || (u >= 0x1D9B && u <= 0x1DBF) || (u >= 0x2B0 && u <= 0x2B8) || (u >= 0x2E0 && u <= 0x2E4) ? 0.3
+      : (u >= 0x2080 && u <= 0x209C) || (u >= 0x1D62 && u <= 0x1D6A) || u === 0x2C7C ? -0.12 : 0);
+    const SCR_K = 0.62;
+    function textChars(t) {
+      const parts = [];
+      const walkT = n => {
+        for (const c of n.childNodes) {
+          if (c.nodeType === 3) parts.push([c.data, n]);
+          else if (c.nodeType === 1 && /^(tspan|textPath|a)$/.test(c.tagName) && getComputedStyle(c).display !== 'none') walkT(c);
+        }
+      };
+      walkT(t);
+      const pre = /^pre|break-spaces/.test(getComputedStyle(t).whiteSpace || '');
+      let u = [];
+      parts.forEach(([s, el]) => { for (let i = 0; i < s.length; i++) { let ch = s[i]; if (!pre && /[\n\r\t]/.test(ch)) ch = ' '; u.push([ch, el]); } });
+      if (!pre) {
+        const o = [];
+        u.forEach(x => { if (x[0] === ' ' && (!o.length || o[o.length - 1][0] === ' ')) return; o.push(x); });
+        while (o.length && o[o.length - 1][0] === ' ') o.pop();
+        u = o;
+      }
+      return u;
+    }
+    let mc = null;
+    const ascCache = new Map();
+    /* qué parte de la caja de una letra queda arriba de la línea de base */
+    function ascRatio(cs) {
+      const k = cs.fontStyle + ' ' + cs.fontWeight + ' 100px ' + cs.fontFamily;
+      if (ascCache.has(k)) return ascCache.get(k);
+      let r = 0.8;
+      try {
+        if (!mc) mc = document.createElement('canvas').getContext('2d');
+        mc.font = k;
+        const m = mc.measureText('Hg');
+        if (m.fontBoundingBoxAscent > 0) r = m.fontBoundingBoxAscent / (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent);
+      } catch (e) { /* 0.8 */ }
+      ascCache.set(k, r);
+      return r;
+    }
+    function text(t, cs, M, out, R) {
+      let n = 0;
+      try { n = t.getNumberOfChars(); } catch (e) { return; }
+      if (!n) return;
+      tables();
+      /* cada carácter con su elemento y su índice para el navegador (que cuenta en unidades de UTF-16 o en
+         puntos de código): un par sustituto va junto */
+      const units = textChars(t), list = [];
+      const cps = [];
+      for (let i = 0; i < units.length; i++) { const c = units[i][0].charCodeAt(0); if (c >= 0xD800 && c <= 0xDBFF && i + 1 < units.length) { cps.push([units[i][0] + units[i + 1][0], units[i][1], i]); i++; } else cps.push([units[i][0], units[i][1], i]); }
+      if (units.length === n) cps.forEach(c => list.push([c[0], c[1], c[2]]));
+      else if (cps.length === n) cps.forEach((c, k) => list.push([c[0], c[1], k]));
+      else { R.notes.add('text-count'); return; }
+      const op = clamp01(+cs.opacity);
+      if (op <= 0) return;
+      const STY = new Map();
+      const styleOf = el => {
+        let s = STY.get(el);
+        if (s) return s;
+        const c = el === t ? cs : getComputedStyle(el);
+        const size = parseFloat(c.fontSize) || 16;
+        const sw = strokeW(c, R);
+        s = { el, c, size, base: baseFont(c), hidden: c.visibility === 'hidden' || c.visibility === 'collapse', ls: parseFloat(c.letterSpacing) || 0,
+          fill: paintOf(c.fill, t, M, R), stroke: sw > 0 ? paintOf(c.stroke, t, M, R) : null, sw, delta: null,
+          strokeFirst: /^\s*(stroke|markers\s+stroke)/.test(c.paintOrder || '') };
+        s.fa = s.fill ? s.fill.a * clamp01(+c.fillOpacity) * op : 0;
+        s.sa = s.stroke ? s.stroke.a * clamp01(+c.strokeOpacity) * op : 0;
+        if (s.fill && s.fa <= 0.001) s.fill = null;
+        if (s.stroke && s.sa <= 0.001) s.stroke = null;
+        STY.set(el, s);
+        return s;
+      };
+      const glyph = (ch, base) => {
+        const u = ch.codePointAt(0), m = metricsOf(base);
+        const w = FT.u2w.get(u);
+        if (w != null) return { f: base, c: w, w: m === 'Courier' ? 600 : FT.win[m][w - 32] };
+        const xi = FT.u2x.get(u === 0x394 ? 0x2206 : u);
+        if (xi != null) { const c = R.slot(base, xi); if (c != null) return { f: base, c, w: m === 'Courier' ? 600 : FT.xw[m][xi] }; }
+        if (u === 0x3BC) return glyph(String.fromCharCode(0xB5), base);
+        const s = FT.sym.get(u === 0x2126 ? 0x3A9 : u);
+        if (s) return { f: 'Symbol', c: s[0], w: s[1] };
+        return null;
+      };
+      const tall = ch => ch !== ch.toLowerCase() || /[bdfhklt]/.test(ch);
+      /* el acento sobre la letra anterior, centrado; más arriba sobre una mayúscula o una letra alta */
+      const accentOn = (run, bg, bch, accU) => {
+        const ag = glyph(String.fromCharCode(ACC[accU]), run.st.base);
+        if (!ag) return false;
+        const D = PDF_DESC[metricsOf(run.st.base)];
+        const raise = BELOW[accU] ? 0 : (tall(bch) ? (D[4] - D[5]) / 1000 : 0);
+        run.p.push({ adj: -(bg.w + ag.w) / 2000 }, { g: ag, rise: raise, acc: 1 }, { adj: (bg.w - ag.w) / 2000 });
+        return true;
+      };
+      const pieces = (ch, base) => {
+        let u = ch.codePointAt(0);
+        if (ZW(u)) return { skip: 1 };
+        if (SPC(u)) { ch = ' '; u = 32; }
+        const g = glyph(ch, base);
+        if (g) return { p: [{ g }], w: g.w, last: [g, ch] };
+        if (u >= 0x300 && u <= 0x36F) return ACC[u] ? { mark: u } : { skip: 1 };
+        const sc = SCRIPT(u);
+        if (sc) {
+          const b = Array.from(ch.normalize('NFKC')), gs = b.map(c => glyph(c, base));
+          if (gs.length && gs.every(Boolean)) return { p: gs.map(x => ({ g: x, scale: SCR_K, rise: sc })), w: gs.reduce((a, x) => a + x.w * SCR_K, 0) };
+        }
+        const d = ch.normalize('NFD');
+        if (d.length > 1) {
+          const bg = glyph(d[0], base);
+          if (bg && Array.from(d.slice(1)).every(c => ACC[c.codePointAt(0)])) return { p: [{ g: bg }], w: bg.w, last: [bg, d[0]], marks: Array.from(d.slice(1)).map(c => c.codePointAt(0)) };
+        }
+        const k = ch.normalize('NFKC');
+        if (k !== ch) { const gs = Array.from(k).map(c => glyph(c, base)); if (gs.length && gs.every(Boolean)) return { p: gs.map(x => ({ g: x })), w: gs.reduce((a, x) => a + x.w, 0) }; }
+        return { img: 1 };
+      };
+      const runs = [];
+      let run = null;
+      const close = () => { if (run && run.p.length) runs.push(run); run = null; };
+      for (let i = 0; i < list.length; i++) {
+        const ch = list[i][0], st = styleOf(list[i][1]);
+        if (st.hidden || (!st.fill && !st.stroke)) { close(); continue; }
+        const I = list[i][2];
+        let p, e, x, r = 0;
+        try { p = t.getStartPositionOfChar(I); e = t.getEndPositionOfChar(I); x = t.getExtentOfChar(I); r = t.getRotationOfChar(I) || 0; } catch (err) { close(); continue; }
+        if (st.delta == null) st.delta = r ? 0 : (x.y + x.height * ascRatio(st.c) - p.y);
+        const pc = pieces(ch, st.base);
+        if (pc.skip) continue;
+        if (pc.mark) { if (run && run.last) accentOn(run, run.last[0], run.last[1], pc.mark); continue; }
+        if (pc.img) { close(); runs.push({ img: ch, st, p, x, r }); continue; }
+        const tol = 0.05 * st.size;
+        const by = p.y + st.delta;
+        if (!(run && run.st === st && !r && !run.r && Math.abs(p.x - run.ex) < tol && Math.abs(by - run.ey) < tol)) {
+          close();
+          run = { st, x0: p.x, y0: by, ex: p.x, ey: by, r, p: [], nat: 0, n: 0 };
+        }
+        pc.p.forEach(q => run.p.push(q));
+        run.nat += pc.w; run.n++;
+        run.last = pc.last || null;
+        if (pc.marks) pc.marks.forEach(mk => accentOn(run, pc.last[0], pc.last[1], mk));
+        run.ex = e.x; run.ey = e.y + st.delta;
+      }
+      close();
+      if (!runs.length) return;
+      const clip = clipOps(t, cs, M, R);
+      out.push('q');
+      if (clip) out.push(clip);
+      out.push(mat(M) + ' cm');
+      for (const rn of runs) {
+        const st = rn.st;
+        if (rn.img) { stencil(rn, out, R); continue; }
+        const dx = rn.ex - rn.x0, dy = rn.ey - rn.y0, L = Math.hypot(dx, dy);
+        if (!(L > 0)) continue;
+        if (rn.p.every(q => q.g && q.g.f !== 'Symbol' && q.g.c === 32)) continue;
+        const nat = rn.nat / 1000 * st.size + rn.n * st.ls;
+        if (!(nat > 0)) continue;
+        const th = rn.r ? rn.r * Math.PI / 180 : Math.atan2(dy, dx);
+        const tz = Math.max(25, Math.min(400, 100 * L / nat));
+        const passes = st.fill && st.stroke ? (st.strokeFirst ? [1, 0] : [2]) : [st.fill ? 0 : 1];
+        for (const mode of passes) {
+          const o = ['BT'];
+          const g = gsOp(R, mode === 1 ? 1 : st.fa, mode === 0 ? 1 : st.sa, '');
+          if (g) o.push(g);
+          if (mode !== 1) o.push(st.fill.set('rg'));
+          if (mode !== 0) o.push(st.stroke.set('RG'), nf(st.sw) + ' w 1 j 1 J');
+          o.push(mode + ' Tr', nf(tz) + ' Tz', nf(st.ls) + ' Tc');
+          o.push([Math.cos(th), Math.sin(th), Math.sin(th), -Math.cos(th), rn.x0, rn.y0].map(nf).join(' ') + ' Tm');
+          let curF = null, curS = 0, curR = 0, arr = [], str = null;
+          const flush = () => { if (str != null) { arr.push('(' + str + ')'); str = null; } if (arr.length) { o.push('[' + arr.join(' ') + '] TJ'); arr = []; } };
+          for (const q of rn.p) {
+            if (q.adj != null) { if (str != null) { arr.push('(' + str + ')'); str = null; } arr.push(nf(-q.adj * st.size / curS * 1000)); continue; }
+            const fname = R.font(q.g.f), size = st.size * (q.scale || 1), rise = st.size * (q.rise || 0);
+            if (fname !== curF || size !== curS) { flush(); o.push('/' + fname + ' ' + nf(size) + ' Tf'); curF = fname; curS = size; }
+            if (rise !== curR) { flush(); o.push(nf(rise) + ' Ts'); curR = rise; }
+            const c = q.g.c;
+            const b = c === 40 || c === 41 || c === 92 ? '\\' + String.fromCharCode(c) : (c < 32 || c > 126 ? '\\' + c.toString(8).padStart(3, '0') : String.fromCharCode(c));
+            str = (str || '') + b;
+            /* el acento no avanza: se descuenta su espacio entre letras */
+            if (q.acc && st.ls) { arr.push('(' + str + ')'); str = null; arr.push(nf(st.ls / curS * 1000)); }
+          }
+          flush();
+          o.push('ET');
+          out.push(o.join('\n'));
+        }
+      }
+      out.push('Q');
+    }
+    /* un carácter que no traen las letras estándar: su imagen, pintada con el color del texto. Aquí solo se pide;
+       se dibuja al armar el archivo (glyphImg), como lo dibuja el navegador en un SVG */
+    function stencil(rn, out, R) {
+      const st = rn.st, x = rn.x;
+      if (!st.fill || !(x.height > 0 && x.width > 0)) return;
+      const c = st.fill.rgb || [0, 0, 0, 1];
+      const key = rn.img + '|' + st.c.fontStyle + '|' + st.c.fontWeight + '|' + st.c.fontFamily + '|' + c.join(',');
+      let name = R.stc.get(key);
+      if (!name) {
+        const k = 256 / x.height;
+        name = R.xo({ glyph: { ch: rn.img, style: st.c.fontStyle, weight: st.c.fontWeight, family: st.c.fontFamily, size: st.size * k, W: Math.max(1, Math.min(1024, Math.ceil(x.width * k))), H: 256, x: (rn.p.x - x.x) * k, y: (rn.p.y + st.delta - x.y) * k, rgb: c } });
+        R.stc.set(key, name);
+      }
+      const g = gsOp(R, st.fa, 1, '');
+      out.push('q' + (g ? ' ' + g : '') + ' ' + [x.width, 0, 0, -x.height, x.x, x.y + x.height].map(nf).join(' ') + ' cm /' + name + ' Do Q');
+      R.notes.add('glyph-img');
+    }
+    async function glyphImg(g) {
+      const xe = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + g.W + '" height="' + g.H + '"><text x="' + nf(g.x) + '" y="' + nf(g.y) + '" style="font-style:' + xe(g.style) + ';font-weight:' + xe(g.weight) + ';font-size:' + nf(g.size) + 'px;font-family:' + xe(g.family) + ';fill:#000;white-space:pre">' + xe(g.ch) + '</text></svg>';
+      const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+      const a = new Uint8Array(g.W * g.H);
+      try {
+        const im = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = url; });
+        const cv = document.createElement('canvas'); cv.width = g.W; cv.height = g.H;
+        const ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(im, 0, 0);
+        const d = ctx.getImageData(0, 0, g.W, g.H).data;
+        for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3];
+      } catch (e) { /* queda transparente */ } finally { URL.revokeObjectURL(url); }
+      const rgb = new Uint8Array(g.W * g.H * 3), r = Math.round(g.rgb[0] * 255), gg = Math.round(g.rgb[1] * 255), b = Math.round(g.rgb[2] * 255);
+      for (let i = 0; i < g.W * g.H; i++) { rgb[i * 3] = r; rgb[i * 3 + 1] = gg; rgb[i * 3 + 2] = b; }
+      return { w: g.W, h: g.H, rgb, a };
+    }
+
+    /* ----- imágenes dentro del SVG ----- */
+    async function loadImages(svg) {
+      const map = new Map();
+      for (const im of svg.querySelectorAll('image')) {
+        const h = im.getAttribute('href') || im.getAttribute('xlink:href');
+        if (!h || map.has(h)) continue;
+        try {
+          const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = h; });
+          let W = img.naturalWidth, H = img.naturalHeight;
+          const s = Math.min(1, 4000 / Math.max(W, H)); W = Math.max(1, Math.round(W * s)); H = Math.max(1, Math.round(H * s));
+          const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+          const g = cv.getContext('2d', { willReadFrequently: true });
+          g.drawImage(img, 0, 0, W, H);
+          const d = g.getImageData(0, 0, W, H).data, rgb = new Uint8Array(W * H * 3), a = new Uint8Array(W * H);
+          let op = true;
+          for (let i = 0, j = 0; i < W * H; i++, j += 4) { rgb[i * 3] = d[j]; rgb[i * 3 + 1] = d[j + 1]; rgb[i * 3 + 2] = d[j + 2]; a[i] = d[j + 3]; if (d[j + 3] < 255) op = false; }
+          map.set(h, { w: W, h: H, rgb, a: op ? null : a });
+        } catch (e) { map.set(h, null); }
+      }
+      return map;
+    }
+    function image(el, cs, M, out, R) {
+      if (cs.visibility === 'hidden') return;
+      const h = el.getAttribute('href') || el.getAttribute('xlink:href');
+      const im = R.imgs && R.imgs.get(h);
+      if (!im) { R.notes.add('image'); return; }
+      const x = el.x.animVal.value, y = el.y.animVal.value;
+      let w = el.width.animVal.value, hh = el.height.animVal.value;
+      if (!w && !hh) { w = im.w; hh = im.h; } else if (!w) w = hh * im.w / im.h; else if (!hh) hh = w * im.h / im.w;
+      if (!(w > 0 && hh > 0)) return;
+      const F = fitM({ x: 0, y: 0, width: im.w, height: im.h }, el.preserveAspectRatio && el.preserveAspectRatio.animVal, w, hh);
+      const pl = mul(tr(x, y), mul(F, [im.w, 0, 0, -im.h, 0, im.h]));
+      let name = R.stc.get('img|' + h);
+      if (!name) { name = R.xo({ img: im }); R.stc.set('img|' + h, name); }
+      const clip = clipOps(el, cs, M, R);
+      const g = gsOp(R, clamp01(+cs.opacity), 1, blendOf(cs));
+      out.push('q', clip || '', g, mat(M) + ' cm', pathOps(rectS(x, y, w, hh)) + '\nW n', mat(pl) + ' cm /' + name + ' Do', 'Q');
+    }
+
+    /* ----- el árbol de la figura ----- */
+    function walk(parent, out, R) {
+      for (const el of parent.children) {
+        const tag = el.tagName;
+        if (NOREND[tag]) continue;
+        let cs;
+        try { cs = getComputedStyle(el); } catch (e) { continue; }
+        if (cs.display === 'none') continue;
+        if (tag === 'g' || tag === 'a' || tag === 'svg' || tag === 'switch') { group(el, cs, out, R); continue; }
+        const c = el.getScreenCTM && el.getScreenCTM();
+        if (!c) continue;
+        const M = mul(R.RB, dm(c));
+        if (tag === 'text') { text(el, cs, M, out, R); continue; }
+        if (tag === 'image') { image(el, cs, M, out, R); continue; }
+        if (SHAPES[tag]) { const s = geom(el, tag); if (s) shape(el, cs, s, M, out, R, null); continue; }
+        if (tag === 'use') { R.notes.add('use'); continue; }
+        if (tag === 'foreignObject') { R.notes.add('html'); continue; }
+      }
+    }
+    function group(el, cs, out, R) {
+      const op = clamp01(+cs.opacity);
+      if (op <= 0) return;
+      const c = el.getScreenCTM && el.getScreenCTM();
+      const M = c ? mul(R.RB, dm(c)) : null;
+      let clip = M ? clipOps(el, cs, M, R) : '';
+      /* un <svg> anidado recorta a su ventana */
+      if (el.tagName === 'svg' && el !== R.root && !/visible|auto/.test(cs.overflow || 'hidden')) {
+        const pc = el.parentNode && el.parentNode.getScreenCTM && el.parentNode.getScreenCTM();
+        const w = el.width.animVal.value, h = el.height.animVal.value;
+        if (pc && w > 0 && h > 0) clip = (clip ? clip + '\n' : '') + pathOps(rectS(el.x.animVal.value, el.y.animVal.value, w, h), mul(R.RB, dm(pc))) + '\nW n';
+      }
+      if (cs.filter && cs.filter !== 'none') R.notes.add('filter');
+      if ((cs.maskImage && cs.maskImage !== 'none') || (cs.mask && cs.mask !== 'none')) R.notes.add('mask');
+      const bm = blendOf(cs);
+      if (!clip && op >= 0.999 && !bm) { walk(el, out, R); return; }
+      out.push('q');
+      if (clip) out.push(clip);
+      if (op < 0.999 || bm) { const sub = []; walk(el, sub, R); if (sub.length) out.push('/' + R.gs(op, op, bm) + ' gs /' + R.xo({ form: sub.join('\n') }) + ' Do'); }
+      else walk(el, out, R);
+      out.push('Q');
+    }
+
+    /* ----- el archivo ----- */
+    const enc = s => { const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i) & 255; return u; };
+    const utf16 = s => { let h = 'FEFF'; for (let i = 0; i < s.length; i++) h += s.charCodeAt(i).toString(16).padStart(4, '0').toUpperCase(); return '<' + h + '>'; };
+    async function assemble(Wp, Hp, content, R, o) {
+      const objs = [null, null, null, null, null];
+      const add = x => { objs.push(x); return objs.length; };
+      const stream = async (dict, data) => { const u = typeof data === 'string' ? enc(data) : data; const z = await deflate(u); return { dict, data: z || u, z: !!z }; };
+      /* letras */
+      const fontRefs = [];
+      for (const f of R.fonts.values()) {
+        const D = PDF_DESC[f.base === 'Symbol' ? 'Symbol' : metricsOf(f.base)];
+        const obl = /Oblique/.test(f.base);
+        const flags = f.base === 'Symbol' ? 4 : ((/^Times/.test(f.base) ? 2 : 0) + (/^Courier/.test(f.base) ? 1 : 0) + 32 + (/Italic|Oblique/.test(f.base) ? 64 : 0));
+        const ital = obl ? -12 : D[8];
+        const fd = add({ dict: '<< /Type /FontDescriptor /FontName /' + f.base + ' /Flags ' + flags + ' /FontBBox [' + D.slice(0, 4).join(' ') + '] /ItalicAngle ' + ital + ' /Ascent ' + (D[6] || D[3]) + ' /Descent ' + (D[7] || D[1]) + ' /CapHeight ' + (D[4] || D[3]) + (D[5] ? ' /XHeight ' + D[5] : '') + ' /StemV ' + D[9] + ' >>' });
+        let dict;
+        if (f.base === 'Symbol') {
+          const w = []; for (let c = 32; c <= 254; c++) w.push(FT.symW.get(c) || 0);
+          dict = '<< /Type /Font /Subtype /Type1 /BaseFont /Symbol /FirstChar 32 /LastChar 254 /Widths [' + w.join(' ') + '] /FontDescriptor ' + fd + ' 0 R >>';
+        } else {
+          const m = metricsOf(f.base), slots = Array.from(f.slots.entries()).sort((a, b) => a[1] - b[1]);
+          const first = slots.length ? Math.min(32, slots[0][1]) : 32;
+          const byCode = new Map(slots.map(([xi, c]) => [c, xi]));
+          const w = [];
+          for (let c = first; c <= 255; c++) {
+            if (byCode.has(c)) w.push(m === 'Courier' ? 600 : FT.xw[m][byCode.get(c)]);
+            else w.push(c >= 32 ? (m === 'Courier' ? (FT.win.Helvetica[c - 32] ? 600 : 0) : FT.win[m][c - 32]) : 0);
+          }
+          const diffs = slots.length ? ' /Differences [' + slots.map(([xi, c]) => c + ' /' + FT.xu[xi][1]).join(' ') + ']' : '';
+          dict = '<< /Type /Font /Subtype /Type1 /BaseFont /' + f.base + ' /Encoding << /Type /Encoding /BaseEncoding /WinAnsiEncoding' + diffs + ' >> /FirstChar ' + first + ' /LastChar 255 /Widths [' + w.join(' ') + '] /FontDescriptor ' + fd + ' 0 R >>';
+        }
+        fontRefs.push('/' + f.name + ' ' + add({ dict }) + ' 0 R');
+      }
+      /* patrones */
+      const patRefs = [];
+      for (let i = 0; i < R.pats.length; i++) {
+        const p = R.pats[i];
+        const n = p.tile != null ? add(await stream('<< /Type /Pattern ' + p.dict + ' /Resources 4 0 R', p.tile)) : add({ dict: p.dict });
+        patRefs.push('/P' + (i + 1) + ' ' + n + ' 0 R');
+      }
+      /* imágenes y grupos */
+      const xoRefs = [];
+      for (let i = 0; i < R.xos.length; i++) {
+        const x = R.xos[i];
+        let n;
+        if (x.form != null) n = add(await stream('<< /Type /XObject /Subtype /Form /BBox [0 0 ' + nf(Wp) + ' ' + nf(Hp) + '] /Group << /S /Transparency >> /Resources 4 0 R', x.form));
+        else {
+          const im = x.glyph ? await glyphImg(x.glyph) : x.img;
+          let sm = '';
+          if (im.a) { const s = add(await stream('<< /Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceGray /BitsPerComponent 8', im.a)); sm = ' /SMask ' + s + ' 0 R'; }
+          n = add(await stream('<< /Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8' + sm, im.rgb));
+        }
+        xoRefs.push('/X' + (i + 1) + ' ' + n + ' 0 R');
+      }
+      const gsRefs = Array.from(R.gsm.entries()).map(([k, n]) => { const [ca, CA, bm] = k.split('|'); return '/' + n + ' << /Type /ExtGState /ca ' + ca + ' /CA ' + CA + (bm ? ' /BM /' + bm : '') + ' >>'; });
+      objs[0] = { dict: '<< /Type /Catalog /Pages 2 0 R >>' };
+      objs[1] = { dict: '<< /Type /Pages /Kids [3 0 R] /Count 1 >>' };
+      objs[2] = { dict: '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + nf(Wp) + ' ' + nf(Hp) + '] /Resources 4 0 R /Contents 5 0 R >>' };
+      objs[3] = { dict: '<< /ProcSet [/PDF /Text /ImageB /ImageC]' + (fontRefs.length ? ' /Font << ' + fontRefs.join(' ') + ' >>' : '') + (gsRefs.length ? ' /ExtGState << ' + gsRefs.join(' ') + ' >>' : '') + (patRefs.length ? ' /Pattern << ' + patRefs.join(' ') + ' >>' : '') + (xoRefs.length ? ' /XObject << ' + xoRefs.join(' ') + ' >>' : '') + ' >>' };
+      objs[4] = await stream('<<', content);
+      const d = new Date(), p2 = v => String(v).padStart(2, '0');
+      const info = add({ dict: '<< /Producer (LABG Estudio de figuras ' + VERSION + ') /Creator (LABG Suite)' + (o.title ? ' /Title ' + utf16(String(o.title).slice(0, 200)) : '') + ' /CreationDate (D:' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds()) + ') >>' });
+      /* escribir */
+      const parts = [], offs = [];
+      let len = 0;
+      const push = u => { parts.push(u); len += u.length; };
+      push(enc('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n'));
+      objs.forEach((x, i) => {
+        offs[i] = len;
+        if (x.data) { push(enc((i + 1) + ' 0 obj\n' + x.dict + (x.z ? ' /Filter /FlateDecode' : '') + ' /Length ' + x.data.length + ' >>\nstream\n')); push(x.data); push(enc('\nendstream\nendobj\n')); }
+        else push(enc((i + 1) + ' 0 obj\n' + x.dict + '\nendobj\n'));
+      });
+      const xref = len;
+      let x = 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n';
+      offs.forEach(o2 => { x += String(o2).padStart(10, '0') + ' 00000 n \n'; });
+      push(enc(x + 'trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R /Info ' + info + ' 0 R >>\nstartxref\n' + xref + '\n%%EOF\n'));
+      return new Blob(parts, { type: 'application/pdf' });
+    }
+
+    /* la figura completa: o.wmm × o.hmm, fondo o.bg (o null), colores del tema claro con o.light */
+    return async function vecPdf(svg, o) {
+      o = o || {};
+      tables();
+      const imgs = svg.querySelector('image') ? await loadImages(svg) : null;
+      const Wp = o.wmm * PT_MM, Hp = o.hmm * PT_MM;
+      const R = mkRes(svg);
+      R.imgs = imgs;
+      const draw = () => {
+        const vb0 = svg.viewBox && svg.viewBox.baseVal;
+        const vb = vb0 && vb0.width > 0 && vb0.height > 0 ? vb0 : { x: 0, y: 0, width: svg.clientWidth || svg.getBoundingClientRect().width || 300, height: svg.clientHeight || svg.getBoundingClientRect().height || 150 };
+        const F = fitM(vb, svg.preserveAspectRatio && svg.preserveAspectRatio.baseVal, Wp, Hp);
+        const B = [F[0], 0, 0, -F[3], F[4], Hp - F[5]];
+        const rc = svg.getScreenCTM();
+        R.RB = mul(B, rc ? inv(dm(rc)) : ID);
+        const out = [];
+        const bg = o.bg ? rgba(o.bg) : null;
+        if (bg) out.push(nf(bg[0]) + ' ' + nf(bg[1]) + ' ' + nf(bg[2]) + ' rg 0 0 ' + nf(Wp) + ' ' + nf(Hp) + ' re f');
+        walk(svg, out, R);
+        return out.join('\n');
+      };
+      const content = o.light ? inLight(draw) : draw();
+      const blob = await assemble(Wp, Hp, content, R, o);
+      return { blob, notes: Array.from(R.notes) };
+    };
+  })();
   /* PDF propio: una página del tamaño de la figura con la imagen a la resolución elegida */
   async function pdfBlob(cv, wmm, hmm, alpha) {
     const W = cv.width, H = cv.height, ctx = cv.getContext('2d');
@@ -2673,7 +3683,7 @@
     let fn = '';
     try { fn = ST.native && ST.native.file ? String(typeof ST.native.file === 'function' ? ST.native.file() : ST.native.file || '') : ''; } catch (e) { fn = ''; }
     const t = slug(fn || natTitle() || ST.rec.key);
-    return APP + '-' + t + '-' + fmtN(expW(), 0) + 'mm' + (ext === 'svg' ? '' : '-' + ST.exp.dpi + 'ppp') + (ST.exp.fmt === 'geotiff' ? '-geo' : '') + '.' + ext;
+    return APP + '-' + t + '-' + fmtN(expW(), 0) + 'mm' + (ext === 'svg' || (ext === 'pdf' && pdfVec()) ? '' : '-' + ST.exp.dpi + 'ppp') + (ST.exp.fmt === 'geotiff' ? '-geo' : '') + '.' + ext;
   }
   let busy = false;
   async function doExport() {
@@ -2685,7 +3695,7 @@
     try {
       const fmt = ST.exp.fmt, wmm = expW(), hmm = expH();
       const bg = bgColor();
-      let blob, ext = fmt === 'tiff' || fmt === 'geotiff' ? 'tif' : fmt;
+      let blob, notes = [], ext = fmt === 'tiff' || fmt === 'geotiff' ? 'tif' : fmt;
       const N = ST.native;
       /* lo que la app dibuja por sí misma; si no, se arma con su PNG (y, sin figura elevada, siempre así) */
       let want = nativeCan(N, fmt) ? fmt : (fmt === 'tiff' ? 'png' : null);
@@ -2719,6 +3729,11 @@
           const url = cv.toDataURL('image/png');
           blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="' + NS + '" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + fmtN(wmm, 2) + 'mm" height="' + fmtN(hmm, 2) + 'mm" viewBox="0 0 ' + cv.width + ' ' + cv.height + '"><image width="' + cv.width + '" height="' + cv.height + '" xlink:href="' + url + '"/></svg>'], { type: 'image/svg+xml' });
         }
+      } else if (fmt === 'pdf' && pdfVec()) {
+        /* trazos y texto, no la imagen */
+        say(T('Escribiendo el PDF vectorial…', 'Writing the vector PDF…'));
+        const r = await vecPdf(ST.el, { wmm, hmm, bg, light: lightOn(), title: natTitle() });
+        blob = r.blob; notes = r.notes;
       } else {
         let px = expPx();
         if (px.w * px.h > 150e6 || px.w > 16000 || px.h > 16000) {
@@ -2734,9 +3749,9 @@
       }
       const name = fileName(ext);
       download(blob, name);
-      say(T('Exportada: ', 'Exported: ') + name + ' (' + (blob.size / 1048576).toFixed(2) + ' MB)');
+      say(T('Exportada: ', 'Exported: ') + name + ' (' + (blob.size / 1048576).toFixed(2) + ' MB)' + pdfNotes(notes));
       ring();
-      document.dispatchEvent(new CustomEvent('labg-figure-studio:export', { detail: { name, size: blob.size, format: fmt } }));
+      document.dispatchEvent(new CustomEvent('labg-figure-studio:export', { detail: { name, size: blob.size, format: fmt, vector: fmt === 'svg' || (fmt === 'pdf' && pdfVec()) } }));
     } catch (err) {
       console.error('LABG Estudio: exportación', err);
       say(T('No se pudo exportar: ', 'Could not export: ') + (err && err.message ? err.message : err));
@@ -2744,6 +3759,18 @@
       busy = false;
       btns.forEach(b => { b.disabled = false; b.classList.remove('busy'); });
     }
+  }
+  /* lo que el PDF vectorial no lleva, en pocas palabras */
+  function pdfNotes(n) {
+    const t = [], has = k => n.indexOf(k) >= 0;
+    if (has('filter')) t.push(T('sin filtros (sombras)', 'without filters (shadows)'));
+    if (has('mask')) t.push(T('sin máscaras', 'without masks'));
+    if (has('html')) t.push(T('sin el HTML de dentro', 'without the HTML inside'));
+    if (has('use') || has('defs-text') || has('text-count')) t.push(T('falta alguna pieza: compárala con el PNG', 'some piece is missing: compare it with the PNG'));
+    if (has('image')) t.push(T('sin una imagen que no se pudo leer', 'without an image that could not be read'));
+    if (has('stop-opacity') || has('spread')) t.push(T('algún degradado, simplificado', 'some gradient, simplified'));
+    if (has('glyph-img')) t.push(T('algún carácter especial va como imagen', 'some special character goes as an image'));
+    return t.length ? ' · ' + t.join(' · ') : '';
   }
   async function doCopy() {
     if (!ST.open) return;
@@ -2846,6 +3873,12 @@
     presets: PRESETS,
     on: (ev, fn) => document.addEventListener('labg-figure-studio:' + ev, e => fn(e.detail)),
     refresh: () => decorate(),
+    /* PDF vectorial de una figura SVG de la app (1.5.0): { wmm, hmm, bg, light, title } → Promise de { blob, notes } */
+    toPDF(el, o) {
+      o = Object.assign({ wmm: 170, bg: '#ffffff' }, o || {});
+      if (!o.hmm) { const vb = el.viewBox && el.viewBox.baseVal, r = el.getBoundingClientRect(); o.hmm = o.wmm * (vb && vb.width ? vb.height / vb.width : (r.width ? r.height / r.width : 0.62)); }
+      return vecPdf(el, o);
+    },
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(start, 80));
