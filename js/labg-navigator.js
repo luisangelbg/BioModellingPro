@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.1.0 (módulo compartido)
+/* LABG Suite — Navegador LABG v1.1.1 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -51,7 +51,7 @@
 (function () {
   'use strict';
   if (window.LABGNavigator && window.LABGNavigator.version) return;
-  const VERSION = '1.1.0';
+  const VERSION = '1.1.1';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -832,7 +832,23 @@
     }
     progressBar();
   }
+  /* los botones flotantes suben por encima del pie del bloque (Anterior / Siguiente)
+     cuando éste entra en pantalla, en vez de taparlo */
+  function dodgeFloats() {
+    if (!floatBox) return;
+    const vh = window.innerHeight;
+    let up = 0;
+    $$('.step-footer, .next-bar').forEach(f => {
+      if (!f.offsetParent || f.hidden) return;
+      const r = f.getBoundingClientRect();
+      if (r.bottom <= 0 || r.top >= vh) return;
+      const bottom = parseFloat(getComputedStyle(floatBox).bottom) || 0;
+      up = Math.max(up, Math.min(vh * 0.5, (vh - bottom) - (r.top - 10)));
+    });
+    floatBox.style.transform = up > 0 ? 'translateY(' + (-Math.round(up)) + 'px)' : '';
+  }
   function progressBar() {
+    dodgeFloats();
     const p = activePanel();
     if (!p || !progress) return;
     const r = p.getBoundingClientRect();
