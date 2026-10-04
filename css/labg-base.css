@@ -243,8 +243,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
   display: flex; align-items: center; gap: 10px; min-width: 0;
   font-weight: 800; font-size: 1.14rem; letter-spacing: -0.4px;
   color: var(--text); text-decoration: none; cursor: pointer; user-select: none;
+  white-space: nowrap;
 }
-.brand svg, .brand img { width: 32px; height: 32px; display: block; flex-shrink: 0; }
+/* max-width: none: con el img, svg { max-width: 100% } general, el logo se aplastaba cuando faltaba espacio */
+.brand svg, .brand img { width: 32px; height: 32px; max-width: none; display: block; flex-shrink: 0; }
 .brand .brand-pro { color: var(--primary); }
 .brand .brand-sub {
   font-weight: 500; font-size: var(--fs-xs); letter-spacing: 0; color: var(--text-muted);
@@ -759,6 +761,14 @@ dialog.labg-dialog::backdrop { background: rgba(10, 14, 24, 0.5); -webkit-backdr
   .brand .brand-sub { display: none; }
   .suite-link .suite-text { display: none; }
   .card { padding: var(--sp-4); }
+  /* sin subtítulo, el nombre va completo: si no cabe junto a las herramientas,
+     éstas bajan a un segundo renglón en vez de taparlo */
+  .topbar-row { flex-wrap: wrap; row-gap: 2px; }
+  .brand { min-width: max-content; }
+}
+/* en el celular, el renglón de herramientas admite hasta seis controles de 44 px */
+@media (max-width: 480px) {
+  .top-tools { gap: 6px; }
 }
 /* en pantallas táctiles, los controles llegan a 44 px */
 @media (pointer: coarse) {
