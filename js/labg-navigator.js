@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.1.1 (módulo compartido)
+/* LABG Suite — Navegador LABG v1.1.2 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -39,7 +39,8 @@
    las figuras de cada sección.
 
    Mejora progresiva: si algo falla, la app sigue con su barra de bloques de
-   siempre. Funciona con doble clic (file://), sin servidor ni dependencias.
+   siempre. Funciona con doble clic (file://), sin servidor ni dependencias, y
+   no pide nada a internet: usa las letras del sistema.
 
    Uso: una línea, después de labg-core.js:
      <script src="js/labg-navigator.js" defer></script>
@@ -51,7 +52,7 @@
 (function () {
   'use strict';
   if (window.LABGNavigator && window.LABGNavigator.version) return;
-  const VERSION = '1.1.1';
+  const VERSION = '1.1.2';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */

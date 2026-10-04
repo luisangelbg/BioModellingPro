@@ -74,7 +74,5 @@ en `vendor/THIRD-PARTY-NOTICES.txt`.
 
 ## Letras
 
-La interfaz del navegador y del estudio usa las letras de la suite, «LABG Sans» y «LABG Serif».
-No van dentro de este programa: se cargan del portal de la suite cuando hay conexión y, sin ella,
-se usan las del sistema. Su origen y su licencia (SIL Open Font License 1.1) están en
-<https://luisangelbg.github.io/assets/fonts/AVISO-TERCEROS.txt>.
+El programa no trae letras de otros ni las pide a internet: la interfaz, el navegador y el estudio
+de figuras usan las letras del sistema.

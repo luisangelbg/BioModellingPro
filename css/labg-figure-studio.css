@@ -1,26 +1,10 @@
-/* LABG Suite — Estudio de figuras LABG v1.5.0 (hoja de estilo del módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.5.1 (hoja de estilo del módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán — GPL-3.0 (ver LICENSE).
 
    Oro y negro de la marca LABG; fondos, textos y bordes salen de los tokens de
    la base común (labg-base.css), así que siguen el tema claro u oscuro de cada
-   app. Interfaz en «LABG Sans» y títulos en «LABG Serif» (servidas desde el
-   portal; sin red, las del sistema). */
-
-@font-face {
-  font-family: "LABG Sans"; font-style: normal; font-weight: 500; font-display: swap;
-  src: url("https://luisangelbg.github.io/assets/fonts/sans-500-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "LABG Sans"; font-style: normal; font-weight: 600; font-display: swap;
-  src: url("https://luisangelbg.github.io/assets/fonts/sans-600-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "LABG Serif"; font-style: normal; font-weight: 600; font-display: swap;
-  src: url("https://luisangelbg.github.io/assets/fonts/serif-600-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+   app. La interfaz va con la letra de palo seco del sistema y los títulos con
+   la de remates: el módulo no trae letras de otros ni las pide a internet. */
 
 :root {
   --lfs-oro: var(--btn-oro, #D4A848);
@@ -35,8 +19,8 @@
   --lfs-line: var(--border, #dde3ee);
   --lfs-line2: var(--border-strong, #b9c3d6);
   --lfs-stage: #E9E6DF;
-  --lfs-ui: "LABG Sans", system-ui, sans-serif;
-  --lfs-title: "LABG Serif", ui-serif, serif;
+  --lfs-ui: system-ui, sans-serif;
+  --lfs-title: ui-serif, serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --lfs-stage: #171512; } }
 :root[data-theme="dark"] { --lfs-stage: #171512; }

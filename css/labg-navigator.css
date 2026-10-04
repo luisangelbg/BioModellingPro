@@ -1,27 +1,11 @@
-/* LABG Suite — Navegador LABG v1.1.1 (hoja de estilo del módulo compartido)
+/* LABG Suite — Navegador LABG v1.1.2 (hoja de estilo del módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán — GPL-3.0 (ver LICENSE).
 
-   Identidad: oro y negro de la marca LABG. Títulos de bloque en «LABG Serif»
-   y la interfaz en «LABG Sans», servidas desde el portal de la suite; sin red
-   se usan las letras del sistema. Los colores de fondo, texto y bordes salen
-   de los tokens de la base común (labg-base.css), así que siguen el tema
-   claro u oscuro de cada app. */
-
-@font-face {
-  font-family: "LABG Sans"; font-style: normal; font-weight: 500; font-display: swap;
-  src: url("https://luisangelbg.github.io/assets/fonts/sans-500-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "LABG Sans"; font-style: normal; font-weight: 600; font-display: swap;
-  src: url("https://luisangelbg.github.io/assets/fonts/sans-600-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "LABG Serif"; font-style: normal; font-weight: 600; font-display: swap;
-  src: url("https://luisangelbg.github.io/assets/fonts/serif-600-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+   Identidad: oro y negro de la marca LABG. Los títulos de bloque van con la
+   letra con remates del sistema y la interfaz con la de palo seco: el módulo
+   no trae letras de otros ni las pide a internet. Los colores de fondo, texto
+   y bordes salen de los tokens de la base común (labg-base.css), así que
+   siguen el tema claro u oscuro de cada app. */
 
 :root {
   --lnav-oro: var(--btn-oro, #D4A848);
@@ -35,8 +19,8 @@
   --lnav-soft: var(--bg-soft, #eef0f4);
   --lnav-line: var(--border, #dde3ee);
   --lnav-line2: var(--border-strong, #b9c3d6);
-  --lnav-ui: "LABG Sans", system-ui, sans-serif;
-  --lnav-title: "LABG Serif", ui-serif, serif;
+  --lnav-ui: system-ui, sans-serif;
+  --lnav-title: ui-serif, serif;
   --lnav-side-w: 248px;
   --lnav-rail-w: 60px;
   --lnav-toc-w: 228px;

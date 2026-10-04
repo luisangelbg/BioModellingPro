@@ -1,4 +1,4 @@
-/* LABG Suite — Estudio de figuras LABG v1.5.0 (módulo compartido)
+/* LABG Suite — Estudio de figuras LABG v1.5.1 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -49,6 +49,8 @@
    PDF vectorial (1.5.0): el PDF de una figura SVG sale con trazos y texto, no como imagen: se amplía sin perder
    nitidez, pesa poco y el texto se puede buscar. El texto va con las letras estándar de PDF, como en el pdf() de R.
 
+   Letras (1.5.1): la interfaz usa las del sistema; el estudio no trae letras de otros ni las pide a internet.
+
    Lo propio del estudio: paletas científicas con simulación de daltonismo,
    tamaño del texto y grosor de las líneas pensados para el tamaño de salida,
    edición de un texto con doble clic, historial, comparación, preajustes de un
@@ -67,7 +69,7 @@
 (function () {
   'use strict';
   if (window.LABGFigureStudio && window.LABGFigureStudio.version) return;
-  const VERSION = '1.5.0';
+  const VERSION = '1.5.1';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -221,7 +223,6 @@
     ['', ['La de la figura', 'The figure’s own'], ''],
     ['sans', ['Sans (palo seco)', 'Sans'], 'system-ui, sans-serif'],
     ['serif', ['Serif (con remates)', 'Serif'], 'ui-serif, serif'],
-    ['labg', ['LABG Sans (de la suite)', 'LABG Sans (the suite’s)'], '"LABG Sans", system-ui, sans-serif'],
     ['mono', ['Monoespaciada', 'Monospace'], 'ui-monospace, monospace'],
   ];
   /* simulación de la visión con daltonismo (Machado, Oliveira y Fernandes, 2009; severidad 1) */
@@ -479,6 +480,9 @@
 
   /* ---------------- estado de cada figura (lo que el estudio le cambia) ---------------- */
   const FIGS = load('figs', {});
+  /* la opción «LABG Sans» se quitó en la 1.5.1: lo que la usaba queda en la sans del sistema, que es como ya se veía sin red */
+  const sinLabg = p => (p && p.font === 'labg' ? Object.assign({}, p, { font: 'sans' }) : p);
+  Object.keys(FIGS).forEach(k => { FIGS[k] = sinLabg(FIGS[k]); });
   const blankFig = () => ({ pal: '', font: '', txt: 1, line: 1, texts: {}, leg: null });
   const figState = k => Object.assign(blankFig(), FIGS[k] || {});
   /* ¿la leyenda tiene un lugar que no es el de la app? */
@@ -892,7 +896,7 @@
     compare: false, curtain: load('curtain', 50), before: null,
     cvd: '', exp: Object.assign({ w: 85, unit: 'mm', h: 0, dpi: 600, fmt: 'png', bg: 'white', colors: 'light', pdf: 'vec' }, load('exp', {})),
     fig: blankFig(), proxies: [], hist: [], hi: -1, secsOpen: load('secs', { app: true, palette: true, text: false, size: true, presets: false, history: false }),
-    presets: load('presets', []),
+    presets: load('presets', []).map(sinLabg),
     native: null, nativeAspect: null, nativeUrl: null, pvOn: load('nativePreview', true), pvKey: null,
   };
   const hasPopover = typeof HTMLElement !== 'undefined' && HTMLElement.prototype && typeof HTMLElement.prototype.showPopover === 'function';
@@ -1947,7 +1951,8 @@
           if (['png', 'svg', 'pdf', 'tiff'].indexOf(p.fmt) >= 0) q.fmt = p.fmt;
           if (['white', 'screen', 'none'].indexOf(p.bg) >= 0) q.bg = p.bg;
           if (PALETTES.some(x => x.id === p.pal)) q.pal = p.pal;
-          if (FONTS.some(x => x[0] === p.font)) q.font = p.font;
+          const pf = p.font === 'labg' ? 'sans' : p.font;
+          if (FONTS.some(x => x[0] === pf)) q.font = pf;
           if (+p.txt >= 0.5 && +p.txt <= 3) q.txt = +p.txt;
           if (+p.line >= 0.3 && +p.line <= 3) q.line = +p.line;
           if (+p.minPt > 0 && +p.minPt < 60) q.minPt = +p.minPt;
