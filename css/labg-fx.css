@@ -1,0 +1,317 @@
+/* LABG Suite — Efectos LABG v1.0.0 (hoja de estilo del módulo compartido)
+   Copyright (C) 2026  Luis Ángel Barrera-Guzmán — GPL-3.0 (ver LICENSE).
+
+   La capa de espera sobre el panel de resultados, las animaciones de cada app, el botón «Animaciones» y las
+   microanimaciones. Todo lo que se mueve mientras se calcula usa solo transform y opacity: el navegador lo anima
+   aparte, así que sigue vivo aunque el cálculo ocupe la página. Usa los tokens de labg-base.css, con valores de
+   respaldo para funcionar también sin ella. */
+
+/* ---------------- capa de espera ---------------- */
+/* el escudo: transparente, cubre la página para que nada se pulse a media cuenta (como hacía la ventana) */
+.lfx-shield { position: fixed; inset: 0; z-index: 44; cursor: progress; background: transparent; }
+.lfx-shield.lfx-done { cursor: default; }
+/* la capa: solo sobre la parte visible del panel de resultados */
+.lfx-layer {
+  position: fixed; z-index: 45; display: grid; place-items: center; padding: 12px; box-sizing: border-box;
+  /* un velo sin desenfoque: el desenfoque (backdrop-filter) es caro en equipos sin tarjeta gráfica */
+  background: color-mix(in srgb, var(--bg, #f6f7fb) 82%, transparent);
+  border-radius: var(--r-lg, 14px);
+  opacity: 0; transition: opacity 300ms var(--ease, cubic-bezier(.2, .7, .2, 1));
+}
+.lfx-layer.open { opacity: 1; }
+/* sin panel a la vista: una tarjeta al centro de la pantalla, sin velo */
+.lfx-layer.lfx-float { inset: 0; background: transparent; pointer-events: none; }
+.lfx-layer.lfx-float .lfx-box { pointer-events: auto; box-shadow: var(--shadow-lg, 0 18px 50px rgba(15, 23, 42, .22)); }
+.lfx-box {
+  position: relative; width: min(330px, 100%); box-sizing: border-box; text-align: center;
+  padding: 18px 22px 14px; color: var(--text, #1d2433);
+  background: var(--card-bg, #fff); border: 1px solid var(--border, #dfe3ec); border-radius: var(--r-lg, 14px);
+  box-shadow: var(--shadow, 0 6px 22px rgba(15, 23, 42, .12));
+  transform: translateY(6px) scale(.985); transition: transform 300ms var(--ease, cubic-bezier(.2, .7, .2, 1));
+}
+.lfx-layer.open .lfx-box { transform: none; }
+.lfx-box:focus { outline: none; }
+.lfx-stage { position: relative; width: 120px; height: 120px; margin: 0 auto 6px; }
+.lfx-title { margin: 4px 0 0; font-size: var(--fs-md, 15px); font-weight: 600; line-height: 1.3; }
+.lfx-msg { margin: 3px 0 0; min-height: 1.35em; font-size: var(--fs-sm, 13px); color: var(--text-muted, #667085); line-height: 1.35; }
+.lfx-bar { position: relative; height: 6px; margin: 12px 0 6px; border-radius: 999px; overflow: hidden; background: var(--bg-soft, #eef1f6); }
+.lfx-fill { position: absolute; inset: 0; border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0);
+  background: linear-gradient(90deg, var(--primary, #2a4a94), var(--accent, #b76a17)); transition: transform 420ms var(--ease, ease); }
+.lfx-bar.indet .lfx-fill { right: auto; width: 36%; transform: translateX(-100%); }
+.lfx-meta { display: flex; justify-content: space-between; gap: 10px; font-size: var(--fs-xs, 12px);
+  color: var(--text-muted, #667085); font-variant-numeric: tabular-nums; min-height: 1.3em; }
+.lfx-actions { margin-top: 10px; display: flex; justify-content: center; gap: 8px; }
+.lfx-actions:empty { display: none; }
+/* final: la escena se va y llega el isotipo con la palomita (o el tache) */
+.lfx-scene, .lfx-spin { transition: opacity 260ms var(--ease, ease), transform 260ms var(--ease, ease); }
+.lfx-badge { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px;
+  opacity: 0; transform: scale(.4) rotate(-12deg); pointer-events: none;
+  transition: transform 520ms cubic-bezier(.34, 1.6, .64, 1), opacity 160ms; }
+.lfx-badge .lfx-iso { width: 100%; height: 100%; display: block; filter: drop-shadow(0 6px 14px rgba(125, 91, 20, .3)); }
+.lfx-mark { position: absolute; right: -9px; bottom: -9px; width: 30px; height: 30px; border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--card-bg, #fff); transform: scale(0); transition: transform 460ms 260ms cubic-bezier(.34, 1.7, .64, 1); }
+.lfx-badge.solo .lfx-mark { left: 50%; top: 50%; right: auto; bottom: auto; width: 52px; height: 52px; margin: -26px 0 0 -26px; box-shadow: none; }
+.lfx-mark svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.lfx-disc { fill: var(--success, #2f8f4a); }
+.lfx-check, .lfx-cross { fill: none; stroke: var(--card-bg, #fff); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.lfx-check { stroke-dasharray: 36; stroke-dashoffset: 36; transition: stroke-dashoffset 380ms 520ms var(--ease, ease); }
+.lfx-cross { display: none; }
+.lfx-box.is-done .lfx-scene, .lfx-box.is-done .lfx-spin, .lfx-box.is-failed .lfx-scene, .lfx-box.is-failed .lfx-spin { opacity: 0; transform: scale(.8); }
+.lfx-box.is-done .lfx-badge, .lfx-box.is-failed .lfx-badge { opacity: 1; transform: none; }
+.lfx-box.is-done .lfx-mark, .lfx-box.is-failed .lfx-mark { transform: none; }
+.lfx-box.is-done .lfx-check { stroke-dashoffset: 0; }
+.lfx-box.is-done .lfx-fill { background: var(--success, #2f8f4a); transform: scaleX(1); }
+.lfx-box.is-done .lfx-title { color: var(--success-text, #1d6b34); }
+.lfx-box.is-failed .lfx-disc { fill: var(--danger, #c43a2f); }
+.lfx-box.is-failed .lfx-check { display: none; }
+.lfx-box.is-failed .lfx-cross { display: inline; }
+.lfx-box.is-failed .lfx-fill { background: var(--danger, #c43a2f); }
+.lfx-box.is-failed .lfx-title { color: var(--danger-text, #a82c22); }
+/* sin animaciones: solo un círculo que gira */
+.lfx-spin { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; box-sizing: border-box;
+  border-radius: 50%; border: 4px solid var(--bg-soft, #eef1f6); border-top-color: var(--primary, #2a4a94); animation: lfx-turn .9s linear infinite; }
+@keyframes lfx-turn { to { transform: rotate(360deg); } }
+/* lo que el cálculo dibujó, escalonado al terminar */
+.lfx-wait { opacity: 0 !important; }
+.lfx-in { animation: lfx-in 300ms var(--ease, cubic-bezier(.2, .7, .2, 1)) both; }
+.lfx-in-o { animation: lfx-in-o 300ms var(--ease, ease) both; }
+@keyframes lfx-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes lfx-in-o { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .lfx-bar.indet .lfx-fill { animation: lfx-indet 1.3s ease-in-out infinite; }
+  .lfx-box.is-failed { animation: lfx-shake 420ms var(--ease, ease); }
+}
+@keyframes lfx-indet { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+@keyframes lfx-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+/* sin animaciones, la capa aparece de golpe pero respeta la demora (lo rápido sigue sin verse) */
+html.lfx-still .lfx-layer, html.lfx-still .lfx-box { transition-duration: 1ms !important; }
+html.lfx-still .lfx-box { transform: none !important; }
+html.lfx-still .lfx-badge, html.lfx-still .lfx-mark, html.lfx-still .lfx-check, html.lfx-still .lfx-fill { transition-duration: 0ms !important; transition-delay: 0ms !important; }
+html.lfx-still .lfx-bar.indet .lfx-fill, html.lfx-still .lfx-box.is-failed { animation: none !important; }
+html.lfx-still .lfx-bar.indet .lfx-fill { width: 100%; opacity: .35; transform: none; }
+
+/* ---------------- botón «Animaciones» ---------------- */
+.lfx-motion-btn .lfx-off { display: none; }
+.lfx-motion-btn[aria-pressed="false"] .lfx-off { display: inline; }
+.lfx-motion-btn[aria-pressed="false"] { color: var(--text-muted, #667085); }
+/* en el teléfono no cabe junto a los demás: el interruptor queda en la ayuda («?») */
+@media (max-width: 480px) { .lfx-motion-btn { display: none; } }
+.lfx-help { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 0 0 14px; padding: 0 0 12px; border-bottom: 1px solid var(--border, #dfe3ec); font-size: var(--fs-sm, 13px); }
+
+/* ---------------- microanimaciones (150 a 200 ms) ---------------- */
+html.lfx-motion.lfx-m-btn .btn { transition: transform 150ms var(--ease, ease), box-shadow 150ms var(--ease, ease), background-color 150ms, border-color 150ms, color 150ms; }
+html.lfx-motion.lfx-m-btn .btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(15, 23, 42, .10); }
+html.lfx-motion.lfx-m-btn .btn:not(:disabled):active { transform: translateY(0) scale(.98); box-shadow: none; transition-duration: 80ms; }
+html.lfx-motion.lfx-m-btn .icon-btn { transition: color 150ms, border-color 150ms, background-color 150ms, transform 150ms var(--ease, ease); }
+html.lfx-motion.lfx-m-btn .icon-btn:hover { transform: scale(1.06); }
+html.lfx-motion.lfx-m-det details[open] > :not(summary) { animation: lfx-open 200ms var(--ease, ease) both; }
+@keyframes lfx-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+html.lfx-motion.lfx-m-row tbody tr { transition: background-color 150ms; }
+html.lfx-motion.lfx-m-row tbody tr:hover { background-color: color-mix(in srgb, var(--primary, #2a4a94) 7%, transparent); }
+/* sin animaciones: también se aquietan las barras y los puntos de la base */
+html.lfx-still .lw-bar.indet .lw-fill, html.lfx-still .lw-dots i, html.lfx-still .lw-bar:not(.indet) .lw-fill::after, html.lfx-still .skeleton { animation: none !important; }
+
+/* ---------------- escenas: 120 × 120 px, en los colores de la app ---------------- */
+.lfx-scene {
+  --fx1: var(--primary, #2a4a94); --fx2: var(--accent, #b76a17); --fx3: var(--success, #2f8f4a); --fx4: var(--info, #3b6fd8);
+  --fxm: var(--border-strong, #a7afc0); --fxs: var(--text-muted, #667085);
+  position: absolute; left: 0; top: 0; width: 120px; height: 120px;
+}
+.lfx-scene i, .lfx-scene b { position: absolute; display: block; font-style: normal; }
+.lfx-scene .will { will-change: transform, opacity; }
+/* las escenas que se arman: al final de cada vuelta se desvanecen y vuelven a empezar */
+.lfx-scene.lfx-loop { animation: lfx-loopfade var(--lfx-d, 3s) linear infinite; }
+@keyframes lfx-loopfade { 0% { opacity: 0; } 4% { opacity: 1; } 90% { opacity: 1; } 97%, 100% { opacity: 0; } }
+/* ejes comunes */
+.lfx-ax { background: var(--fxm); border-radius: 2px; }
+.lfx-ax.x { left: 12px; right: 6px; top: 104px; height: 2px; }
+.lfx-ax.y { left: 12px; top: 8px; height: 98px; width: 2px; }
+
+/* PCAPro: nube de puntos que gira y se proyecta sobre dos ejes */
+.lfx-pca { perspective: 260px; }
+.lfx-pca .lfx-ax.x { top: 106px; }
+.lfx-pca-w { width: 0; height: 0; transform-style: preserve-3d; }
+.lfx-pca-w.px { transform: scaleY(.2); }
+.lfx-pca-w.py { transform: scaleX(.2); }
+.lfx-pca-rot { left: 0; top: 0; transform-style: preserve-3d; animation: lfx-pca-rot 3s linear infinite; }
+@keyframes lfx-pca-rot { from { transform: rotateX(-16deg) rotateY(0deg); } to { transform: rotateX(-16deg) rotateY(360deg); } }
+.lfx-pca-p { left: 0; top: 0; transform-style: preserve-3d; }
+.lfx-pca-p b { left: -4.5px; top: -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--fx1); animation: lfx-pca-bill 3s linear infinite; }
+.lfx-pca-p b.g1 { background: var(--fx2); }
+.lfx-pca-p b.g2 { background: var(--fx3); }
+.lfx-pca-w.px b, .lfx-pca-w.py b { opacity: .85; }
+@keyframes lfx-pca-bill { from { transform: rotateY(0deg) rotateX(16deg); } to { transform: rotateY(-360deg) rotateX(16deg); } }
+
+/* ClusteringPro: puntos que se agrupan y toman el color de su grupo */
+.lfx-cl { left: -4.5px; top: -4.5px; width: 9px; height: 9px; }
+.lfx-cl b { left: 0; top: 0; width: 100%; height: 100%; border-radius: 50%; background: var(--fxm); }
+.lfx-cl b.c { opacity: 0; animation: lfx-cl-c 3s ease infinite; }
+.lfx-cl b.g0, .lfx-halo.g0 { background: var(--fx1); }
+.lfx-cl b.g1 { background: var(--fx2); }
+.lfx-cl b.g2 { background: var(--fx3); }
+@keyframes lfx-cl-c { 0%, 20% { opacity: 0; } 42%, 80% { opacity: 1; } 96%, 100% { opacity: 0; } }
+.lfx-halo { width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; box-sizing: border-box;
+  border: 1.5px dashed var(--fx1); background: transparent !important; opacity: 0; animation: lfx-halo 3s ease infinite; }
+.lfx-halo.g1 { border-color: var(--fx2); }
+.lfx-halo.g2 { border-color: var(--fx3); }
+@keyframes lfx-halo { 0%, 42% { opacity: 0; transform: scale(.7); } 56%, 80% { opacity: .9; transform: none; } 94%, 100% { opacity: 0; transform: scale(1.1); } }
+
+/* PopGeneticsPro: hélice de alelos que se recombinan */
+.lfx-hx { top: 60px; width: 0; height: 0; animation: lfx-hx 2.8s linear infinite; }
+.lfx-hx b { left: -4.5px; top: -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--fx1); }
+.lfx-hx.b b { background: var(--fx2); }
+.lfx-hx b.x { background: var(--fx2); opacity: 0; animation: lfx-hx-x 5.6s ease infinite; }
+.lfx-hx.b b.x { background: var(--fx1); }
+@keyframes lfx-hx-x { 0%, 38% { opacity: 0; } 50%, 88% { opacity: 1; } 100% { opacity: 0; } }
+.lfx-hx-r { top: 42px; width: 2px; height: 36px; margin-left: -1px; background: var(--fxm); border-radius: 2px; opacity: .55; animation: lfx-hx-r 2.8s linear infinite; }
+
+/* PhylogenyPro y CladisticsPro: árbol que se ramifica desde la raíz */
+.lfx-tr { background: var(--fx1); border-radius: 2px; }
+.lfx-tr.h { height: 2.5px; transform-origin: 0 50%; }
+.lfx-tr.v { width: 2.5px; transform-origin: 50% 50%; }
+.lfx-tip { width: 8px; height: 8px; border-radius: 50%; background: var(--fx1); }
+.lfx-tip.g1 { background: var(--fx2); }
+.lfx-tip.g2 { background: var(--fx3); }
+
+/* PhenologyPro: brote que crece por etapas */
+.lfx-gr-soil { left: 26px; right: 26px; top: 106px; height: 3px; border-radius: 3px; background: var(--fx2); opacity: .6; }
+.lfx-gr-seed { left: 54px; top: 100px; width: 12px; height: 8px; border-radius: 50%; background: var(--fx2); }
+.lfx-gr-stem { left: 58.5px; top: 30px; width: 3px; height: 75px; border-radius: 3px; background: var(--fx3); transform-origin: 50% 100%;
+  animation: lfx-gr-stem 3.2s var(--ease, ease) infinite; }
+@keyframes lfx-gr-stem { 0%, 8% { transform: scaleY(.04); } 20%, 28% { transform: scaleY(.32); } 40%, 48% { transform: scaleY(.62); } 60%, 100% { transform: scaleY(1); } }
+.lfx-gr-leaf { width: 22px; height: 10px; background: var(--fx3); transform: scale(0); }
+.lfx-gr-leaf.r { border-radius: 0 100% 0 100%; transform-origin: 0 100%; }
+.lfx-gr-leaf.l { border-radius: 100% 0 100% 0; transform-origin: 100% 100%; }
+.lfx-gr-leaf.k1 { left: 61px; top: 80px; animation: lfx-gr-k1 3.2s cubic-bezier(.34, 1.5, .64, 1) infinite; }
+.lfx-gr-leaf.k2 { left: 37px; top: 68px; animation: lfx-gr-k2 3.2s cubic-bezier(.34, 1.5, .64, 1) infinite; }
+.lfx-gr-leaf.k3 { left: 61px; top: 55px; width: 19px; height: 9px; animation: lfx-gr-k3 3.2s cubic-bezier(.34, 1.5, .64, 1) infinite; }
+.lfx-gr-leaf.k4 { left: 40px; top: 44px; width: 18px; height: 8px; animation: lfx-gr-k4 3.2s cubic-bezier(.34, 1.5, .64, 1) infinite; }
+@keyframes lfx-gr-k1 { 0%, 22% { transform: scale(0) rotate(-24deg); } 30%, 100% { transform: scale(1) rotate(-24deg); } }
+@keyframes lfx-gr-k2 { 0%, 32% { transform: scale(0) rotate(24deg); } 40%, 100% { transform: scale(1) rotate(24deg); } }
+@keyframes lfx-gr-k3 { 0%, 44% { transform: scale(0) rotate(-30deg); } 52%, 100% { transform: scale(1) rotate(-30deg); } }
+@keyframes lfx-gr-k4 { 0%, 54% { transform: scale(0) rotate(30deg); } 62%, 100% { transform: scale(1) rotate(30deg); } }
+.lfx-gr-fl { left: 60px; top: 26px; width: 0; height: 0; }
+.lfx-gr-pet { left: -5px; top: -14px; width: 10px; height: 14px; border-radius: 50% 50% 45% 45%; background: var(--fx1); transform-origin: 50% 100%; transform: scale(0); }
+.lfx-gr-eye { left: -4.5px; top: -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--fx2); transform: scale(0); animation: lfx-gr-eye 3.2s cubic-bezier(.34, 1.6, .64, 1) infinite; }
+@keyframes lfx-gr-eye { 0%, 62% { transform: scale(0); } 68%, 100% { transform: scale(1); } }
+
+/* PollinationPro: polen que viaja entre flores */
+.lfx-po-stem { width: 2.5px; top: 80px; height: 34px; margin-left: -1.25px; background: var(--fx3); border-radius: 2px; }
+.lfx-po-leaf { width: 14px; height: 7px; background: var(--fx3); border-radius: 0 100% 0 100%; }
+.lfx-po-fl { width: 0; height: 0; top: 78px; }
+.lfx-po-fl b.p { left: -5px; top: -15px; width: 10px; height: 12px; border-radius: 50%; background: var(--fx1); opacity: .9; transform-origin: 50% 15px; }
+.lfx-po-fl b.e { left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: var(--fx2); }
+.lfx-po-fl.in b.e { animation: lfx-po-eye .65s ease-out infinite; }
+@keyframes lfx-po-eye { 0%, 70% { transform: scale(1); } 85% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.lfx-po-arc { left: 26px; top: 34px; width: 68px; height: 88px; box-sizing: border-box; border-radius: 50%;
+  border: 1.5px dashed transparent; border-top-color: var(--fxm); opacity: .7; }
+.lfx-po-g { left: 26px; top: 78px; width: 0; height: 0; animation: lfx-po-x 2.6s linear infinite; }
+.lfx-po-g b { left: -3.5px; top: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--fx2); animation: lfx-po-y 2.6s linear infinite; }
+@keyframes lfx-po-x { from { transform: translateX(0); } to { transform: translateX(68px); } }
+@keyframes lfx-po-y {
+  0% { transform: translateY(0); opacity: 0; animation-timing-function: cubic-bezier(.3, .6, .5, 1); }
+  8% { opacity: 1; }
+  50% { transform: translateY(-44px); animation-timing-function: cubic-bezier(.5, 0, .7, .4); }
+  92% { opacity: 1; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+
+/* AgriDesign: parcelas que se ordenan en bloques */
+.lfx-ag-blk { left: 9px; width: 102px; height: 30px; box-sizing: border-box; border: 1.5px dashed var(--fxm); border-radius: 5px;
+  opacity: 0; animation: lfx-ag-blk 3.2s ease infinite; }
+@keyframes lfx-ag-blk { 0%, 40% { opacity: 0; } 52%, 100% { opacity: 1; } }
+.lfx-ag-pl { left: 0; top: 0; width: 20px; height: 22px; border-radius: 3px; background: var(--fx1); }
+.lfx-ag-pl.t1 { background: var(--fx2); }
+.lfx-ag-pl.t2 { background: var(--fx3); }
+.lfx-ag-pl.t3 { background: var(--fx4); }
+
+/* SciMetricsPro: barras y red de citas que se forman */
+.lfx-sm-bar { width: 7px; top: 52px; height: 54px; border-radius: 2px 2px 0 0; background: var(--fx1); transform-origin: 50% 100%; transform: scaleY(0); }
+.lfx-sm-ed { height: 1.6px; margin-top: -.8px; background: var(--fxm); transform-origin: 0 50%; }
+.lfx-sm-nd { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--fx2); transform: scale(0); }
+.lfx-sm-nd.hub { width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; background: var(--fx1); }
+
+/* BioModellingPro: curva logística que se traza */
+.lfx-lg { height: 2.5px; margin-top: -1.25px; border-radius: 2px; background: var(--fx1); transform-origin: 0 50%; transform: scaleX(0); }
+.lfx-lg-pen { left: -4.5px; top: -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--fx2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx2) 25%, transparent); }
+.lfx-lg-pt { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--fxs); opacity: .55; }
+.lfx-lg-pt.on { background: var(--fx3); opacity: .8; }
+
+/* EconomicsPro: oferta y demanda que convergen */
+.lfx-ec-ln { left: 14px; width: 96px; top: 57px; height: 2.5px; border-radius: 2px; transform-origin: 50% 50%; }
+.lfx-ec-ln.d { background: var(--fx1); animation: lfx-ec-d 3.2s cubic-bezier(.45, .05, .3, 1) infinite; }
+.lfx-ec-ln.s { background: var(--fx2); animation: lfx-ec-s 3.2s cubic-bezier(.45, .05, .3, 1) infinite; }
+@keyframes lfx-ec-d { 0%, 8% { transform: translateY(-17px) rotate(16deg); } 46%, 100% { transform: translateY(0) rotate(36deg); } }
+@keyframes lfx-ec-s { 0%, 8% { transform: translateY(17px) rotate(-14deg); } 46%, 100% { transform: translateY(0) rotate(-36deg); } }
+.lfx-ec-eq { left: 57.5px; top: 53.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--fx3); transform: scale(0);
+  animation: lfx-ec-eq 3.2s cubic-bezier(.34, 1.6, .64, 1) infinite; }
+@keyframes lfx-ec-eq { 0%, 46% { transform: scale(0); } 54%, 100% { transform: scale(1); } }
+.lfx-ec-ring { left: 54px; top: 50px; width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--fx3);
+  opacity: 0; animation: lfx-ec-ring 3.2s ease-out infinite; }
+@keyframes lfx-ec-ring { 0%, 54% { opacity: 0; transform: scale(.6); } 58% { opacity: .8; } 80%, 100% { opacity: 0; transform: scale(2.4); } }
+.lfx-ec-gv { left: 61px; top: 62px; width: 0; height: 43px; border-left: 1.5px dashed var(--fxs); transform-origin: 50% 0; transform: scaleY(0);
+  animation: lfx-ec-gv 3.2s ease infinite; }
+.lfx-ec-gh { left: 14px; top: 57.5px; width: 44px; height: 0; border-top: 1.5px dashed var(--fxs); transform-origin: 100% 50%; transform: scaleX(0);
+  animation: lfx-ec-gh 3.2s ease infinite; }
+@keyframes lfx-ec-gv { 0%, 56% { transform: scaleY(0); } 66%, 100% { transform: none; } }
+@keyframes lfx-ec-gh { 0%, 58% { transform: scaleX(0); } 68%, 100% { transform: none; } }
+
+/* BreedingPro: la cruza de dos progenitores */
+.lfx-br-par { width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; color: #fff; font: 700 15px/26px system-ui, sans-serif; text-align: center; }
+.lfx-br-par.a { left: 30px; top: 26px; background: var(--fx1); }
+.lfx-br-par.b { left: 90px; top: 26px; background: var(--fx2); }
+.lfx-br-x { left: 54px; top: 16px; width: 12px; height: 20px; color: var(--fxs); font: 700 16px/20px system-ui, sans-serif; text-align: center; opacity: 0;
+  animation: lfx-br-x 3.2s ease infinite; }
+@keyframes lfx-br-x { 0%, 6% { opacity: 0; } 14%, 40% { opacity: 1; } 48%, 100% { opacity: .35; } }
+.lfx-br-gam { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; top: 26px; }
+.lfx-br-gam.a { left: 30px; background: var(--fx1); animation: lfx-br-ga 3.2s cubic-bezier(.45, .05, .35, 1) infinite; }
+.lfx-br-gam.b { left: 90px; background: var(--fx2); animation: lfx-br-gb 3.2s cubic-bezier(.45, .05, .35, 1) infinite; }
+@keyframes lfx-br-ga { 0%, 14% { transform: none; opacity: 0; } 18% { opacity: 1; } 42% { transform: translate(26px, 50px); opacity: 1; } 46%, 100% { transform: translate(26px, 50px); opacity: 0; } }
+@keyframes lfx-br-gb { 0%, 14% { transform: none; opacity: 0; } 18% { opacity: 1; } 42% { transform: translate(-26px, 50px); opacity: 1; } 46%, 100% { transform: translate(-26px, 50px); opacity: 0; } }
+.lfx-br-off { left: 60px; top: 88px; width: 0; height: 0; transform: scale(0); animation: lfx-br-off 3.2s cubic-bezier(.34, 1.6, .64, 1) infinite; }
+.lfx-br-off b { top: -13px; width: 13px; height: 26px; }
+.lfx-br-off b.a { left: -13px; border-radius: 13px 0 0 13px; background: var(--fx1); }
+.lfx-br-off b.b { left: 0; border-radius: 0 13px 13px 0; background: var(--fx2); }
+@keyframes lfx-br-off { 0%, 44% { transform: scale(0); } 54%, 100% { transform: none; } }
+.lfx-br-ln { background: var(--fxm); }
+.lfx-br-ln.h { left: 30px; top: 50px; width: 60px; height: 2px; transform: scaleX(0); animation: lfx-br-lh 3.2s ease infinite; }
+.lfx-br-ln.v1 { left: 29px; top: 39px; width: 2px; height: 11px; transform-origin: 50% 0; transform: scaleY(0); animation: lfx-br-lv 3.2s ease infinite; }
+.lfx-br-ln.v2 { left: 89px; top: 39px; width: 2px; height: 11px; transform-origin: 50% 0; transform: scaleY(0); animation: lfx-br-lv 3.2s ease infinite; }
+.lfx-br-ln.v3 { left: 59px; top: 51px; width: 2px; height: 22px; transform-origin: 50% 0; transform: scaleY(0); animation: lfx-br-lv3 3.2s ease infinite; }
+@keyframes lfx-br-lv { 0%, 50% { transform: scaleY(0); } 56%, 100% { transform: none; } }
+@keyframes lfx-br-lh { 0%, 54% { transform: scaleX(0); } 60%, 100% { transform: none; } }
+@keyframes lfx-br-lv3 { 0%, 58% { transform: scaleY(0); } 64%, 100% { transform: none; } }
+
+/* StatsPro y SigmaPro: un histograma que se acomoda en una campana */
+.lfx-st-bar { width: 8px; top: 30px; height: 74px; border-radius: 2px 2px 0 0; background: var(--fx1); opacity: .9; transform-origin: 50% 100%; }
+.lfx-st-cv { height: 2.5px; margin-top: -1.25px; border-radius: 2px; background: var(--fx2); transform-origin: 0 50%; transform: scaleX(0); }
+
+/* GermplasmPro: semillas que entran a los cajones del banco */
+.lfx-gm-dr { top: 76px; width: 28px; height: 30px; box-sizing: border-box; border: 2px solid var(--fxm); border-radius: 4px; overflow: hidden; }
+.lfx-gm-dr b.f { left: 2px; right: 2px; bottom: 2px; height: 20px; border-radius: 2px; background: var(--fx3); opacity: .75; transform-origin: 50% 100%; transform: scaleY(0); }
+.lfx-gm-dr b.k { left: 9px; top: 3px; width: 6px; height: 2px; border-radius: 1px; background: var(--fxm); }
+.lfx-gm-sd { left: 0; top: 0; width: 10px; height: 6px; border-radius: 50%; background: var(--fx2); }
+.lfx-gm-top { left: 10px; right: 10px; top: 72px; height: 2px; border-radius: 2px; background: var(--fxm); }
+
+/* ReviewPro: documentos que pasan por el embudo PRISMA */
+.lfx-rv-f { height: 2.5px; border-radius: 2px; background: var(--fxm); transform-origin: 0 50%; }
+.lfx-rv-doc { left: 0; top: 0; width: 11px; height: 14px; box-sizing: border-box; border-radius: 2px; background: var(--card-bg, #fff); border: 1.5px solid var(--fx1); }
+.lfx-rv-doc b { left: 2px; right: 2px; height: 1.5px; background: var(--fx1); opacity: .6; }
+.lfx-rv-doc b.l1 { top: 3px; }
+.lfx-rv-doc b.l2 { top: 6.5px; }
+.lfx-rv-doc.out { border-color: var(--fxs); }
+.lfx-rv-doc.out b { background: var(--fxs); }
+
+/* respaldo (apps sin escena propia): puntos que se ordenan en una recta */
+.lfx-df-ln { left: 14px; top: 92px; height: 2.5px; margin-top: -1.25px; border-radius: 2px; background: var(--fx2); transform-origin: 0 50%;
+  opacity: 0; animation: lfx-df-ln 3s ease infinite; }
+@keyframes lfx-df-ln { 0%, 40% { opacity: 0; } 56%, 100% { opacity: 1; } }
+.lfx-df-pt { left: -4.5px; top: -4.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--fx1); }
+.lfx-df-pt.g1 { background: var(--fx2); }
+
+/* con «reducir movimiento» del sistema, nada de esto se mueve (la capa muestra el círculo) */
+@media (prefers-reduced-motion: reduce) {
+  .lfx-scene, .lfx-scene * { animation: none !important; }
+  .lfx-in, .lfx-in-o { animation: none !important; }
+}

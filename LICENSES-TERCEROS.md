@@ -6,8 +6,8 @@ todas son compatibles con la GPL-3.0.
 
 ## Íconos de Lucide (v1.49.0)
 
-- **Qué son:** los íconos de línea fina del **Navegador LABG** y del **Estudio de figuras LABG**
-  (`js/labg-navigator.js` y `js/labg-figure-studio.js`). Van dentro de esos archivos como trazos SVG y se dibujan con un trazo de 1.5
+- **Qué son:** los íconos de línea fina del **Navegador LABG**, del **Estudio de figuras LABG** y de **Efectos LABG**
+  (`js/labg-navigator.js`, `js/labg-figure-studio.js` y `js/labg-fx.js`). Van dentro de esos archivos como trazos SVG y se dibujan con un trazo de 1.5
   en lugar de 2, un cambio que la licencia permite.
 - **De dónde vienen:** el paquete `lucide-static` 1.49.0 del proyecto Lucide
   (<https://lucide.dev>, <https://github.com/lucide-icons/lucide>).
@@ -17,6 +17,7 @@ todas son compatibles con la GPL-3.0.
 - **Íconos que se usan**
   - Navegador: panel-left-close, panel-left-open, chevron-right, chevron-down, chevrons-down-up, chevrons-up-down, search, file-text, focus, arrow-up, arrow-left, arrow-right, pencil-line, lock, check, triangle-alert, circle-dashed, link, circle-help, corner-down-right, pencil-ruler, sun, languages, keyboard, message-circle-warning, house, x, list, clock, zap, table-of-contents.
   - Estudio de figuras: pencil-ruler, undo-2, redo-2, columns-2, zoom-in, zoom-out, scan, ruler, wand-sparkles, download, copy, rotate-ccw, x, search, panel-right, panel-left, picture-in-picture-2, palette, eye, type, history, sliders-horizontal, chevron-down, grip-vertical, save, upload, file-json, bookmark-plus, trash-2, check, info, keyboard, image, layers, pencil, maximize-2, circle-help.
+  - Efectos LABG (`js/labg-fx.js`): sparkles, en el botón «Animaciones», con su trazo de 2 y una raya encima cuando las animaciones están apagadas.
 
 ### Texto de la licencia
 
