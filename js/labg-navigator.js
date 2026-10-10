@@ -1,4 +1,4 @@
-/* LABG Suite — Navegador LABG v1.1.2 (módulo compartido)
+/* LABG Suite — Navegador LABG v1.1.3 (módulo compartido)
    Copyright (C) 2026  Luis Ángel Barrera-Guzmán
 
    This program is free software: you can redistribute it and/or modify it under
@@ -52,7 +52,7 @@
 (function () {
   'use strict';
   if (window.LABGNavigator && window.LABGNavigator.version) return;
-  const VERSION = '1.1.2';
+  const VERSION = '1.1.3';
   const me = document.currentScript;
 
   /* ---------------- hoja de estilo (se carga sola) ---------------- */
@@ -404,7 +404,8 @@
         '<button type="button" class="lnav-ibtn lnav-rail-btn" data-lnav="rail"></button></div>' +
         '<nav class="lnav-side-nav"><ol class="lnav-list" role="list"></ol></nav>' +
         '<div class="lnav-side-foot">' +
-        '<button type="button" class="lnav-sbtn" data-lnav="palette">' + ico('search') + '<span class="lnav-sbtn-t"></span><kbd>Ctrl K</kbd></button>' +
+        /* el espacio antes de la tecla no se ve (el botón es flex): separa «Buscar» de «Ctrl K» para quien lee el texto del botón */
+        '<button type="button" class="lnav-sbtn" data-lnav="palette">' + ico('search') + '<span class="lnav-sbtn-t"></span> <kbd>Ctrl K</kbd></button>' +
         '<button type="button" class="lnav-sbtn" data-lnav="mode">' + ico('focus') + '<span class="lnav-sbtn-t"></span></button>' +
         '<button type="button" class="lnav-sbtn" data-lnav="help">' + ico('circle-help') + '<span class="lnav-sbtn-t"></span><kbd>?</kbd></button>' +
         '</div>';
@@ -493,7 +494,8 @@
     seg[0].title = T('Todas las secciones del bloque, una tras otra', 'Every section of the block, one after another');
     seg[1].title = T('Una sección a la vez (Alt+← / Alt+→)', 'One section at a time (Alt+← / Alt+→)');
     $('.lnav-seg', bar).setAttribute('aria-label', T('Modo de lectura', 'Reading mode'));
-    const k = $('.lnav-k', bar); k.title = T('Buscar en la app (Ctrl+K)', 'Search the app (Ctrl+K)'); k.setAttribute('aria-label', k.title);
+    /* el nombre lleva el atajo tal como se ve en la tecla del botón: «Ctrl K» (WCAG 2.5.3) */
+    const k = $('.lnav-k', bar); k.title = T('Buscar en la app', 'Search the app') + ' (' + $('kbd', k).textContent + ')'; k.setAttribute('aria-label', k.title);
     const sb = $('.lnav-secbtn', bar); sb.title = T('Secciones de este bloque', 'Sections of this block'); sb.setAttribute('aria-label', sb.title);
     $('.lnav-secbtn-t', bar).textContent = T('Secciones', 'Sections');
     const tp = $('.lnav-top', floatBox); tp.title = T('Volver arriba', 'Back to top'); tp.setAttribute('aria-label', tp.title);
@@ -650,7 +652,11 @@
     b.innerHTML = ico(rail ? 'panel-left-open' : 'panel-left-close');
     const t = rail ? T('Mostrar los nombres de los bloques ( [ )', 'Show block names ( [ )') : T('Contraer la barra de bloques ( [ )', 'Collapse the block bar ( [ )');
     b.title = t; b.setAttribute('aria-label', t); b.setAttribute('aria-expanded', String(!rail));
-    $$('.lnav-sbtn', side).forEach(x => { const s = x.querySelector('.lnav-sbtn-t'); if (s) x.setAttribute('aria-label', s.textContent); });
+    /* el nombre de cada botón es lo que se ve en él: su texto y, si la tecla lleva letras («Ctrl K»), también la tecla (WCAG 2.5.3) */
+    $$('.lnav-sbtn', side).forEach(x => {
+      const s = x.querySelector('.lnav-sbtn-t'), k = x.querySelector('kbd');
+      if (s) x.setAttribute('aria-label', s.textContent + (k && /[a-z]/i.test(k.textContent) ? ' ' + k.textContent : ''));
+    });
   }
   const isRail = () => (S.rail == null ? window.innerWidth < 1280 : !!S.rail);
 
