@@ -29,6 +29,25 @@
     return 'es';                       /* Spanish by default in the whole LABG Suite */
   }
 
+  /* WCAG 2.5.3 (Label in Name). Does the control `n` show, in language `L`, a readable text that its tooltip `tip`
+     does not contain? Only for what takes its name from its content (links, buttons, tabs); the text of the other
+     language and the icons do not count, and case, punctuation and symbols are ignored. */
+  const NAMED_BY_CONTENT = 'a[href], button, summary, [role="link"], [role="button"], [role="tab"], [role="menuitem"]';
+  const plain = s => String(s).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  function shownText(n, L) {
+    let s = '';
+    n.childNodes.forEach(c => {
+      if (c.nodeType === 3) s += c.nodeValue;
+      else if (c.nodeType === 1 && !c.hidden && !/^(svg|script|style)$/i.test(c.nodeName) && (c.getAttribute('data-l') || L) === L) s += shownText(c, L);
+    });
+    return s;
+  }
+  function namedByItsText(n, tip, L) {
+    if (!n.matches(NAMED_BY_CONTENT)) return false;
+    const text = plain(shownText(n, L));
+    return text.length > 1 && !plain(tip).includes(text);
+  }
+
   const I18N = {
     lang: initialLang(),
 
@@ -51,7 +70,11 @@
       scope.querySelectorAll('[data-es-ph]').forEach(n => { const v = n.getAttribute('data-' + L + '-ph'); if (v != null) n.setAttribute('placeholder', v); });
       scope.querySelectorAll('[data-es-title]').forEach(n => {
         const v = n.getAttribute('data-' + L + '-title');
-        if (v != null) { n.setAttribute('title', v); n.setAttribute('aria-label', v); }
+        if (v == null) return;
+        n.setAttribute('title', v);
+        /* the tooltip is also the name, except where the control already shows a text of its own that the tooltip
+           does not contain: there the name is that text and the tooltip stays as its description */
+        if (namedByItsText(n, v, L)) n.removeAttribute('aria-label'); else n.setAttribute('aria-label', v);
       });
       const t = document.querySelector('title');
       if (t && t.dataset.es) document.title = t.getAttribute('data-' + L);

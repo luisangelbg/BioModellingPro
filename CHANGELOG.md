@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Accessibility (WCAG 2.5.3, Label in Name). The brand link in the top bar was announced as "BioModelling Pro home",
+  a name that did not contain the text it shows. `I18N.apply` (`js/i18n.js`) copied every tooltip (`data-es-title` /
+  `data-en-title`) to `aria-label`; it still does, except where a link, button or tab already shows a readable text
+  that the tooltip does not contain: there the control is named by that text and the tooltip stays as its
+  description. This also fixes three buttons with the same mismatch ("Use example records", "Use the selection as
+  the rectangle" and "Pin BIO1 and BIO12 and recompute"). Nothing looks or computes differently.
+
 ## 1.1.1 — 2026-09-23
 
 - Wording. Everywhere the climate layers are explained — `NOTICE.md`, the README, the Spanish readme,
