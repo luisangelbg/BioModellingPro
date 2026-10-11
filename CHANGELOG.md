@@ -8,6 +8,10 @@
   that the tooltip does not contain: there the control is named by that text and the tooltip stays as its
   description. This also fixes three buttons with the same mismatch ("Use example records", "Use the selection as
   the rectangle" and "Pin BIO1 and BIO12 and recompute"). Nothing looks or computes differently.
+- Source hygiene. `js/map.js` carried a raw NUL character inside the string `ALL_RECORDS`, the key of the
+  single-colour category of the record map (step 4). It is now written as the escape `\0`, which is the same
+  string. With the raw character, git and other tools took the file for binary and could not show its changes.
+  Nothing looks or computes differently.
 
 ## 1.1.1 — 2026-09-23
 
