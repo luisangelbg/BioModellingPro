@@ -1,7 +1,7 @@
 # Notice: what is ours, what is not
 
 BioModelling Pro is free software released under the **GNU General Public Licence, version 3 or later**.
-That licence covers **the source code written by the authors of this program**: `index.html`, the files in
+That licence covers **the source code written by the author of this program**: `index.html`, the files in
 `css/` and `js/` (except the three data files listed below), `server.ps1` and the project's own
 documentation and manual.
 

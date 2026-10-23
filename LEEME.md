@@ -78,8 +78,7 @@ estudio real) y el paso 5 las lee de donde las tengas. Köppen-Geiger sí viene 
 
 ## Cómo citar
 
-Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D. y
-Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
+Barrera-Guzmán, L. Á. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
 (versión 1.1.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 Ese DOI es el **DOI de concepto**: siempre lleva a la versión más reciente. La versión 1.0.0 tiene además el suyo,
@@ -89,7 +88,7 @@ que usaste.
 ## Licencia y qué alcanza
 
 El programa es software libre con **licencia GPL v3 o posterior** (archivo `LICENSE`), y esa licencia cubre el
-código fuente escrito por las personas autoras.
+código fuente escrito por su autor.
 
 Las bibliotecas que el programa usa y los datos que trae de ejemplo son de otras personas y conservan sus propias
 condiciones. **WorldClim no permite redistribuir sus capas sin permiso previo**, así que desde la versión 1.1.0 el

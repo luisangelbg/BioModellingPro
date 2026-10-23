@@ -182,16 +182,14 @@
   /* ---------- citation ---------- */
   const YEAR = 2026, REPO_URL = 'https://github.com/luisangelbg/BioModellingPro';
   const DOI = '10.5281/zenodo.22907825';   /* concept DOI: always the latest version */
-  const APA = `Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &amp; Mojica-Zárate, H. T. (${YEAR}). <i>BioModelling Pro: biogeography and species distribution modelling in the browser</i> (Version 1.1.1) [Computer software]. Zenodo. https://doi.org/${DOI}`;
-  const BIBTEX = `@software{barrera_biomodellingpro_${YEAR},\n  author    = {Barrera-Guzm{\\'a}n, Luis {\\'A}ngel and Ram{\\'i}rez-Ojeda, Gabriela and Cadena-I{\\~n}iguez, Jorge and Cadena-Zamudio, Daniel Alejandro and Cadena-Zamudio, Jorge David and Mojica-Z{\\'a}rate, H{\\'e}ctor Tecumsh{\\'e}},\n  title     = {{BioModelling Pro}: biogeography and species distribution modelling in the browser},\n  year      = {${YEAR}},\n  version   = {1.1.1},\n  publisher = {Zenodo},\n  doi       = {${DOI}},\n  url       = {${REPO_URL}},\n  license   = {GPL-3.0-or-later}\n}`;
+  const APA = `Barrera-Guzmán, L. Á. (${YEAR}). <i>BioModelling Pro: biogeography and species distribution modelling in the browser</i> (Version 1.1.1) [Computer software]. Zenodo. https://doi.org/${DOI}`;
+  const BIBTEX = `@software{barrera_biomodellingpro_${YEAR},\n  author    = {Barrera-Guzm{\\'a}n, Luis {\\'A}ngel},\n  title     = {{BioModelling Pro}: biogeography and species distribution modelling in the browser},\n  year      = {${YEAR}},\n  version   = {1.1.1},\n  publisher = {Zenodo},\n  doi       = {${DOI}},\n  url       = {${REPO_URL}},\n  license   = {GPL-3.0-or-later}\n}`;
   $('citeBox').innerHTML = `
     <p>${L2('Si usas BioModelling Pro en una publicación, cítalo así, y cita también los datos (GBIF, WorldClim, SoilGrids) y los métodos que uses:', 'If you use BioModelling Pro in a publication, cite it as follows, and also cite the data (GBIF, WorldClim, SoilGrids) and the methods you use:')}</p>
     <p style="font-size:.92rem">${APA}</p>
     <pre id="bibtexBox" style="font-size:.78rem;overflow:auto;background:var(--bg-soft);padding:10px;border-radius:8px;margin:8px 0">${esc(BIBTEX)}</pre>
     <button class="btn btn-secondary btn-sm" id="copyBibBtn">${L2('Copiar BibTeX', 'Copy BibTeX')}</button> <span class="hint" id="copyBibMsg"></span>
-    <p class="hint" style="margin-top:10px">${L2('Autoría', 'Authors')}: Luis Ángel Barrera-Guzmán (ORCID 0000-0001-8057-2583), Gabriela Ramírez-Ojeda (0000-0001-9679-6514),
-      Jorge Cadena-Iñiguez (0000-0002-6427-0646), Daniel Alejandro Cadena-Zamudio (0000-0002-6972-7414),
-      Jorge David Cadena-Zamudio (0000-0002-2855-4561) ${L2('y', 'and')} Héctor Tecumshé Mojica-Zárate (0000-0002-9067-3983).
+    <p class="hint" style="margin-top:10px">${L2('Autoría', 'Author')}: Luis Ángel Barrera-Guzmán (ORCID 0000-0001-8057-2583).
       ${L2('Software libre, licencia GPL v3 o posterior.', 'Free software, GPL v3 or later.')}</p>`;
   $('copyBibBtn').addEventListener('click', async () => {
     const msg = $('copyBibMsg');

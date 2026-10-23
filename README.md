@@ -127,8 +127,7 @@ server.ps1, *.bat          optional local web server (Windows)
 
 ## How to cite
 
-Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &
-Mojica-Zárate, H. T. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
+Barrera-Guzmán, L. Á. (2026). *BioModelling Pro: biogeography and species distribution modelling in the browser*
 (Version 1.1.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825
 
 That DOI is the **concept DOI**: it always resolves to the latest version. Version 1.0.0 also has its own,
@@ -139,7 +138,7 @@ See [`CITATION.cff`](CITATION.cff). Please also cite the data sources and the me
 ## Licence, and what it covers
 
 The program is free software under the **GNU General Public License v3.0 or later** (see [`LICENSE`](LICENSE)).
-That licence covers the source code written by the authors.
+That licence covers the source code written by its author.
 
 The libraries the program bundles or loads, and the data it ships as an example, belong to other people and keep
 their own terms — and one of them has a restriction worth knowing before you redistribute the program:

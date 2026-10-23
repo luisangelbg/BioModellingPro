@@ -22,36 +22,6 @@
       "familyName": "Barrera-Guzmán",
       "email": "lbarrerag@chapingo.mx",
       "@id": "https://orcid.org/0000-0001-8057-2583"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Gabriela",
-      "familyName": "Ramírez-Ojeda",
-      "@id": "https://orcid.org/0000-0001-9679-6514"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Jorge",
-      "familyName": "Cadena-Iñiguez",
-      "@id": "https://orcid.org/0000-0002-6427-0646"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Daniel Alejandro",
-      "familyName": "Cadena-Zamudio",
-      "@id": "https://orcid.org/0000-0002-6972-7414"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Jorge David",
-      "familyName": "Cadena-Zamudio",
-      "@id": "https://orcid.org/0000-0002-2855-4561"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Héctor Tecumshé",
-      "familyName": "Mojica-Zárate",
-      "@id": "https://orcid.org/0000-0002-9067-3983"
     }
   ],
   "softwareRequirements": ["A modern web browser; no installation"],

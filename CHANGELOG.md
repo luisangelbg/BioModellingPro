@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Authorship. The program has a single author, Luis Ángel Barrera-Guzmán: the citation and BibTeX shown on the
+  home page, the authorship line below them (`js/home.js`), `CITATION.cff`, `codemeta.json`, the README, the
+  Spanish readme and `NOTICE.md` now name him alone. Nothing looks or computes differently.
+- Step 3 (cleaning). The rules are built whenever the step opens, whatever the way in (step bar, side navigator,
+  footer, keyboard or «Continue»); before, only «Continue» built them and the other ways left the step without
+  rules, so «Apply cleaning» removed nothing. The flag counts are worked out on the records filtered at that
+  moment.
 - Accessibility (WCAG 2.5.3, Label in Name). The brand link in the top bar was announced as "BioModelling Pro home",
   a name that did not contain the text it shows. `I18N.apply` (`js/i18n.js`) copied every tooltip (`data-es-title` /
   `data-en-title`) to `aria-label`; it still does, except where a link, button or tab already shows a readable text
