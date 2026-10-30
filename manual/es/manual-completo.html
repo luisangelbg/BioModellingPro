@@ -1852,7 +1852,7 @@
 
   <div class="caja importante">
     <div class="caja-t"><span class="ico">!</span>Decide una vez, y que se note</div>
-    <p>La selección de este bloque es la que usan por omisión los bloques 7, 8 y 9: el botón <span class="ui">Las del paso 6</span> aparece en todos ellos. Si más adelante cambias de opinión, vuelve aquí y recalcula; no dejes dos selecciones distintas en el mismo trabajo.</p>
+    <p>La selección de este bloque es la que usan por omisión los bloques 7, 8 y 9; en los bloques 8 y 9 el botón <span class="ui">Las del paso 6</span> la recupera. Si más adelante cambias de opinión, vuelve aquí y recalcula; no dejes dos selecciones distintas en el mismo trabajo.</p>
   </div>
 
   <!-- 6.6 -->
@@ -1886,7 +1886,7 @@
       <tr><td>La selección deja fuera «mi» variable</td><td>Fíjala con el alfiler y recalcula. Es exactamente para eso.</td></tr>
       <tr><td>Pearson y Spearman dan resultados muy distintos</td><td>La relación entre esas variables no es lineal. Ábrela en el visor de pares antes de decidir.</td></tr>
       <tr><td>Quedan muy pocas variables</td><td>Sube un poco los umbrales, o fija las que necesites. Tres variables con sentido ecológico modelan mejor que diez redundantes.</td></tr>
-      <tr><td>Cambié la selección y los resultados de otro bloque no cambiaron</td><td>Los bloques 7, 8 y 9 toman la selección al entrar o al pulsar <span class="ui">Las del paso 6</span>. Vuelve a ese bloque y recarga la selección.</td></tr>
+      <tr><td>Cambié la selección y los resultados de otro bloque no cambiaron</td><td>Los bloques 7, 8 y 9 toman la selección al entrar, o, en el 8 y el 9, al pulsar <span class="ui">Las del paso 6</span>. Vuelve a ese bloque y recarga la selección.</td></tr>
     </tbody>
   </table>
 </section>
@@ -2154,8 +2154,8 @@
   <p>La <b>amplitud de nicho</b> de Levins mide, variable por variable, si la especie usa un rango estrecho o amplio de condiciones respecto al disponible; su versión estandarizada va de 0 a 1 y permite comparar variables entre sí. El <b>solapamiento</b> —D de Schoener e I de Hellinger, también de 0 a 1— compara el nicho de dos taxones o de dos grupos: cuánto comparten del espacio ambiental.</p>
 
   <figure class="chica limpia">
-    <div class="marco"><img src="../img/b8-nicho.png" alt="Figura del espacio ambiental con la densidad de los registros"></div>
-    <figcaption><b>Figura 8.6.</b> El nicho en el espacio ambiental. Cuando hay dos o más taxones con registros suficientes, la app calcula además el solapamiento entre sus nubes.</figcaption>
+    <div class="marco"><img src="../img/b8-nicho.png" alt="Amplitud de nicho (B de Levins estandarizada) de cada variable y distribución espacial de los registros con el polígono de su EOO"></div>
+    <figcaption><b>Figura 8.6.</b> Amplitud de nicho y patrón espacial: a la izquierda, la B de Levins estandarizada de cada variable; a la derecha, los registros en kilómetros con el polígono convexo del EOO. Cuando hay dos o más taxones con registros suficientes, la app calcula además el solapamiento entre sus nubes ambientales.</figcaption>
   </figure>
 
   <!-- 8.7 -->
@@ -2299,7 +2299,7 @@
     <div class="caja-t"><span class="ico">▸</span>Qué dicen estos números</div>
     <ul>
       <li><b>Los cuatro modelos valen prácticamente lo mismo</b> en AUC de prueba: MaxEnt 0.837, GLM 0.840, bosque aleatorio 0.835 y BRT 0.831, todos con desviaciones de ±0.02. Cuando cuatro algoritmos distintos coinciden así, la señal está en los datos, no en el método.</li>
-      <li><b>El BRT es el que más sobreajusta</b>: su AUC de entrenamiento es 0.929 frente a 0.831 de prueba, una diferencia de casi 0.10. El GLM, el más rígido, tiene la diferencia más pequeña (0.885 contra 0.840).</li>
+      <li><b>El BRT es el que más sobreajusta</b>: su AUC de entrenamiento es 0.929 frente a 0.831 de prueba, una diferencia de casi 0.10. El bosque aleatorio (0.873 contra 0.835) y el GLM, el más rígido (0.885 contra 0.840), tienen las diferencias más pequeñas.</li>
       <li><b>El índice de Boyce separa lo que el AUC no</b>: el bosque aleatorio llega a 0.958 y el BRT se queda en 0.871. Con AUC casi idénticos, el bosque ordena mejor las clases de idoneidad.</li>
       <li><b>El TSS anda entre 0.51 y 0.54</b>, por debajo del 0.6 que se suele pedir: un recordatorio de que con 403 presencias y celdas de 18.6 km el modelo es útil, no perfecto.</li>
     </ul>
@@ -2316,12 +2316,12 @@
 
   <figure class="limpia">
     <div class="marco"><img src="../img/b9-respuesta.png" alt="Curvas de respuesta de las variables, con la idoneidad predicha frente al valor de cada variable"></div>
-    <figcaption><b>Figura 9.4.</b> Las curvas de respuesta: cómo cambia la idoneidad al mover una variable dejando las demás en su valor medio. Una curva con forma de campana indica un óptimo; una monótona, un límite.</figcaption>
+    <figcaption><b>Figura 9.4.</b> Las curvas de respuesta: cómo cambia la idoneidad al mover una variable dejando las demás en la mediana de las presencias. Una curva con forma de campana indica un óptimo; una monótona, un límite.</figcaption>
   </figure>
 
   <div class="caja importante">
     <div class="caja-t"><span class="ico">!</span>Importancia no es causa</div>
-    <p>Que BIO16 salga como la variable más importante no significa que la lluvia del trimestre húmedo <i>cause</i> la distribución: puede ser una variable que acompaña a la verdadera causa —la altitud, el tipo de suelo, la historia—. Y si dos variables están correlacionadas, el modelo reparte la importancia entre ellas de forma arbitraria; por eso el Bloque 6 va antes que este.</p>
+    <p>Que la altitud (ALT) salga como la variable más importante en los cuatro modelos no significa que la altitud misma <i>cause</i> la distribución: puede ser una variable que acompaña a la verdadera causa —el frío, la humedad de las sierras, el suelo, la historia—. Y si dos variables están correlacionadas, el modelo reparte la importancia entre ellas de forma arbitraria; por eso el Bloque 6 va antes que este.</p>
   </div>
 
   <!-- 9.7 -->

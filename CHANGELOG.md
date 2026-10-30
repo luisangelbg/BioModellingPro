@@ -6,6 +6,10 @@
   (English).pdf`), with screenshots of the English interface (`manual/img/en/`) and one capture recipe per figure
   (`manual/herramientas/recetas/`). The running header and the window title follow the language of each part.
   Nothing in the program changed.
+- Manual in Spanish. Four passages now match the program: the «Las del paso 6» button exists only in steps 8 and
+  9 (chapter 6); figure 8.6 shows niche breadth and the EOO polygon (chapter 8); in chapter 9 the random forest also
+  has one of the smallest train–test gaps, elevation (not BIO16) is the most important variable in all four models,
+  and the response curves hold the other variables at the median of the presences. PDF reprinted (92 pages).
 - Authorship. The program has a single author, Luis Ángel Barrera-Guzmán: the citation and BibTeX shown on the
   home page, the authorship line below them (`js/home.js`), `CITATION.cff`, `codemeta.json`, the README, the
   Spanish readme and `NOTICE.md` now name him alone. Nothing looks or computes differently.
