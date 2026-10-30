@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 8 · Multivariate analysis, ecology and diversity</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 66%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 17%; margin-right: 17%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b8" data-pestana="8" data-orden="9" style="--acento: var(--b8)">
+  <div class="cap-apertura">
+    <div class="cap-num">8</div>
+    <div class="cap-etiqueta">Block 8 · The structure of the data</div>
+    <h1>Multivariate analysis, ecology and diversity</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Four families of methods on the same table: ordination, clustering, range and niche metrics, and diversity. Everything that can be said about a species before fitting a distribution model.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>8.1</b>What this block does</li>
+      <li><b>8.2</b>Principal component analysis</li>
+      <li><b>8.3</b>Clustering</li>
+      <li><b>8.4</b>Correspondence analysis</li>
+      <li><b>8.5</b>The range</li>
+      <li><b>8.6</b>Niche breadth and overlap</li>
+      <li><b>8.7</b>Diversity</li>
+      <li><b>8.8</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 8.1 -->
+  <h2 id="b8-1"><span class="num">8.1</span>What this block does</h2>
+  <p class="lead">Up to this point each variable has been examined on its own. This block looks at them <b>together</b>: which axes of environmental variation exist, whether the records form groups, how large the area they occupy is and how much variety there is within it. Everything is computed on the table from Block 5, with the variables chosen in Block 6, and it starts by pressing <span class="ui">Prepare data →</span>, which standardises each variable to mean zero and standard deviation one — essential when millimetres are mixed with degrees and metres.</p>
+
+  <!-- 8.2 -->
+  <h2 id="b8-2"><span class="num">8.2</span>Principal component analysis</h2>
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>The idea behind PCA</div>
+    <p>With eight correlated variables, the records do not fill an eight-dimensional space: they crowd close to a surface of fewer dimensions. PCA looks for the axes of that surface — combinations of the original variables — ordered by the amount of variation they capture. The first summarises as much as a single number can; the second, as much as is left, and so on.</p>
+  </div>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/en/b8-scree.png" alt="Scree plot with the percentage of variance of each dimension"></div>
+    <figcaption><b>Figure 8.1.</b> The scree plot for the example. The first four components pass the Kaiser criterion (eigenvalue &gt; 1) and together hold 83% of the variation; the first two, 52.5%.</figcaption>
+  </figure>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/en/b8-circulo.png" alt="Correlation circle with the arrows of the eight variables coloured by their quality of representation"></div>
+    <figcaption><b>Figure 8.2.</b> The correlation circle. The long arrows — BIO16, elevation, BIO3 and BIO18 — are the variables well represented on the plane; the colour is the quality of representation (cos²). Two arrows close together indicate variables that say the same thing; opposite arrows, variables that work against each other.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>What the first two axes mean</div>
+    <p>In the example, <b>dimension 1</b> (29.9% of the variance) is built on BIO16 — precipitation of the wettest quarter — with a 27.4% contribution, <b>elevation</b> with 25.5%, isothermality with 22.9% and BIO18 with 17.4%: it is an axis of <i>moisture and altitude</i>. <b>Dimension 2</b> (22.5%) is made up of BIO9 (25.1%) and BIO19 (25.0%), temperature and precipitation of the driest quarter: an axis of <i>dry-season conditions</i>. Between them they order half of the species’ environmental variation.</p>
+  </div>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/en/b8-individuos.png" alt="Individuals map on the plane of the first two dimensions, with the records coloured by taxon"></div>
+    <figcaption><b>Figure 8.3.</b> The 1,885 records projected onto that plane. Each point is a site; the cloud shows whether there are groups, tails or outlying records — which are usually the same ones that caught the eye in Block 5.</figcaption>
+  </figure>
+
+  <!-- 8.3 -->
+  <h2 id="b8-3"><span class="num">8.3</span>Clustering</h2>
+  <p>The question clustering asks is whether the records split into sets with different environments. The app answers it in three steps, and they are best taken in order.</p>
+  <ol class="pasos">
+    <li><b>Is there a tendency to cluster?</b> The Hopkins statistic compares the distribution of the data with a random one. By convention, a value above 0.75 indicates a clear tendency to cluster; around 0.5, none at all.</li>
+    <li><b>How many clusters?</b> The elbow method, the mean silhouette and the gap statistic each propose a number. They rarely agree: the choice is a matter of judgement, looking also at whether the clusters make geographic sense.</li>
+    <li><b>Run the clustering</b> with the chosen algorithm — hierarchical with different linkages, k-means, PAM, fuzzy, Gaussian mixture or DBSCAN — and validate it.</li>
+  </ol>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b8-grupos.png" alt="The records on the plane of the first two PCA dimensions, coloured by the cluster they were assigned to"></div>
+    <figcaption><b>Figure 8.4.</b> The three clusters of the example on the PCA plane. A useful clustering looks like this: clusters occupying different regions of the plane, even if they touch at the edges.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.7in">Validation measure</th><th>How to read it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Mean silhouette</b></td><td>From −1 to 1. By convention: above 0.7 strong structure, 0.5 to 0.7 reasonable, 0.25 to 0.5 weak, below that no real structure. In the example it is <b>0.422</b>: weak but recognisable clusters, which is the usual outcome with continuous environmental data.</td></tr>
+      <tr><td><b>Dunn index</b></td><td>The larger, the better separated. It has no accepted scale: it serves to compare partitions of the same data set, not to judge a single one.</td></tr>
+      <tr><td><b>Cophenetic correlation</b></td><td>Only for hierarchical clustering: how faithfully the dendrogram represents the original distances. Above 0.8 is considered good; in the example, 0.662.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Clusters are not subspecies</div>
+    <p>An environmental cluster brings together sites with a similar climate, not lineages. It may coincide with a subspecies — and then it is an interesting result — or cut right across it. Before giving a cluster a biological name, look at where it falls on the map and which taxa it contains: the app can colour the map of Block 4 by cluster.</p>
+  </div>
+
+  <!-- 8.4 -->
+  <h2 id="b8-4"><span class="num">8.4</span>Correspondence analysis</h2>
+  <p>Whereas PCA works with continuous variables, correspondence analysis works with <b>tables of counts</b>: taxon × Köppen climate type, taxon × state, cluster × soil class. It answers questions of the kind “which subspecies is associated with which climate?”, and draws them on a map where closeness between a row and a column means association.</p>
+  <p>With the example, the taxon × Köppen table confirms what Block 5 already suggested: the species in the broad sense is concentrated in the cold arid steppe climate, while the infrataxa of the centre-east appear associated with the temperate climates with a dry winter.</p>
+
+  <!-- 8.5 -->
+  <h2 id="b8-5"><span class="num">8.5</span>The range</h2>
+  <p>Three measures describe the area the species occupies, and all three are used in risk assessments.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b8-eco.png" alt="Cards for nearest neighbour, spatial pattern, z and EOO, and the tables of extent of occurrence and area of occupancy at several cell sizes"></div>
+    <figcaption><b>Figure 8.5.</b> The range metrics for the example. The app computes the area of occupancy at four cell sizes and marks the one used by red lists, because the figure <b>depends entirely</b> on the cell chosen.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.55in">Metric</th><th>What it is and how to read it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Extent of occurrence (EOO)</b></td><td>The area of the minimum convex polygon enclosing all the records. It measures geographic <i>spread</i>, not occupied habitat: it includes the cities, seas and deserts that lie between the populations. In the example, <b>2,797,094 km²</b>.</td></tr>
+      <tr><td><b>Area of occupancy (AOO)</b></td><td>The total area of the cells that contain at least one record. In the example: 1,258 km² with 1 km cells, <b>4,304 km² with 2 km cells</b> (the size used by red lists), 13,952 km² with 4 km and 59,200 km² with 10 km.</td></tr>
+      <tr><td><b>Nearest neighbour (R)</b></td><td>The Clark and Evans index: 1 means a random distribution, less than 1 clustered, more than 1 regular. In the example it is <b>0.210</b> with z = −65.7: strongly clustered.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Two warnings before quoting these numbers</div>
+    <p><b>The AOO depends on sampling as much as on the species.</b> A well-collected species has more occupied cells than an equally widespread but poorly collected one. The red-list thresholds (AOO &lt; 2,000 km², EOO &lt; 20,000 km² for “vulnerable”) were designed for complete inventories, and a threshold on its own <b>does not assign a category</b>: the criteria also require fragmentation, decline or fluctuation.</p>
+    <p><b>Clustering also measures effort.</b> An R of 0.21 says the points are tightly bunched, but part of that bunching comes from repeated collections along roads and in well-studied mountain ranges. Removing duplicates (Block 3) improves the estimate; removing the bias altogether is impossible with herbarium data.</p>
+  </div>
+
+  <!-- 8.6 -->
+  <h2 id="b8-6"><span class="num">8.6</span>Niche breadth and overlap</h2>
+  <p>Levins’ <b>niche breadth</b> measures, variable by variable, whether the species uses a narrow or a wide range of conditions relative to what is available; its standardised version runs from 0 to 1 and allows variables to be compared with one another. <b>Overlap</b> — Schoener’s D and Hellinger’s I, also from 0 to 1 — compares the niches of two taxa or two clusters: how much of the environmental space they share.</p>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/en/b8-nicho.png" alt="Standardised Levins’ niche breadth of each variable and the spatial distribution of the records with their EOO polygon"></div>
+    <figcaption><b>Figure 8.6.</b> Niche breadth and spatial pattern: on the left, the standardised Levins’ B of each variable; on the right, the records in kilometres with the convex polygon of the EOO. When there are two or more taxa with enough records, the app also computes the overlap between their environmental clouds.</figcaption>
+  </figure>
+
+  <!-- 8.7 -->
+  <h2 id="b8-7"><span class="num">8.7</span>Diversity</h2>
+  <p>The last section applies the classic toolkit of community diversity — Shannon, Simpson, Hill numbers, rarefaction, beta diversity — to the table of records, taking as “sites” the cells of a grid, elevation bands, states or the clusters from the clustering.</p>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Read this before interpreting anything</div>
+    <p>In a collection of presence records, <b>the number of records of a taxon measures sampling effort</b>, not abundance. A species with 800 records is not more abundant than one with 80: it may be better collected, more conspicuous or live beside a road. Diversity indices were designed for communities sampled with comparable effort, and here they are applied to data that do not meet that assumption.</p>
+    <p>They are useful on two conditions: that you compare <b>sites with similar effort</b> — or use rarefaction to even it out — and that you state in the text what you are measuring. With the example data, what is being measured is the diversity of <b>infrataxa</b> of the Mexican pinyon, not that of a plant community.</p>
+  </div>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The example, with 31 sites</div>
+    <p>With grid cells as sites, the example gives <b>31 sites × 7 taxa</b> and 1,867 records. The observed richness of the whole set is <b>7</b>, the Chao1 estimate is also <b>7.0</b> and the sample coverage is <b>99.95%</b>: practically everything there was to collect has been collected, which was to be expected because the “taxa” are the described infrataxa of a single species.</p>
+    <p>The Shannon index of the whole set is <b>0.231</b> and the Simpson index (1 − D) <b>0.083</b>: very low values, because one taxon — the species in the strict sense, with 2,281 of the original records — dominates completely. In a real plant community those numbers would point to a problem; here they describe the situation exactly.</p>
+  </div>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b8-rarefaccion.png" alt="Individual-based rarefaction curves for eight sites, with confidence bands and the extrapolated part as a dotted line"></div>
+    <figcaption><b>Figure 8.7.</b> Individual-based rarefaction. Each curve tells you how many taxa would have been found with <i>m</i> records: this is how sites with unequal effort are compared. The dotted part is extrapolation, and the band, the confidence interval. The black curve is the whole set.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b8-rangoabundancia.png" alt="Rank–abundance curve of the taxa on a logarithmic scale, with the fitted models"></div>
+    <figcaption><b>Figure 8.8.</b> The rank–abundance curve. A very steep drop, like this one, is the signature of a set dominated by a single taxon.</figcaption>
+  </figure>
+
+  <p>The app also computes <b>beta diversity</b> between sites — Jaccard, Sørensen, Bray–Curtis and Morisita–Horn — with its partition into turnover and nestedness, and orders the sites by composition with PCoA and NMDS. Every table and figure can be downloaded as CSV and as an image.</p>
+
+  <!-- 8.8 -->
+  <h2 id="b8-8"><span class="num">8.8</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>“First press "Prepare data" above.”</td><td>The methods in this block need the standardised matrix. Press <span class="ui">Prepare data →</span> at the very top.</td></tr>
+      <tr><td>The PCA does not separate anything</td><td>If the first two axes hold little variance, the variables are not strongly correlated: that is a result, not an error. Look at more dimensions in the eigenvalue table.</td></tr>
+      <tr><td>The silhouette is low for every <i>k</i></td><td>The data are a continuum, not clusters. This is common with climatic variables. Report the silhouette and do not force a partition.</td></tr>
+      <tr><td>The AOO changes enormously with the cell size</td><td>That is expected and must be stated: always report the cell size alongside the number, and use 2 km if you are going to compare with red-list criteria.</td></tr>
+      <tr><td>Shannon comes out almost zero</td><td>One taxon dominates. With records of a single species and its infrataxa, that is normal.</td></tr>
+      <tr><td>The rarefaction curve of a site is a flat line</td><td>That site has a single taxon: there is nothing to rarefy.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

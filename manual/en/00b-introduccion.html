@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · User’s Manual · Front matter and introduction</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<!-- reparte el contenido en hojas tamaño carta, con encabezados, números de página e índice -->
+<script src="../paginar.js"></script>
+<style>
+  .bloques-10 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.06in 0.22in; }
+  figure.reducida { width: 74%; margin-left: auto; margin-right: auto; }
+  .autoria { display: grid; grid-template-columns: 1fr 1fr; gap: 0.04in 0.2in; margin: 0.06in 0 0.1in; }
+  .autoria div { font-size: 10.5pt; }
+  .autoria .orc { font-family: var(--sans); font-size: 8pt; color: var(--gris); display: block; }
+</style>
+</head>
+<body>
+
+<!-- ====================================================================== CRÉDITOS -->
+<section class="preliminares creditos" id="creditos">
+  <div class="cred-titulo">BioModelling Pro</div>
+  <div class="cred-sub">User’s Manual · Biogeography and species distribution modelling</div>
+
+  <dl>
+    <dt>Authors</dt>
+    <dd>
+      <div class="autoria">
+        <div><b>Luis Ángel Barrera-Guzmán</b><span class="orc">ORCID 0000-0001-8057-2583</span></div>
+        <div><b>Gabriela Ramírez-Ojeda</b><span class="orc">ORCID 0000-0001-9679-6514</span></div>
+        <div><b>Jorge Cadena-Iñiguez</b><span class="orc">ORCID 0000-0002-6427-0646</span></div>
+        <div><b>Daniel Alejandro Cadena-Zamudio</b><span class="orc">ORCID 0000-0002-6972-7414</span></div>
+        <div><b>Jorge David Cadena-Zamudio</b><span class="orc">ORCID 0000-0002-2855-4561</span></div>
+        <div><b>Héctor Tecumshé Mojica-Zárate</b><span class="orc">ORCID 0000-0002-9067-3983</span></div>
+      </div>
+    </dd>
+    <dt>Software</dt><dd>BioModelling Pro, version 1.1.1 (September 2026), the one this manual describes</dd>
+    <dt>Manual</dt><dd>First English edition, 2026, translated from the first Spanish edition.</dd>
+    <dt>Software licence</dt><dd>GNU General Public License, version 3 or later (GPL-3.0-or-later).</dd>
+    <dt>Manual copyright</dt><dd>© 2026 the authors. All rights reserved.</dd>
+    <dt>Interface language</dt><dd>Spanish or English, with the <span class="ui">ES</span> · <span class="ui">EN</span> buttons on the top bar (Spanish by default). Button and menu names are given as they appear <b>in English</b>, e.g. <span class="ui">Run models →</span>.</dd>
+  </dl>
+
+  <h4>How to cite the software</h4>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &amp; Mojica-Zárate, H. T. (2026). <i>BioModelling Pro: biogeography and species distribution modelling in the browser</i> (Version 1.1.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22907825</div>
+  <h4>How to cite this manual</h4>
+  <div class="cita">Barrera-Guzmán, L. Á., Ramírez-Ojeda, G., Cadena-Iñiguez, J., Cadena-Zamudio, D. A., Cadena-Zamudio, J. D., &amp; Mojica-Zárate, H. T. (2026). <i>BioModelling Pro. User’s Manual</i> (1st English ed.). Distributed with BioModelling Pro, version 1.1.1.</div>
+  <p class="small">That DOI is the <b>concept DOI</b>: it always resolves to the latest version, and each version also has its own. The citation is also given in the <span class="ui">How to cite</span> section of the app, together with its BibTeX entry.</p>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Your data never leave your computer</div>
+    <p>BioModelling Pro runs inside the browser: the files you open are read on your own machine and <b>none of your data are uploaded to any server</b>. An internet connection is needed to query GBIF, to draw the base map and to download the computing engine the first time. The only query that sends coordinates is the soil-type lookup in Block 5, which is optional.</p>
+  </div>
+
+  <p class="small" style="margin-top:0.1in;color:#5d6a64">The illustrations, diagrams and screenshots in this manual are original. The example data are described in section I.7.</p>
+</section>
+
+<!-- ====================================================================== ÍNDICE -->
+<section class="preliminares indice" id="indice" data-nueva-hoja>
+  <h1>Contents</h1>
+  <div class="indice-sub">Overview of the manual</div>
+
+  <ol class="toc">
+    <li>
+      <div class="toc-cap"><span class="chip k0">P</span><a href="#como-leer">How to read this manual</a><a class="pag" href="#como-leer"></a></div>
+    </li>
+    <li>
+      <div class="toc-cap"><span class="chip k0">In</span><a href="#cap-intro">Introduction to BioModelling Pro</a><a class="pag" href="#cap-intro"></a></div>
+      <ul>
+        <li><span class="n">I.1</span><a href="#si-1"><span class="t">What is BioModelling Pro?</span></a></li>
+        <li><span class="n">I.2</span><a href="#si-2"><span class="t">Questions it answers</span></a></li>
+        <li><span class="n">I.3</span><a href="#si-3"><span class="t">Five key ideas of niche modelling</span></a></li>
+        <li><span class="n">I.4</span><a href="#si-4"><span class="t">Data it accepts</span></a></li>
+        <li><span class="n">I.5</span><a href="#si-5"><span class="t">What you need and how to open it</span></a></li>
+        <li><span class="n">I.6</span><a href="#si-6"><span class="t">A tour of the interface</span></a></li>
+        <li><span class="n">I.7</span><a href="#si-7"><span class="t">The bundled example: the Mexican pinyon</span></a></li>
+        <li><span class="n">I.8</span><a href="#si-8"><span class="t">Recommended workflow</span></a></li>
+        <li><span class="n">I.9</span><a href="#si-9"><span class="t">How to read the numbers: scales and thresholds</span></a></li>
+      </ul>
+    </li>
+    <li><div class="toc-cap"><span class="chip k1">B1</span><a href="#cap-b1">Presence records: GBIF and your own data</a><a class="pag" href="#cap-b1"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k2">B2</span><a href="#cap-b2">Filters: taxon, country, years, bounding box and states</a><a class="pag" href="#cap-b2"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k3">B3</span><a href="#cap-b3">Coordinate cleaning</a><a class="pag" href="#cap-b3"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k4">B4</span><a href="#cap-b4">The records map and the map studio</a><a class="pag" href="#cap-b4"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k5">B5</span><a href="#cap-b5">Environmental variables: climate, elevation, Köppen and soil</a><a class="pag" href="#cap-b5"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k6">B6</span><a href="#cap-b6">Correlation and variable selection</a><a class="pag" href="#cap-b6"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k7">B7</span><a href="#cap-b7">Descriptive statistics and the figure studio</a><a class="pag" href="#cap-b7"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k8">B8</span><a href="#cap-b8">Multivariate analysis, ecology and diversity</a><a class="pag" href="#cap-b8"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k9">B9</span><a href="#cap-b9">Distribution modelling and projection to the future</a><a class="pag" href="#cap-b9"></a></div></li>
+    <li><div class="toc-cap"><span class="chip k10">B10</span><a href="#cap-b10">Agroclimatic suitability of crops</a><a class="pag" href="#cap-b10"></a></div></li>
+    <li><div class="toc-cap"><span class="chip kx">A</span><a href="#apendices">Appendices</a><a class="pag" href="#apendices"></a></div></li>
+  </ol>
+</section>
+
+<!-- ====================================================================== CÓMO LEER ESTE MANUAL -->
+<section class="preliminares" id="como-leer" data-nueva-hoja style="--acento: var(--b0)">
+  <h2 style="margin-top:0.2in">How to read this manual</h2>
+  <p class="lead">The manual follows the same order as the app: ten numbered blocks, laid out from left to right on the top bar. Each chapter explains one block and carries its number: chapter 3 is Block 3, and its sections, figures and tables are numbered 3.1, 3.2… Each chapter opens with the essential theory, goes on to what the app computes and how to read it, and closes with a step-by-step example using the data that already come with the program. The introduction comes before the blocks and is numbered separately: I.1, I.2…</p>
+
+  <h3>One colour per block</h3>
+  <p>The block colour appears on the opening page of its chapter, in the section numbers, on the tab at the edge of the page and in the contents, and it matches the strip on the cover. That way you can tell at a glance which part of the app you are in.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:0.6in">Block</th><th style="width:1.5in">Name in the app</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip k1">1</span></td><td><span class="ui">1 GBIF</span></td><td>Searches GBIF for the species and fetches its records with coordinates, or loads your own from a file</td></tr>
+      <tr><td><span class="chip k2">2</span></td><td><span class="ui">2 Filter</span></td><td>Filters by taxon, country, year, basis of record, geographic bounding box and Mexican state or region</td></tr>
+      <tr><td><span class="chip k3">3</span></td><td><span class="ui">3 Clean</span></td><td>Nine coordinate-quality rules with a before-and-after report</td></tr>
+      <tr><td><span class="chip k4">4</span></td><td><span class="ui">4 Map</span></td><td>Records map and map studio: base layers, legend, scale bar, compass rose and export</td></tr>
+      <tr><td><span class="chip k5">5</span></td><td><span class="ui">5 Variables</span></td><td>Extracts at each point the 19 bioclimatic variables, elevation, the Köppen-Geiger climate and soil</td></tr>
+      <tr><td><span class="chip k6">6</span></td><td><span class="ui">6 Correlation</span></td><td>Correlation matrix, VIF and a selection of weakly collinear variables that keeps the ones you lock</td></tr>
+      <tr><td><span class="chip k7">7</span></td><td><span class="ui">7 Statistics</span></td><td>Descriptive statistics, histograms, box plots, normality and transformations, with fully editable figures</td></tr>
+      <tr><td><span class="chip k8">8</span></td><td><span class="ui">8 ML and ecology</span></td><td>PCA, clustering, correspondence analysis, range size, niche breadth and diversity</td></tr>
+      <tr><td><span class="chip k9">9</span></td><td><span class="ui">9 SDM modelling</span></td><td>Ten algorithms and an ensemble, validation, thresholds, maps and projection to future scenarios</td></tr>
+      <tr><td><span class="chip k10">10</span></td><td><span class="ui">10 Agroclimate</span></td><td>Agroclimatic indices and crop suitability on the same climate, now and in the future</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Types of box</h3>
+  <div class="dos">
+    <div class="caja nota" style="margin:0"><div class="caja-t"><span class="ico">i</span>Note</div><p>Clarifications and practical tips that save time.</p></div>
+    <div class="caja importante" style="margin:0"><div class="caja-t"><span class="ico">!</span>Important</div><p>Things that can change your conclusions if overlooked.</p></div>
+    <div class="caja teoria" style="margin:0"><div class="caja-t"><span class="ico">θ</span>Theory in brief</div><p>The idea behind an analysis, without unnecessary formulas.</p></div>
+    <div class="caja ejemplo" style="margin:0"><div class="caja-t"><span class="ico">▸</span>Example</div><p>A case worked step by step with the data bundled with the program.</p></div>
+  </div>
+  <div class="caja regla" style="margin-top:0.18in">
+    <div class="caja-t"><span class="ico">✓</span>Decision rule</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:40%"><b>If</b> the result falls in this case…</td><td><b>then</b> this is the recommended reading.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">These are guides to interpretation, not laws: what you know about your species and your region always comes first.</p>
+  </div>
+  <div class="caja dato">
+    <div class="dato-cifra">97</div>
+    <div class="dato-txt"><div class="caja-t">Key fact</div>Help cards built into the app, one per index or statistic, each with its reading scale, the most common mistake and the reference it comes from.</div>
+  </div>
+
+  <h3>Typographic conventions</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:38%">Written like this</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">Prepare model data →</span></td><td>A button, checkbox or menu in the app, with its text exactly as it appears on screen in English.</td></tr>
+      <tr><td><span class="ruta">Map studio<span class="sep">›</span>Export<span class="sep">›</span>Clip to the country</span></td><td>A path: open the first item, then the second, and so on.</td></tr>
+      <tr><td><code>decimalLatitude</code>, <code>.tif</code></td><td>A column name, file name or value, written exactly as shown.</td></tr>
+      <tr><td>BIO1, BIO12 · AUC, TSS</td><td>Variables and indices; their meaning is explained the first time they appear and collected in the glossary.</td></tr>
+      <tr><td><i>Pinus cembroides</i></td><td>Scientific names are in italics, as in any biological text.</td></tr>
+      <tr><td><span class="si">●</span> <span class="parcial">◐</span> <span class="no">—</span></td><td>Available · partly available or with conditions · not applicable.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>If you are coming from another program</div>
+    <p>Anyone who has modelled niches before will recognise the route: cleaned records, environmental layers, variable selection, fitting, validation and projection. What changes is that here everything happens in a single window, with nothing to install, and every result comes with its reading card alongside. The methods go by the names used in the literature and are cited by their original papers.</p>
+  </div>
+</section>
+
+<!-- ====================================================================== INTRODUCCIÓN -->
+<section class="capitulo" id="cap-intro" data-pestana="In" data-orden="1" style="--acento: var(--b0)">
+  <div class="cap-apertura">
+    <div class="cap-num">In</div>
+    <div class="cap-etiqueta">Introduction · Before the blocks</div>
+    <h1>Introduction to BioModelling Pro</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">What the program is, which biogeographical questions it answers, which data it accepts and how to work through it from start to finish. It includes the five ideas of niche modelling on which the rest of the manual rests.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>I.1</b>What is BioModelling Pro?</li>
+      <li><b>I.2</b>Questions it answers</li>
+      <li><b>I.3</b>Five key ideas of niche modelling</li>
+      <li><b>I.4</b>Data it accepts</li>
+      <li><b>I.5</b>What you need and how to open it</li>
+      <li><b>I.6</b>A tour of the interface</li>
+      <li><b>I.7</b>The bundled example: the Mexican pinyon</li>
+      <li><b>I.8</b>Recommended workflow</li>
+      <li><b>I.9</b>How to read the numbers</li>
+    </ul>
+  </div>
+
+  <!-- I.1 -->
+  <h2 id="si-1"><span class="num">I.1</span>What is BioModelling Pro?</h2>
+  <p class="lead">BioModelling Pro is a platform for carrying out a complete species distribution study, <b>from records to maps</b>: it downloads presence records, cleans them, extracts climate, elevation and soil at each point, explores them with statistics and multivariate methods, fits and validates distribution models, projects the result onto future climate scenarios and assesses the agroclimatic suitability of crops over the same territory.</p>
+  <p>Everything happens inside the browser. There is nothing to install, no programming is needed and your data never leave your computer. The same route works for a wild species, for a crop wild relative or for a crop: the question changes, the workflow does not.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="Jost, sans-serif" role="img"
+         aria-label="The ten blocks of BioModelling Pro in two rows, from the presence record to the suitability map and crop suitability">
+      <defs>
+        <marker id="flA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#5d6a64"/></marker>
+      </defs>
+      <g font-size="10">
+        <!-- fila 1: datos -->
+        <text x="16" y="24" font-size="8.5" fill="#5d6a64" letter-spacing="1.6">THE DATA</text>
+        <g>
+          <rect x="16" y="34" width="120" height="54" rx="8" fill="#eaf1fa" stroke="#1d5bb0"/>
+          <text x="76" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#123f7d">1 · Records</text>
+          <text x="76" y="70" text-anchor="middle" fill="#2c3c50">GBIF or your own file</text>
+          <rect x="152" y="34" width="120" height="54" rx="8" fill="#e6f2f0" stroke="#0f766e"/>
+          <text x="212" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#0b4f4a">2 · Filter</text>
+          <text x="212" y="70" text-anchor="middle" fill="#254946">taxon, country, states</text>
+          <rect x="288" y="34" width="120" height="54" rx="8" fill="#eaf4ee" stroke="#2f7d4f"/>
+          <text x="348" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#1f5c39">3 · Clean</text>
+          <text x="348" y="70" text-anchor="middle" fill="#2b4a3a">nine rules</text>
+          <rect x="424" y="34" width="120" height="54" rx="8" fill="#fbf2e0" stroke="#b7791f"/>
+          <text x="484" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#8a5a12">4 · Map</text>
+          <text x="484" y="70" text-anchor="middle" fill="#57492f">view and export</text>
+          <rect x="560" y="34" width="124" height="54" rx="8" fill="#fbeee6" stroke="#c2410c"/>
+          <text x="622" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#8a2f08">5 · Variables</text>
+          <text x="622" y="70" text-anchor="middle" fill="#5c3c2c">climate, elevation, soil</text>
+        </g>
+        <path d="M136 61 L150 61 M272 61 L286 61 M408 61 L422 61 M544 61 L558 61" stroke="#5d6a64" stroke-width="1.4" marker-end="url(#flA)" fill="none"/>
+        <!-- bajada: pasa por debajo del rótulo de la fila -->
+        <path d="M622 92 C540 132 220 132 76 134" stroke="#5d6a64" stroke-width="1.4" fill="none" stroke-dasharray="5 4" marker-end="url(#flA)"/>
+        <!-- fila 2: análisis -->
+        <text x="16" y="120" font-size="8.5" fill="#5d6a64" letter-spacing="1.6">THE ANALYSIS</text>
+        <g>
+          <rect x="16" y="138" width="120" height="54" rx="8" fill="#fbeaee" stroke="#b4234a"/>
+          <text x="76" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#8c1738">6 · Correlation</text>
+          <text x="76" y="174" text-anchor="middle" fill="#55303a">which variables to use</text>
+          <rect x="152" y="138" width="120" height="54" rx="8" fill="#f4edfb" stroke="#7e3fb0"/>
+          <text x="212" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#5c2a85">7 · Statistics</text>
+          <text x="212" y="174" text-anchor="middle" fill="#463357">describe and test</text>
+          <rect x="288" y="138" width="120" height="54" rx="8" fill="#e8f4f9" stroke="#2b8fb3"/>
+          <text x="348" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#19647f">8 · Multivariate</text>
+          <text x="348" y="174" text-anchor="middle" fill="#2c4753">niche and diversity</text>
+          <rect x="424" y="128" width="120" height="74" rx="8" fill="#eceafa" stroke="#4f46a5"/>
+          <text x="484" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#37307c">9 · Modelling</text>
+          <text x="484" y="166" text-anchor="middle" fill="#3b3a52">ten algorithms</text>
+          <text x="484" y="180" text-anchor="middle" fill="#3b3a52">validation and maps</text>
+          <text x="484" y="194" text-anchor="middle" fill="#3b3a52">future</text>
+          <rect x="560" y="138" width="124" height="54" rx="8" fill="#f0f5e4" stroke="#4d7c0f"/>
+          <text x="622" y="158" text-anchor="middle" font-size="11" font-weight="600" fill="#3a5f0b">10 · Agroclimate</text>
+          <text x="622" y="174" text-anchor="middle" fill="#41502f">crop suitability</text>
+        </g>
+        <path d="M136 165 L150 165 M272 165 L286 165 M408 165 L422 165 M544 165 L558 165" stroke="#5d6a64" stroke-width="1.4" marker-end="url(#flA)" fill="none"/>
+        <!-- salidas -->
+        <text x="16" y="232" font-size="8.5" fill="#5d6a64" letter-spacing="1.6">WHAT YOU TAKE AWAY</text>
+        <g font-size="9.5" fill="#1f2724">
+          <rect x="16" y="242" width="210" height="44" rx="8" fill="#ffffff" stroke="#d7e1dc"/>
+          <text x="121" y="260" text-anchor="middle" font-weight="600">Maps</text>
+          <text x="121" y="275" text-anchor="middle" fill="#3f4f49">PNG, TIFF, GeoTIFF and SVG</text>
+          <rect x="242" y="242" width="210" height="44" rx="8" fill="#ffffff" stroke="#d7e1dc"/>
+          <text x="347" y="260" text-anchor="middle" font-weight="600">Tables and figures</text>
+          <text x="347" y="275" text-anchor="middle" fill="#3f4f49">CSV and editable figures at 600 dpi</text>
+          <rect x="468" y="242" width="216" height="44" rx="8" fill="#ffffff" stroke="#d7e1dc"/>
+          <text x="576" y="260" text-anchor="middle" font-weight="600">Model metrics</text>
+          <text x="576" y="275" text-anchor="middle" fill="#3f4f49">AUC, TSS, Boyce and thresholds</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption><b>Figure I.1.</b> The ten blocks. The first five prepare the data; the next five analyse them. Each block leaves the input of the next one ready, and all of them draw on the same cleaned data set.</figcaption>
+  </figure>
+
+  <!-- I.2 -->
+  <h2 id="si-2"><span class="num">I.2</span>Questions it answers</h2>
+  <p>These are real questions from theses, papers and projects that the program answers with the data you already have or can download in a few minutes:</p>
+  <ul>
+    <li><b>Where does my species live today, and where <i>could</i> it live?</b> The suitability map of Block 9 points to the areas with the climate the species occupies, even where nobody has collected it yet.</li>
+    <li><b>Which climate variables explain its distribution?</b> Permutation importance and the response curves of Block 9 tell you, once Block 6 has discarded the variables that duplicate each other.</li>
+    <li><b>How well does my model predict?</b> Spatial block validation with AUC, TSS and the Boyce index, and thresholds to turn suitability into a presence–absence map.</li>
+    <li><b>What will happen under climate change?</b> Projection to several scenarios, periods and climate models, with the area gained and lost, the shift of the centre of the distribution, and refugia.</li>
+    <li><b>How threatened is it?</b> The extent of occurrence (EOO) and area of occupancy (AOO) of Block 8, with the Red List thresholds.</li>
+    <li><b>Do the subtaxa occupy different environments?</b> Niche overlap, ordinations and clustering in Block 8.</li>
+    <li><b>Which crop suits this region, today and thirty years from now?</b> Block 10 computes growing degree-days, frosts, chill hours, water balance and suitability for each crop, with its planting calendar and its limiting factor.</li>
+  </ul>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>What a distribution model is not</div>
+    <p>A suitability map is <b>not</b> a map of confirmed presence, nor a census, nor a prediction of abundance. It shows where the environment resembles that of the places where the species has been recorded. An area coming out as suitable does not mean the species is there: it may never have reached it, it may have been eliminated, or it may be excluded by a competitor, by the soil or by land use. That distinction, spelled out in full, is the subject of section I.3.</p>
+  </div>
+
+  <!-- I.3 -->
+  <h2 id="si-3"><span class="num">I.3</span>Five key ideas of niche modelling</h2>
+  <p>Five ideas are enough to understand everything the app does. They come back in every chapter.</p>
+
+  <h3>1. The niche is a space of variables; the distribution is a geographical space</h3>
+  <p>Hutchinson (1957) defined the niche as the set of conditions under which a population persists: a volume in a space of <i>n</i> variables (temperature, rainfall, elevation…). That volume cannot be seen on a map, but every point on the map has its place inside it. Modelling means moving back and forth between the two spaces: the niche is learnt in environmental space and drawn in geographical space.</p>
+
+  <figure class="reducida">
+    <svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" font-family="Jost, sans-serif" role="img"
+         aria-label="On the left, environmental space with the records forming a cloud inside an envelope; on the right, the same result painted on the map">
+      <defs>
+        <marker id="flB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#14453a"/></marker>
+        <radialGradient id="gIdo" cx="42%" cy="46%" r="58%">
+          <stop offset="0%" stop-color="#e5462f"/><stop offset="42%" stop-color="#f79a3a"/>
+          <stop offset="72%" stop-color="#8bd0a7"/><stop offset="100%" stop-color="#ffffff"/>
+        </radialGradient>
+      </defs>
+      <!-- espacio ambiental -->
+      <text x="18" y="22" font-size="9" fill="#5d6a64" letter-spacing="1.4">ENVIRONMENTAL SPACE</text>
+      <path d="M40 210 L240 210 M40 210 L40 40" stroke="#1f2724" stroke-width="1.2" fill="none"/>
+      <text x="140" y="232" font-size="9.5" text-anchor="middle" fill="#3f4f49">BIO1 · mean temperature</text>
+      <text x="26" y="125" font-size="9.5" text-anchor="middle" fill="#3f4f49" transform="rotate(-90 26 125)">BIO12 · annual rainfall</text>
+      <ellipse cx="135" cy="120" rx="66" ry="48" fill="#8bd0a7" opacity="0.28" transform="rotate(-24 135 120)"/>
+      <ellipse cx="135" cy="120" rx="66" ry="48" fill="none" stroke="#1d6153" stroke-width="1.4" stroke-dasharray="4 3" transform="rotate(-24 135 120)"/>
+      <g fill="#13312b">
+        <circle cx="104" cy="139" r="2.6"/><circle cx="118" cy="128" r="2.6"/><circle cx="131" cy="118" r="2.6"/>
+        <circle cx="146" cy="110" r="2.6"/><circle cx="159" cy="101" r="2.6"/><circle cx="112" cy="151" r="2.6"/>
+        <circle cx="126" cy="136" r="2.6"/><circle cx="141" cy="127" r="2.6"/><circle cx="155" cy="118" r="2.6"/>
+        <circle cx="97" cy="126" r="2.6"/><circle cx="168" cy="112" r="2.6"/><circle cx="133" cy="101" r="2.6"/>
+        <circle cx="120" cy="112" r="2.6"/><circle cx="150" cy="135" r="2.6"/><circle cx="108" cy="116" r="2.6"/>
+      </g>
+      <text x="196" y="86" font-size="8.5" fill="#1d6153">niche</text>
+      <text x="196" y="97" font-size="8.5" fill="#1d6153">envelope</text>
+      <!-- flechas -->
+      <path d="M252 105 L296 105" stroke="#14453a" stroke-width="1.6" marker-end="url(#flB)" fill="none"/>
+      <path d="M296 145 L252 145" stroke="#14453a" stroke-width="1.6" marker-end="url(#flB)" fill="none"/>
+      <text x="274" y="98" font-size="8" text-anchor="middle" fill="#14453a">drawn</text>
+      <text x="274" y="162" font-size="8" text-anchor="middle" fill="#14453a">learnt</text>
+      <!-- espacio geográfico -->
+      <text x="312" y="22" font-size="9" fill="#5d6a64" letter-spacing="1.4">GEOGRAPHICAL SPACE</text>
+      <rect x="312" y="34" width="228" height="180" rx="6" fill="#fbfcfb" stroke="#d7e1dc"/>
+      <path d="M330 180 C352 150 344 120 366 96 C386 74 414 66 440 78 C470 92 486 120 504 140 C518 156 522 176 512 192 C476 200 396 200 330 180 Z"
+            fill="url(#gIdo)" stroke="#14453a" stroke-width="1.1"/>
+      <g fill="#13312b">
+        <circle cx="392" cy="124" r="2.4"/><circle cx="406" cy="112" r="2.4"/><circle cx="418" cy="132" r="2.4"/>
+        <circle cx="430" cy="118" r="2.4"/><circle cx="444" cy="134" r="2.4"/><circle cx="402" cy="142" r="2.4"/>
+        <circle cx="458" cy="122" r="2.4"/><circle cx="376" cy="140" r="2.4"/>
+      </g>
+      <text x="330" y="212" font-size="8.5" fill="#5d6a64">high suitability</text>
+      <text x="470" y="212" font-size="8.5" fill="#5d6a64" text-anchor="end">low</text>
+    </svg>
+    <figcaption><b>Figure I.2.</b> The two spaces. The model learns in environmental space —where the records fall within the range of temperature and rainfall— and projects that result onto the map. The same points appear on both sides.</figcaption>
+  </figure>
+
+  <h3>2. Fundamental niche, realised niche and what the model can see</h3>
+  <p>The <b>fundamental</b> niche is everything physiology allows; the <b>realised</b> niche is the part the species actually occupies, already trimmed by competitors, predators and history. Presence records estimate something close to the realised niche, and only within the environments that exist in the study region. That is why the area chosen for modelling changes the result: it is a decision for the researcher, not a technical detail.</p>
+
+  <h3>3. The BAM diagram: not everything suitable is occupied</h3>
+  <p>Soberón and Peterson (2005) summed it up in three sets: <b>B</b>, what biotic interactions allow; <b>A</b>, what the abiotic environment allows; and <b>M</b>, what the species has been able to reach through its mobility. The observed distribution lies in the intersection. The app models mainly the <b>A</b> part, which is why there are suitable areas with no presence.</p>
+
+  <figure class="reducida">
+    <svg viewBox="0 0 560 210" xmlns="http://www.w3.org/2000/svg" font-family="Jost, sans-serif" role="img"
+         aria-label="BAM diagram: three circles, abiotic conditions, biotic interactions and accessible area, with the observed distribution at their intersection">
+      <g>
+        <circle cx="186" cy="100" r="76" fill="#c2410c" opacity="0.14" stroke="#c2410c"/>
+        <circle cx="262" cy="100" r="76" fill="#2f7d4f" opacity="0.14" stroke="#2f7d4f"/>
+        <circle cx="224" cy="150" r="76" fill="#1d5bb0" opacity="0.12" stroke="#1d5bb0"/>
+        <text x="132" y="62" font-size="13" font-weight="600" fill="#8a2f08">A</text>
+        <text x="308" y="62" font-size="13" font-weight="600" fill="#1f5c39">B</text>
+        <text x="220" y="204" font-size="13" font-weight="600" fill="#123f7d">M</text>
+        <circle cx="224" cy="118" r="17" fill="#14453a"/>
+        <text x="224" y="122" font-size="9" fill="#fff" text-anchor="middle" font-weight="600">Go</text>
+      </g>
+      <g font-size="9.5" fill="#1f2724">
+        <text x="352" y="56">A · abiotic environment</text><text x="352" y="70" font-size="8.5" fill="#5d6a64">climate, elevation, soil: what the app models</text>
+        <text x="352" y="96">B · biotic interactions</text><text x="352" y="110" font-size="8.5" fill="#5d6a64">competition, herbivory, pollinators</text>
+        <text x="352" y="136">M · accessible area</text><text x="352" y="150" font-size="8.5" fill="#5d6a64">dispersal and history: the study area</text>
+        <text x="352" y="176">Go · occupied distribution</text><text x="352" y="190" font-size="8.5" fill="#5d6a64">what is actually observed in the field</text>
+      </g>
+    </svg>
+    <figcaption><b>Figure I.3.</b> The BAM diagram. The app estimates mainly <b>A</b>; the study area you choose in Block 9 is your hypothesis about <b>M</b>, and <b>B</b> almost always stays outside the model. It is worth saying so in the paper.</figcaption>
+  </figure>
+
+  <h3>4. Records carry biases, and bias looks like signal</h3>
+  <p>Collections pile up along roads, near cities and in protected areas. A naive model learns that sampling pattern instead of the niche. That is why Block 3 removes duplicates, country centroids and impossible coordinates, Block 9 can keep a single presence per cell, and validation is done by <b>spatial blocks</b> rather than at random: with nearby points, random validation hands out excellent results that do not hold at a new site.</p>
+
+  <h3>5. Extrapolating is not interpolating</h3>
+  <p>When the model is projected to another time or another region, combinations of climate appear that it never saw. There the prediction is an extension of the formula, not an estimate backed by data. The MESS map of Block 9 marks those areas, and the manual insists on showing them whenever a future projection is published.</p>
+
+  <!-- I.4 -->
+  <h2 id="si-4"><span class="num">I.4</span>Data it accepts</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">What</th><th style="width:1.5in">Format</th><th>Where it goes in and what to keep in mind</th></tr></thead>
+    <tbody>
+      <tr><td><b>Presence records</b></td><td>GBIF download</td><td>Block 1. The scientific name is enough: the app resolves the taxon and fetches the records with coordinates, with a progress bar, an adjustable cap and a country filter —Mexico, Central America and South America— that is applied within the query itself.</td></tr>
+      <tr><td><b>Your own records</b></td><td><code>.csv</code>, <code>.txt</code>, <code>.xlsx</code> or pasted</td><td>Block 1. Three columns are enough: species, longitude and latitude. It accepts decimal commas, degrees-minutes-seconds and files saved on Windows; you can add them to the GBIF records or use them on their own.</td></tr>
+      <tr><td><b>Climate layers</b></td><td><code>.tif</code> (GeoTIFF)</td><td>Block 5. The 19 bioclimatic variables and elevation from WorldClim 2.1, at whatever resolution you download. The app reads only the window it needs, so it does not load the whole file into memory.</td></tr>
+      <tr><td><b>Köppen-Geiger climate</b></td><td><code>.tif</code></td><td>Block 5. Categorical: the app includes the table of class codes and names.</td></tr>
+      <tr><td><b>Soil type</b></td><td>online query</td><td>Block 5, optional. It queries a public service point by point; it is the only query that sends coordinates.</td></tr>
+      <tr><td><b>Future scenarios</b></td><td><code>.tif</code></td><td>Block 9. One 19-band file or separate layers per variable, for each climate model, pathway and period.</td></tr>
+      <tr><td><b>Monthly layers</b></td><td><code>.tif</code></td><td>Block 10. Minimum temperature, maximum temperature and precipitation month by month, which is what the agroclimatic indices require.</td></tr>
+      <tr><td><b>Your own regions</b></td><td><code>.geojson</code></td><td>Block 2. Municipalities, watersheds, protected areas: any polygon layer can be used to filter and to clip the maps.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>You do not need to download anything to get started</div>
+    <p>The program comes with a complete example: 2,400 GBIF records and climate layers clipped to the whole of Mexico. With them you can work through the ten blocks, try every button and reproduce every figure in this manual before turning to your own data.</p>
+  </div>
+
+  <!-- I.5 -->
+  <h2 id="si-5"><span class="num">I.5</span>What you need and how to open it</h2>
+  <ol class="pasos">
+    <li><b>An up-to-date web browser.</b> Any of the widely used ones, on Windows, macOS or Linux. Nothing else is installed.</li>
+    <li><b>Double-click <code>index.html</code> to open it.</b> That is enough for the example records and everything done with them. The climate layers are downloaded once (section I.4) and loaded with the first two buttons of Block 5, which also work when the app is opened by double-clicking. You can also use the local server that comes with the program if you prefer to open it from another computer on the same network.</li>
+    <li><b>An internet connection</b> for three things: querying GBIF, drawing the base map and downloading the computing engine the first time you enter a block that uses it. Everything else —reading your files, the calculations and the figures— works offline.</li>
+    <li><b>Choose the language and theme</b> on the top bar: <span class="ui">ES</span> or <span class="ui">EN</span>, and light or dark. The app opens in Spanish; once you switch to English the choice is remembered, and the figures redraw themselves.</li>
+  </ol>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>The first time you enter a computing block</div>
+    <p>Blocks 7, 8, 9 and 10 use a Python engine that runs <b>inside</b> the browser. The first time, it takes from a few seconds to a couple of minutes to download, depending on your connection, and a progress notice appears. After that it stays in the browser’s memory and subsequent analyses are immediate.</p>
+  </div>
+
+  <!-- I.6 -->
+  <h2 id="si-6"><span class="num">I.6</span>A tour of the interface</h2>
+  <p>The window always has the same three parts:</p>
+  <ul>
+    <li><b>The top bar</b>, with the name of the program, the <span class="ui">ES</span> · <span class="ui">EN</span> buttons, the theme switch and the <b>block route</b>: <span class="ui">⌂ Home</span> and the ten numbered steps. You can jump from one to another at any time; whatever you have already computed is kept.</li>
+    <li><b>The home page</b> (<span class="ui">⌂ Home</span>), with the summary of the workflow, the cards for the ten steps, the methods gallery, the theory, the references, how to cite and a <b>virtual species lab</b>: an invented landscape with a niche you define, presences sampled with or without bias, and three algorithms that try to recover it. It is the best place to understand what a model does before using real data.</li>
+    <li><b>The block panel</b>, always with the same structure: at the top a box saying what the step is for and what you decide in it, then the controls, then the results in cards, tables and figures, and finally a collapsible <b>interpretation guide</b>. Next to each number there is a help button that opens its card.</li>
+  </ul>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>The help cards</div>
+    <p>Each card tells you four things in this order: <b>what that number measures</b> in plain words, <b>how to read it</b>, <b>on what scale</b> —with a bar of coloured bands that marks where your value falls— and <b>the most common mistake</b> when using it, and it closes with the reference it comes from. When the scale is a reading convention rather than a statistical law, the card says so; when no accepted scale exists, it says that too instead of inventing one.</p>
+  </div>
+
+  <!-- I.7 -->
+  <h2 id="si-7"><span class="num">I.7</span>The bundled example: the Mexican pinyon</h2>
+  <p>All the examples in this manual use the same data set, which comes with the program: the records of the <b>Mexican pinyon</b>, <i>Pinus cembroides</i> Zucc., a pine with edible seeds from the dry mountain ranges of northern and central Mexico. It is a good case study because its distribution is wide but fragmented, it is tied to a well-defined semi-arid montane climate, and it has described subspecies and varieties.</p>
+
+  <table class="compacta">
+    <thead><tr><th style="width:2.1in">In the example data set</th><th>What it contains</th></tr></thead>
+    <tbody>
+      <tr><td><b>Records</b></td><td>2,400 downloaded from GBIF on 21 September 2026, out of the 5,329 reported by the query</td></tr>
+      <tr><td><b>Countries</b></td><td>Mexico 1,719 · United States 670 · New Zealand 8 · France 2 · Austria 1</td></tr>
+      <tr><td><b>Names</b></td><td>7 forms: the species (2,281) and six subspecies and varieties (<i>orizabensis</i>, <i>cembroides</i>, <i>lagunae</i>)</td></tr>
+      <tr><td><b>Basis of record</b></td><td>human observation 1,343 · preserved specimen 967 · other 90</td></tr>
+      <tr><td><b>Years</b></td><td>from 1982 to 2026</td></tr>
+      <tr><td><b>Layers</b></td><td>the 19 bioclimatic variables, elevation and the Köppen-Geiger climate at 10 arc-minutes (≈ 18 km), clipped to lon −122° to −86° and lat 13° to 40°: the whole of Mexico and the south-western United States</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The eleven records worth a lesson</div>
+    <p>Eleven of those 2,400 records are in New Zealand, France and Austria: they are <b>cultivated</b> trees in botanic gardens and arboreta, not natural populations. GBIF delivers them without telling them apart, and if they slip through, the model tries to explain the climate of Europe and Oceania with the niche of a Mexican mountain range. Chapters 2 and 3 show how to detect them and what to do with them. They are not a flaw in the example: they are what turns up in any real download.</p>
+  </div>
+
+  <!-- I.8 -->
+  <h2 id="si-8"><span class="num">I.8</span>Recommended workflow</h2>
+  <p>The order of the blocks is the order in which it pays to work, but it is not a straitjacket: you can go back, change a filter and recompute. This is the short route for a typical study:</p>
+  <ol class="pasos">
+    <li><b>Fetch the records</b> (Block 1) and check how many there are and where they come from.</li>
+    <li><b>Filter</b> (Block 2) by taxon and by country or region. This is where the study area is decided, and that is an ecological decision, not one of convenience.</li>
+    <li><b>Clean</b> (Block 3) and look at the before-and-after table: each rule tells you how many records it removes and why.</li>
+    <li><b>Look at the map</b> (Block 4). A glance reveals the errors that no rule catches: points in the sea, in the wrong country or in a single botanic garden.</li>
+    <li><b>Extract the environment</b> (Block 5) at each point and check how many were left without data.</li>
+    <li><b>Choose the variables</b> (Block 6). Keep those that add distinct information and those that make sense for your species, even if they are correlated.</li>
+    <li><b>Describe them</b> (Block 7): that way you will know the range of temperature and rainfall in which your species lives before modelling anything.</li>
+    <li><b>Explore the structure</b> (Block 8): ordination, groups, range size and niche breadth.</li>
+    <li><b>Model and validate</b> (Block 9). Start with two or three algorithms and block validation; leave the ensemble and the future for when the base model convinces you.</li>
+    <li><b>If your question is agricultural</b>, go on to Block 10 with the monthly layers.</li>
+  </ol>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Save as you go</div>
+    <p>Every block lets you download what it produces: the CSV of the cleaned records, the table of points by variables, the metrics, the maps and the figures. Downloading the cleaned CSV at the end of Block 3 costs one click and saves you repeating the GBIF download if you close the browser.</p>
+  </div>
+
+  <!-- I.9 -->
+  <h2 id="si-9"><span class="num">I.9</span>How to read the numbers: scales and thresholds</h2>
+  <p>This manual, like the app, distinguishes three kinds of numerical reference, and it is worth not confusing them when writing up the results:</p>
+  <table class="compacta">
+    <thead><tr><th style="width:1.45in">Kind</th><th style="width:1.9in">Examples</th><th>How to treat it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Reading convention</b></td><td>|r| &gt; 0.7 is high collinearity; AUC &gt; 0.8 is a good model; VIF &gt; 10 is a problem</td><td>Useful habits, not laws: cite them as such and give the exact value alongside.</td></tr>
+      <tr><td><b>Published threshold</b></td><td>EOO &lt; 20,000 km² and AOO &lt; 2,000 km² from the Red Lists; MESS &lt; 0 marks extrapolation</td><td>They come from a formal criterion; cite them with their source and with the caveat that a threshold on its own does not assign a category.</td></tr>
+      <tr><td><b>No accepted scale</b></td><td>kurtosis, Dunn index, accumulated degree-days, observed richness</td><td>Compare them with one another —between regions, between models, between years—, never against a magic number.</td></tr>
+    </tbody>
+  </table>
+  <p>Whenever the manual gives a band of values, it will say which of the three kinds it belongs to. And whenever a number depends on the sample size, the study area or the resolution of the layers —which is almost always—, it will also say what it depends on.</p>
+
+  <div class="caja regla">
+    <div class="caja-t"><span class="ico">✓</span>Three questions before publishing a map</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:34%"><b>What area did I model?</b></td><td>Say so in the text and show it on the map: the study area is a hypothesis about where the species has been able to reach.</td></tr>
+      <tr><td><b>How did I validate?</b></td><td>Spatial blocks, with AUC, TSS and Boyce, and the number of presences that went in.</td></tr>
+      <tr><td><b>Where did I extrapolate?</b></td><td>Accompany every future projection with its MESS map or, at the very least, with the percentage of the area under extrapolation.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">The three answers fit in two lines of the methods section and head off half of the reviewers’ comments.</p>
+  </div>
+</section>
+
+</body>
+</html>

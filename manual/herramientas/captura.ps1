@@ -8,7 +8,7 @@ param(
   [Parameter(Mandatory = $true)][string]$Receta,
   [int]$Ancho = 1400, [int]$Alto = 900,
   [string]$Tema = 'light', [string]$Idioma = 'es',
-  [string]$Recorte = '', [string]$Salida = ''
+  [string]$Recorte = '', [string]$Salida = '', [int]$Puerto = 9335
 )
 $ErrorActionPreference = 'Stop'
 $man = Split-Path $PSScriptRoot -Parent
@@ -16,7 +16,11 @@ $app = Split-Path $man -Parent
 $archivoReceta = Join-Path (Join-Path $PSScriptRoot 'recetas') "$Receta.js"
 if (-not $Salida) { $Salida = $Receta }
 $png = Join-Path $man "img\$Salida.png"
-& powershell -ExecutionPolicy Bypass -File (Join-Path $app 'tools\local\shot.ps1') -Out $png -SetupFile $archivoReceta -Theme $Tema -Lang $Idioma -Width $Ancho -Height $Alto -Scale 2 -Wait 2500 -SetupWait 700 | Out-Null
+$ret = Join-Path $env:TEMP ("biomodellingpro-receta-" + $Puerto + ".txt")
+if (Test-Path $ret) { Remove-Item $ret }
+& powershell -ExecutionPolicy Bypass -File (Join-Path $app 'tools\local\shot.ps1') -Out $png -SetupFile $archivoReceta -SetupOut $ret -Theme $Tema -Lang $Idioma -Width $Ancho -Height $Alto -Scale 2 -Wait 2500 -SetupWait 700 -Port $Puerto | Out-Null
+# sin -Recorte, se usa el que la receta devolvió (window.__recorte), si lo hay
+if (-not $Recorte -and (Test-Path $ret)) { $v = [string](Get-Content $ret -Raw); if ($v -and $v.Trim() -match '^\d+,\d+,\d+,\d+$') { $Recorte = $v.Trim() } }
 if ($Recorte) {
   Add-Type -AssemblyName System.Drawing
   $r = $Recorte.Split(',') | ForEach-Object { [int]([double]$_ * 2) }

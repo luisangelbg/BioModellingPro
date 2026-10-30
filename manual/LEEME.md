@@ -4,13 +4,14 @@ El manual se escribe por partes, en HTML, con la misma dinámica que los manuale
 ClusteringPro, AgriDesign, BreedingPro y SciMetricsPro. Primero va la versión en español y después, si se decide,
 la versión en inglés. Cuando las partes estén completas se unen en un solo documento y se imprime a PDF.
 
-La **versión en español está completa**: portada, preliminares, introducción, los diez capítulos y los apéndices
+La **versión en español está completa** (y desde octubre de 2026 también la inglesa, en `en/`): portada, preliminares, introducción, los diez capítulos y los apéndices
 A–F, unidos en `es/manual-completo.html` e impresos en `BioModelling Pro User's Manual.pdf` (92 hojas, septiembre
 de 2026).
 
 ```
 manual/
   BioModelling Pro User's Manual.pdf   el manual en español, impreso de una sola vez
+  en/BioModelling Pro User's Manual (English).pdf   el manual en inglés
   manual.css           hoja común: tamaño carta y marco de la portada
   interior.css         estilo de las páginas interiores: hojas blancas, vivos en verde de bosque, un color por capítulo
   paginar.js           reparte el contenido en hojas tamaño carta (encabezados, números de página, índice)
@@ -38,8 +39,24 @@ manual/
     01-bloque1.html … 10-bloque10.html   un capítulo por bloque de la app (capítulo N = Bloque N)
     11-apendices.html  apéndices A–F: formatos de archivo, fórmulas, glosario, mensajes, referencias y terceros
     manual-completo.html  generado por unir-manual.ps1; no se edita a mano
-  en/                  versión en inglés (pendiente)
+  en/                  versión en inglés: las mismas partes traducidas, con capturas de la app en inglés
+    manual-completo.html  generado con unir-manual.ps1 -Lang en
+    BioModelling Pro User's Manual (English).pdf   el manual en inglés impreso (96 hojas, octubre de 2026)
+  img/en/              capturas de la app con la interfaz en inglés
 ```
+
+## Versión en inglés
+
+La versión en inglés está completa (octubre de 2026). Cada parte de `en/` tiene el mismo marcado que su par de
+`es/`; sólo cambia el texto. Las capturas inglesas se toman con las recetas de `herramientas/recetas/`:
+
+    powershell -ExecutionPolicy Bypass -File manualherramientasptura.ps1 -Receta b6-matriz -Idioma en -Salida "en6-matriz"
+
+Desde `file://` el navegador no deja leer las capas de `datos/`, así que las recetas de los Bloques 5 a 10 las toman
+de archivos que viven en `tools/local/` (fuera de git, porque las capas de WorldClim no se redistribuyen):
+`rasters-10min.js` y `rasters-datos.js` (las capas en base64 como `window.EXAMPLE_RASTERS`, la vía que prevé
+`js/rasters.js`) y dos servidores con CORS sobre `datos/`, `cors-19403.ps1` (Bloque 5) y `cors-9406.ps1` (Bloque 8),
+que hay que arrancar antes de tomar esas capturas.
 
 ## Ver una parte
 

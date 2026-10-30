@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 7 · Descriptive statistics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 70%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 15%; margin-right: 15%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b7" data-pestana="7" data-orden="8" style="--acento: var(--b7)">
+  <div class="cap-apertura">
+    <div class="cap-num">7</div>
+    <div class="cap-etiqueta">Block 7 · Getting to know the data</div>
+    <h1>Descriptive statistics and the figure studio</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Before modelling you need to know what the data look like: the range in which the species lives, whether the distributions have one mode or two, whether a transformation is needed. Every figure is drawn as vectors and can be edited down to the last detail.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>7.1</b>Describe before you model</li>
+      <li><b>7.2</b>The descriptive table</li>
+      <li><b>7.3</b>Histograms and density</li>
+      <li><b>7.4</b>A closer look at one variable</li>
+      <li><b>7.5</b>The normality tests</li>
+      <li><b>7.6</b>Suggested transformations</li>
+      <li><b>7.7</b>The figure studio</li>
+      <li><b>7.8</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 7.1 -->
+  <h2 id="b7-1"><span class="num">7.1</span>Describe before you model</h2>
+  <p class="lead">This block fits no model: it describes. And yet it is the one that most often changes the course of a study, because it is where you discover that a variable has two modes, that another is dominated by a handful of extreme values, or that the temperature range the species occupies is narrower than was thought.</p>
+  <p>It is also the first block that uses the <b>computing engine</b>: when you press <span class="ui">Run statistical analysis →</span> the app loads Python inside the browser. The first time takes a while; after that it is immediate.</p>
+
+  <!-- 7.2 -->
+  <h2 id="b7-2"><span class="num">7.2</span>The descriptive table</h2>
+  <figure class="media">
+    <div class="marco"><img src="../img/en/b7-descriptiva.png" alt="Descriptive table with n, mean, standard deviation, coefficient of variation, minimum, quartiles, median, maximum, skewness and kurtosis for each variable"></div>
+    <figcaption><b>Figure 7.1.</b> The eleven measures of each variable. Each heading has its help button with the formula, the reading scale and a warning about the most common mistake.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Measure</th><th>How to read it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Mean and median</b></td><td>If they are close, the distribution is symmetric; if the mean is much larger, there is a long tail to the right. To describe the environment of a species, the median is usually the more honest of the two.</td></tr>
+      <tr><td><b>Standard deviation</b></td><td>The spread in the units of the variable. It is the one to report alongside the mean.</td></tr>
+      <tr><td><b>Coefficient of variation</b></td><td>The relative spread, as a percentage. <b>Careful:</b> it only makes sense on scales with an absolute zero, such as rainfall or elevation. For temperatures in degrees Celsius the zero is arbitrary and the CV means nothing: the same data in kelvin give a different number.</td></tr>
+      <tr><td><b>Quartiles</b></td><td>Q1 and Q3 enclose the middle half of the data. It is the interval worth quoting when describing the environment of a species.</td></tr>
+      <tr><td><b>Skewness</b></td><td>Zero is symmetric; positive, a tail to the right. Values between −0.5 and 0.5 are considered roughly symmetric, and above 1 in absolute value, strongly skewed: this is a reading convention, not a test.</td></tr>
+      <tr><td><b>Kurtosis</b></td><td>The weight of the tails relative to a normal distribution (0 = normal). There is no accepted scale of “high” or “low”: it is used to compare variables with one another, not against a threshold.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Three variables from the example</div>
+    <p>Of the eight variables that Block 6 selected for the Mexican pinyon: the <b>diurnal temperature range</b> (BIO2) has a mean of 15.9 °C and a standard deviation of 1.3, with almost no skewness; <b>isothermality</b> (BIO3) has a mean of 58.6% and a kurtosis of <b>−1.44</b>, the sign of a flattened distribution with two groups; the <b>mean temperature of the driest quarter</b> (BIO9) has a kurtosis of <b>+2.45</b>, that is, heavy tails: a few very cold and very warm sites.</p>
+  </div>
+
+  <!-- 7.3 -->
+  <h2 id="b7-3"><span class="num">7.3</span>Histograms and density</h2>
+  <p>The histogram grid shows all the variables at a glance, each with its density curve. It is the figure that answers the question no table can: <b>what shape does the distribution have?</b></p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b7-histogramas.png" alt="Grid of eight histograms with their density curves for the selected variables, with a legend for the histogram and the Gaussian kernel density"></div>
+    <figcaption><b>Figure 7.2.</b> The eight selected variables. <b>Isothermality</b> (BIO3) and <b>elevation</b> are clearly bimodal: two groups of sites with different conditions, which in Block 8 will show up as groups in the ordination. The rainfall variables have the long right tail typical of precipitation.</figcaption>
+  </figure>
+
+  <!-- 7.4 -->
+  <h2 id="b7-4"><span class="num">7.4</span>A closer look at one variable</h2>
+  <p>When you choose a variable, the app draws five figures of it: a histogram with the fitted normal, a box plot, a violin plot, a Q–Q plot and the empirical cumulative distribution.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b7-elev.png" alt="Histogram of elevation with its density curve and the fitted normal, which does not follow the bimodal shape of the data"></div>
+    <figcaption><b>Figure 7.3.</b> The elevation of the 1,885 records. The blue curve is the normal fitted with the same mean and standard deviation: it looks nothing like the data, which have one group near 1,000 m and another, larger one near 2,100 m.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b7-qq.png" alt="Normal Q-Q plot of elevation, with the points forming a step in the middle instead of following the line"></div>
+    <figcaption><b>Figure 7.4.</b> The same data in a Q–Q plot. If the variable were normal, the points would follow the line. The <b>step</b> in the middle is the signature of a distribution with two modes, and the departures at the ends, that of tails shorter than those of the normal.</figcaption>
+  </figure>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Two modes are usually two populations</div>
+    <p>An environmental variable with two modes almost always means that the records come from two different sets of sites: two mountain systems, two subspecies, or one natural population and one cultivated. It is not a flaw in the data: it is information. In the Mexican pinyon, elevation separates the higher populations of the Sierra Madre Occidental and the Altiplano from the lower ones of the north-east and of Baja California Sur.</p>
+  </div>
+
+  <!-- 7.5 -->
+  <h2 id="b7-5"><span class="num">7.5</span>The normality tests</h2>
+  <p>The app applies five tests (Shapiro-Wilk, D'Agostino-Pearson, Anderson-Darling, Jarque-Bera and Kolmogorov-Smirnov) and sums them up with a majority verdict.</p>
+
+  <figure class="media">
+    <div class="marco"><img src="../img/en/b7-normalidad.png" alt="Normality tests table with the five tests, the votes and the verdict for each variable, all of them not normal"></div>
+    <figcaption><b>Figure 7.5.</b> The five tests for the eight variables of the example: <b>no variable passes any test</b> (0 of 5 votes). With 1,885 records, that result was almost inevitable.</figcaption>
+  </figure>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>With plenty of data, everything comes out “not normal”</div>
+    <p>Normality tests answer the question “can I rule out that these data come from a normal distribution?”. With 50 data points a large departure is needed to rule it out; with 1,885, a tiny departure (and there always is one) is enough for the p-value to be zero. That is why the result in figure 7.5 does not say that the data are odd: it says that the sample is large.</p>
+    <p><b>What to do:</b> look at the shape in the histogram and the Q–Q plot, which do tell “slightly skewed” apart from “two modes”, and remember that <b>none of the algorithms of Block 9 requires normality</b>. Normality matters for classical parametric tests, not for MaxEnt or a random forest.</p>
+  </div>
+
+  <!-- 7.6 -->
+  <h2 id="b7-6"><span class="num">7.6</span>Suggested transformations</h2>
+  <p>The last table tries out transformations (log, square root, Box-Cox, Yeo-Johnson) and says whether they improve the symmetry and the p-value. It is useful when the next step is a method sensitive to shape, such as principal component analysis or a linear model.</p>
+  <p>In the example, the transformations do improve the skewness (BIO2 goes from −0.148 to −0.002 with Box-Cox), but the verdict is still “marginal”: with this much data, no transformation will get the tests to accept normality. One more reason not to become obsessed with it.</p>
+
+  <!-- 7.7 -->
+  <h2 id="b7-7"><span class="num">7.7</span>The figure studio</h2>
+  <p>Every figure in this block has its own <b>studio</b> underneath, with the same philosophy as the one for maps: what you see on screen is what gets exported, and everything can be edited.</p>
+
+  <figure class="media">
+    <div class="marco"><img src="../img/en/b7-estudio.png" alt="Figure studio panel with its tabs for text, axes, grid, series, figure, annotations, looks and export"></div>
+    <figcaption><b>Figure 7.6.</b> The figure studio, with the text tab open: title, subtitle, caption, axis titles and legend title, each with its own size, bold, italic, colour and font.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.25in">Tab</th><th>What it controls</th></tr></thead>
+    <tbody>
+      <tr><td><b>Text</b></td><td>Title, subtitle, axis titles, legend and notes, with full typography.</td></tr>
+      <tr><td><b>Axes</b></td><td>Limits, tick marks, number format, logarithmic scale, orientation of the labels.</td></tr>
+      <tr><td><b>Grid</b></td><td>Reference lines, their colour and thickness, and the frame of the figure.</td></tr>
+      <tr><td><b>Series</b></td><td>Colours, transparency, line width and point size of each series.</td></tr>
+      <tr><td><b>Figure</b></td><td>The options specific to each figure: number of histogram bins, violin width, Q–Q points…</td></tr>
+      <tr><td><b>Annotations</b></td><td>Text, arrows and lines you want to add on top of the figure.</td></tr>
+      <tr><td><b>Looks</b></td><td>Presets, and saving the style as a file to give every figure in the paper the same look.</td></tr>
+      <tr><td><b>Export</b></td><td>SVG, PNG, JPEG or WebP; screen size, A4, one or two journal columns, or slide; 150, 300 or 600 dpi.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>The figures in this manual</div>
+    <p>Figures 7.2, 7.3 and 7.4 are the figures exactly as the app draws them, with no retouching afterwards. Any reader can reproduce them with the data included in the program.</p>
+  </div>
+
+  <!-- 7.8 -->
+  <h2 id="b7-8"><span class="num">7.8</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>“Preparing the Python engine…” takes a long time</td><td>It is the first time: Python and its libraries are being downloaded. On a slow connection it can take a couple of minutes; after that it stays in memory.</td></tr>
+      <tr><td>Every variable comes out “not normal”</td><td>With large samples that is to be expected (section 7.5). It is not a problem with your data and it does not prevent modelling.</td></tr>
+      <tr><td>A histogram with a single, very tall bar</td><td>A few extreme values stretch the axis. Look at them: they are usually the same suspicious records as in Block 5.</td></tr>
+      <tr><td>The CV comes out huge or negative</td><td>You are looking at a variable in degrees Celsius with a mean close to zero. The CV does not apply there.</td></tr>
+      <tr><td>The variable names come out in the wrong language</td><td>Change the language with the ES | EN switch in the top bar: the figures redraw themselves with the translated names.</td></tr>
+      <tr><td>I want the same figure for every variable</td><td>Save the style in the <b>Looks</b> tab and load it into the other figures.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 9 · Distribution modelling</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 62%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 19%; margin-right: 19%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+  table.alg td:first-child { font-weight: 600; color: var(--negro); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b9" data-pestana="9" data-orden="10" style="--acento: var(--b9)">
+  <div class="cap-apertura">
+    <div class="cap-num">9</div>
+    <div class="cap-etiqueta">Block 9 · The model</div>
+    <h1>Distribution modelling and projection to the future</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Ten algorithms and an ensemble, spatial block validation, thresholds, variable importance, response curves, maps, and projection to future climate scenarios with their extrapolation map.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>9.1</b>What this block fits</li>
+      <li><b>9.2</b>Preparing the data</li>
+      <li><b>9.3</b>The ten algorithms</li>
+      <li><b>9.4</b>Validation</li>
+      <li><b>9.5</b>Reading the metrics</li>
+      <li><b>9.6</b>Importance and response curves</li>
+      <li><b>9.7</b>The maps and the threshold</li>
+      <li><b>9.8</b>The ensemble</li>
+      <li><b>9.9</b>Projection to the future</li>
+      <li><b>9.10</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 9.1 -->
+  <h2 id="b9-1"><span class="num">9.1</span>What this block fits</h2>
+  <p class="lead">A distribution model learns to tell the environment of the sites where the species was recorded from the environment <b>available</b> in the region, and then applies what it has learnt to every cell of the map. The result is a continuous surface of <b>suitability</b>: how similar the climate of each cell is to that of the occupied sites.</p>
+  <p>The key word is <i>available</i>. Since there are no true absences (section 1.1), the contrast is made against a sample of the environment of the whole study area, the <b>background points</b>. That is why the area you choose determines what the species is compared against, and why Block 2 mattered so much.</p>
+
+  <!-- 9.2 -->
+  <h2 id="b9-2"><span class="num">9.2</span>Preparing the data</h2>
+  <p>The <span class="ui">Prepare model data →</span> button does four things and reports on them:</p>
+  <ol class="pasos">
+    <li><b>It crops to the chosen extent.</b> By default this is the country of the records —or the states from Block 2, if you chose them deliberately—. Records outside it do not go in, and the app says how many there are.</li>
+    <li><b>It reads the layers onto a grid.</b> The grid inherits the resolution of your layers; if the number of cells is huge, the app aggregates blocks of cells so that the computation is feasible in the browser.</li>
+    <li><b>It thins the presences.</b> With the <span class="ui">Keep a single presence per grid cell</span> checkbox —ticked by default— fifty records of the same tree count once. It is the most effective defence against sampling bias.</li>
+    <li><b>It draws the background points</b> spread across the study area, with a fixed seed so that the result is reproducible.</li>
+  </ol>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The example, prepared</div>
+    <p>With the Mexican pinyon and the WorldClim layers at 10 arc-minutes: extent <b>Country of the records (MX)</b>, box from −118.6° to −86.4° and from 14.4° to 32.8°, a grid of <b>194 × 111</b> cells of <b>18.6 km</b>, 8 predictors. Of the 1,885 cleaned records, <b>14 fall outside</b> the extent —those from the United States above the 32.8° parallel— and of the remaining 1,871, 1,468 fall in a cell that is already occupied or has no data: that leaves <b>403 presences</b> against <b>7,751 background points</b>.</p>
+    <p>Seeing 1,871 records turn into 403 presences is alarming the first time. No data have been lost: the repetition has been removed. With 18.6 km cells, 403 is the number of <i>distinct cells</i> where the species has been recorded, and that is what the model can learn from.</p>
+  </div>
+
+  <!-- 9.3 -->
+  <h2 id="b9-3"><span class="num">9.3</span>The ten algorithms</h2>
+  <table class="compacta alg">
+    <thead><tr><th style="width:1.7in">Algorithm</th><th>What it does and when it is a good choice</th></tr></thead>
+    <tbody>
+      <tr><td>MaxEnt-style</td><td>Penalised (L1) logistic regression on linear, quadratic, product and hinge terms, with cloglog output. It is equivalent to maximum entropy modelling and is the sensible starting point in almost any study.</td></tr>
+      <tr><td>GLM</td><td>Generalised linear model with linear and quadratic terms. Transparent, interpretable, and the most sensitive to collinearity.</td></tr>
+      <tr><td>GAM</td><td>Generalised additive model with splines: smooth curves without imposing their shape.</td></tr>
+      <tr><td>Random forest</td><td>Many trees with balanced subsampling. Flexible and robust; its validation uses out-of-bag predictions so as not to inflate the fit.</td></tr>
+      <tr><td>Boosted trees (BRT)</td><td>Trees added one at a time, each correcting the error of the previous ones. Very accurate, and the most prone to overfitting.</td></tr>
+      <tr><td>Support vector machine</td><td>Non-linear boundary with a radial kernel.</td></tr>
+      <tr><td>Neural network</td><td>Five small networks, averaged.</td></tr>
+      <tr><td>Bioclim</td><td>The classic climatic envelope: percentiles of each variable. Simple and useful with very few presences.</td></tr>
+      <tr><td>Domain</td><td>Gower distance to the most similar record.</td></tr>
+      <tr><td>Mahalanobis</td><td>Distance to the environmental centroid, taking the covariance into account.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 9.4 -->
+  <h2 id="b9-4"><span class="num">9.4</span>Validation</h2>
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Why spatial blocks and not random splits</div>
+    <p>If the records are split at random, the test points end up a few kilometres from the training points: the model gets them right because they are on the same hill, not because it has learnt anything general. The result is a high and misleading AUC. <b>Spatial block</b> validation divides the area into blocks and leaves out whole blocks, so the model has to predict in areas it has not seen. The values drop, and that is as it should be.</p>
+  </div>
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Metric</th><th>What it measures and how to read it</th></tr></thead>
+    <tbody>
+      <tr><td><b>AUC</b></td><td>The probability that a presence site receives a higher suitability than a background site drawn at random. 0.5 is chance. Usual reading bands: 0.7–0.8 acceptable, 0.8–0.9 good, above 0.9 excellent. They are conventions, and with presence-only data the AUC depends on the study area: values are not compared across different studies.</td></tr>
+      <tr><td><b>TSS</b></td><td>Sensitivity + specificity − 1, at the threshold that maximises it. From −1 to 1; by convention, above 0.6 is considered good. It is more stable than kappa and does not depend on prevalence.</td></tr>
+      <tr><td><b>Boyce index</b></td><td>Measures whether the higher suitability classes contain proportionally more presences: it is the metric designed for presence-only data. It ranges from −1 to 1; above 0.8 indicates a very consistent model.</td></tr>
+      <tr><td><b>Omission (P10)</b></td><td>The fraction of test presences that falls below the 10th-percentile threshold. Ideally close to 0.1.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 9.5 -->
+  <h2 id="b9-5"><span class="num">9.5</span>Reading the metrics</h2>
+  <figure class="media">
+    <div class="marco"><img src="../img/en/b9-metricas.png" alt="Performance table with test and training AUC, TSS, sensitivity, specificity, Boyce, omission and threshold for the four models"></div>
+    <figcaption><b>Figure 9.1.</b> The four models of the example, validated with spatial blocks. The <b>Train AUC</b> column is not a result: it is there to be compared with the test column.</figcaption>
+  </figure>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/en/b9-roc.png" alt="ROC curves of the four models with their AUC"></div>
+    <figcaption><b>Figure 9.2.</b> The ROC curves. The closer the curve hugs the top left corner, the better the model separates; the diagonal is chance.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>What these numbers say</div>
+    <ul>
+      <li><b>The four models are practically equal</b> in test AUC: MaxEnt-style 0.840, GLM 0.840, random forest 0.837 and BRT 0.833, with standard deviations between ±0.016 and ±0.022. When four different algorithms agree like this, the signal is in the data, not in the method.</li>
+      <li><b>BRT overfits the most</b>: its training AUC is 0.928 against 0.833 in testing, a gap of almost 0.10. The random forest (0.874 against 0.837) and the GLM, the most rigid (0.885 against 0.840), have the smallest gaps.</li>
+      <li><b>The Boyce index separates what the AUC does not</b>: the random forest reaches 0.958 and BRT stays at 0.856. With almost identical AUCs, the forest ranks the suitability classes better.</li>
+      <li><b>The TSS lies between 0.51 and 0.54</b>, below the 0.6 usually asked for: a reminder that with 403 presences and 18.6 km cells the model is useful, not perfect.</li>
+    </ul>
+  </div>
+
+  <!-- 9.6 -->
+  <h2 id="b9-6"><span class="num">9.6</span>Importance and response curves</h2>
+  <p>Two different questions: <b>how much</b> each variable contributes, and <b>how</b> the species responds to it.</p>
+
+  <figure class="chica limpia">
+    <div class="marco"><img src="../img/en/b9-importancia.png" alt="Chart of permutation importance of the variables"></div>
+    <figcaption><b>Figure 9.3.</b> Permutation importance, measured <b>on the test data</b>: the values of one variable are shuffled and the drop in performance is measured. If a variable contributes nothing, shuffling it changes nothing.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b9-respuesta.png" alt="Response curves of the variables, with the predicted suitability against the value of each variable"></div>
+    <figcaption><b>Figure 9.4.</b> The response curves: how suitability changes as one variable moves while the others are held at the median of the presences. A bell-shaped curve indicates an optimum; a monotonic one, a limit.</figcaption>
+  </figure>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Importance is not causation</div>
+    <p>That elevation comes out as the most important variable in all four models does not mean that elevation itself <i>causes</i> the distribution: it may be a variable that travels with the true cause —the cold, the moisture of the mountains, the soil, history—. And if two variables are correlated, the model shares the importance between them arbitrarily; that is why Block 6 comes before this one.</p>
+  </div>
+
+  <!-- 9.7 -->
+  <h2 id="b9-7"><span class="num">9.7</span>The maps and the threshold</h2>
+  <p>The app draws three maps per model: the <b>continuous suitability</b>, the <b>presence/absence</b> map after applying a threshold, and the <b>uncertainty</b> between models when there are several.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b9-mapa.png" alt="Suitability map of the boosted trees model over the whole of Mexico, clipped to the country, with the presences and the legend of the suitability scale"></div>
+    <figcaption><b>Figure 9.5.</b> The suitability of the boosted trees model over the whole country, clipped to Mexico with the map studio. The dots are the presences used. The two Sierras Madre, the Trans-Mexican Volcanic Belt and the Sierra de La Laguna stand out, and the map points to suitable areas where there are no records: candidates for exploration.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">Threshold</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><b>Max. TSS (sens + spec)</b></td><td>The one that maximises sensitivity + specificity. It is the most commonly used and the one the app proposes.</td></tr>
+      <tr><td><b>10th percentile of presences</b></td><td>The P10 threshold leaves out the 10% of presences with the lowest suitability. Useful when you suspect some records are poorly georeferenced.</td></tr>
+      <tr><td><b>Minimum training presence</b></td><td>Keeps every presence. The most permissive, and the most sensitive to a single error.</td></tr>
+      <tr><td><b>Sensitivity = specificity</b></td><td>Balances the two kinds of error.</td></tr>
+    </tbody>
+  </table>
+  <p>With the threshold applied, the app computes the <b>suitable area in square kilometres</b>: in the example, the MaxEnt-style model with the maximum-TSS threshold (0.384) marks <b>471,566 km²</b> of Mexican territory with a climate suitable for the pinyon. That figure changes with the threshold, so you must report which one you used.</p>
+
+  <!-- 9.8 -->
+  <h2 id="b9-8"><span class="num">9.8</span>The ensemble</h2>
+  <p>When several algorithms agree, their average usually predicts better than any of them on its own, and their disagreement is an honest measure of uncertainty. The ensemble combines the models by <b>weighted mean</b>, <b>median</b> or <b>committee average (votes)</b>, and weights them by test AUC, TSS, Boyce or equally. Next to the averaged map, the app draws the <b>agreement map</b>: where the models say the same thing and where they do not.</p>
+
+  <!-- 9.9 -->
+  <h2 id="b9-9"><span class="num">9.9</span>Projection to the future</h2>
+  <p>The last section applies the fitted model to future climate layers. Scenarios are added to a list —each with its climate model, its pathway and its period— and they are all projected in one go.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">What it delivers</th><th>What it is for</th></tr></thead>
+    <tbody>
+      <tr><td><b>Map per scenario</b></td><td>The future suitability, with the same threshold as the present.</td></tr>
+      <tr><td><b>Gain and loss</b></td><td>How much area is gained, how much is lost and how much is kept, in km² and as a percentage.</td></tr>
+      <tr><td><b>Shift of the suitable area</b></td><td>How far the centre of the distribution moves, in which direction, and how much it climbs in elevation.</td></tr>
+      <tr><td><b>Dispersal assumptions</b></td><td>Unlimited, none, or limited to a distance: three different answers to “will it be able to get there?”.</td></tr>
+      <tr><td><b>Refugia</b></td><td>The areas that are suitable today and in every future scenario: the first thing to conserve.</td></tr>
+      <tr><td><b>Ensemble across scenarios</b></td><td>Mean and agreement between climate models, which is where the greatest uncertainty lies.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Never publish a projection without its MESS</div>
+    <p>The <b>MESS</b> map marks the cells where the future climate falls <i>outside</i> the range the model saw during training. There the prediction is not an estimate: it is the formula extended blindly. The app hatches those areas on the future maps and lets you export the MESS separately. Without that layer, a suitability map for 2070 promises a precision it does not have.</p>
+  </div>
+
+  <!-- 9.10 -->
+  <h2 id="b9-10"><span class="num">9.10</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>The map does not cover the whole country</td><td>The grid was prepared with a different extent. Change the extent and press <span class="ui">Prepare model data →</span> again: the app warns you when the prepared grid no longer matches the chosen extent.</td></tr>
+      <tr><td>An AUC of 0.99</td><td>Be suspicious before celebrating: it usually comes from random validation instead of blocks, from a huge study area, or from duplicated presences.</td></tr>
+      <tr><td>Very few presences after preparing, or a model that takes too long</td><td>The first is the per-cell thinning: if it leaves you below fifteen presences, use higher-resolution layers or enlarge the area. The second is normal for the random forest and the boosted trees, the most expensive: start with MaxEnt and GLM.</td></tr>
+      <tr><td>There are suitable areas with no records</td><td>It may be an interesting prediction —unexplored habitat— or extrapolation: check it against the MESS and against what you know about the species.</td></tr>
+      <tr><td>The future map is almost all suitable</td><td>Check that the future layers have the same resolution and the same variables as those of the present, and look at the MESS.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

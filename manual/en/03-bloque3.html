@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 3 · Coordinate cleaning</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 72%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 14%; margin-right: 14%; }
+  table.reglas td:first-child { font-weight: 600; color: var(--negro); }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b3" data-pestana="3" data-orden="4" style="--acento: var(--b3)">
+  <div class="cap-apertura">
+    <div class="cap-num">3</div>
+    <div class="cap-etiqueta">Block 3 · Data hygiene</div>
+    <h1>Coordinate cleaning</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Nine rules that look for the typical errors of a biodiversity database, each with its count before it is applied, and a before-and-after report. None of them removes anything unless you decide so.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>3.1</b>Why clean</li>
+      <li><b>3.2</b>The nine rules</li>
+      <li><b>3.3</b>The three parameters</li>
+      <li><b>3.4</b>Informative rules</li>
+      <li><b>3.5</b>The before-and-after report</li>
+      <li><b>3.6</b>What cleaning does not do</li>
+      <li><b>3.7</b>What to download</li>
+      <li><b>3.8</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 3.1 -->
+  <h2 id="b3-1"><span class="num">3.1</span>Why clean</h2>
+  <p class="lead">Biodiversity databases accumulate two centuries of work done with very different means: handwritten labels, localities written from memory, georeferencing done afterwards from a text, hurried digitisation. The resulting errors are not random: they recur in the same forms, and that is why they can be searched for with rules.</p>
+  <p>What is at stake is not how the map looks. A record bearing the coordinates of the centre of the country brings into the model a climate the species never occupied; fifty duplicate records of the same tree tell the algorithm that this climate is fifty times more important than the rest; a specimen grown in a European garden widens the niche until it becomes unrecognisable.</p>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Duplicates carry weight</div>
+    <p>A presence-only model learns from the contrast between where there <i>are</i> records and what the environment is like in general. If a site appears fifty times —because fifty people photographed the same tree next to the viewpoint— the model takes that environment to be fifty times more common than it is. Removing duplicates is not cosmetic tidying: it stops sampling effort from passing itself off as ecological preference.</p>
+  </div>
+
+  <!-- 3.2 -->
+  <h2 id="b3-2"><span class="num">3.2</span>The nine rules</h2>
+  <p>Each rule is switched on or off separately and shows <b>how many records it would flag</b> before you apply anything. That live count is the useful part: seeing that a rule flags 400 records forces you to understand why before you delete them.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b3-reglas.png" alt="The nine cleaning rules with their checkboxes, their descriptions and the number of records each one flags, plus the three parameters and the apply button"></div>
+    <figcaption><b>Figure 3.1.</b> The nine rules with the counts for the example. The three marked as <span class="ui">informative</span> come switched off: they point out suspicious records without removing them.</figcaption>
+  </figure>
+
+  <table class="compacta reglas">
+    <thead><tr><th style="width:1.75in">Rule</th><th>What it looks for and when to switch it off</th></tr></thead>
+    <tbody>
+      <tr><td>Missing or out-of-range coordinates</td><td>Latitude or longitude empty, containing text, or impossible (|lat| &gt; 90, |lon| &gt; 180). There is no reason to switch it off.</td></tr>
+      <tr><td>Coordinate (0, 0)</td><td>The “null island” in the Gulf of Guinea, which appears when a program writes zeros instead of leaving the field empty.</td></tr>
+      <tr><td>Latitude ≈ longitude</td><td>Both values almost identical and far from zero: the pattern left by copying one cell over the other. Since it can genuinely occur along a diagonal band of the planet, the app treats it as informative.</td></tr>
+      <tr><td>GBIF geospatial issues</td><td>GBIF’s own flags: country not matching the coordinate, presumably swapped coordinate, and others. Informative, because some flags are harmless.</td></tr>
+      <tr><td>Exact coordinate duplicates</td><td>Records with the same latitude and longitude, down to the last decimal. The first is kept. It is usually the rule that removes the most records.</td></tr>
+      <tr><td>Duplicates after rounding</td><td>Records that coincide after rounding to N decimals: the same tree recorded with different precisions. With 4 decimals, “the same site” means about 11 m.</td></tr>
+      <tr><td>Low precision</td><td>Declared uncertainty above the threshold, or coordinates with two decimals or fewer —which already amounts to more than a kilometre. Informative, because its threshold depends on the resolution of your layers.</td></tr>
+      <tr><td>Country centroid</td><td>Points within about 10 km of the geographic centre of the stated country: the classic mark of a record georeferenced “at country level”.</td></tr>
+      <tr><td>Spatial outliers</td><td>Records whose distance to the centre of the point cloud exceeds k times the interquartile range, <b>computed per taxon</b>. It detects whatever lies far from where everything else is.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3 -->
+  <h2 id="b3-3"><span class="num">3.3</span>The three parameters</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">Parameter</th><th>What it changes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Decimals</b> to detect duplicates after rounding<br><span class="small">default 4</span></td><td>Defines how close counts as “the same site”: 4 decimals ≈ 11 m, 3 ≈ 110 m, 2 ≈ 1.1 km. With 1 km layers it makes sense to go down to 2; with 18 km layers, like those of the example, the thinning by cell in Block 9 does that job better.</td></tr>
+      <tr><td><b>Uncertainty threshold</b><br><span class="small">default 10,000 m</span></td><td>The declared uncertainty above which a record is considered low precision. A sensible rule: the threshold should not be larger than the cell size of your layers.</td></tr>
+      <tr><td><b>Factor k</b> for outliers<br><span class="small">default 3</span></td><td>How many interquartile ranges of distance are tolerated. Lowering it to 1.5 flags many more records —and starts flagging real populations—; raising it to 5 lets almost everything through.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.4 -->
+  <h2 id="b3-4"><span class="num">3.4</span>Informative rules: flagging without deleting</h2>
+  <p>Three rules come switched off on purpose. It is not that they matter less: it is that the decision depends on your study. A record with 5 km of uncertainty is useless for a 1 km model and perfectly usable for an 18 km one. The app tells you how many there are and you decide.</p>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Never delete without looking</div>
+    <p>A spatial outlier may be an error… or the most interesting disjunct population in your study. Before applying the rule, go to the Block 4 map and look at where the flagged points are. If they are real populations, switch the rule off and remove by hand the records that really are errors. The manual insists: the rules propose, the researcher disposes.</p>
+  </div>
+
+  <!-- 3.5 -->
+  <h2 id="b3-5"><span class="num">3.5</span>The before-and-after report</h2>
+  <p>When you press <span class="ui">Apply cleaning →</span> the report appears: how many records entered, how many remained, how many left and through which rule.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b3-reporte.png" alt="Cleaning report with the tiles entered 2,400, cleaned 1,885, discarded 515 and 78.5% kept, and the table of rules with the records discarded by each one"></div>
+    <figcaption><b>Figure 3.2.</b> The report for the example. The table is the one to copy into the methods section: it says exactly what was applied and what each rule cost.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The example, rule by rule</div>
+    <p>With the default rules, the 2,400 records of the Mexican pinyon come down to <b>1,885</b> (78.5% kept). The 515 that go are: <b>407</b> exact coordinate duplicates, <b>97</b> duplicates after rounding to four decimals and <b>11</b> spatial outliers. The other rules flagged nothing: there are no impossible coordinates, no (0, 0) and no country centroids.</p>
+    <p>The informative rules also pointed out <b>103</b> low-precision records, which were kept. With 18 km cells they do no harm; with 1 km layers it would be worth reviewing them.</p>
+  </div>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The eleven outliers, one by one</div>
+    <p>It is worth seeing who the 11 records removed by the outlier rule are, because they explain what it is for:</p>
+    <ul>
+      <li><b>Nine are trees cultivated outside the Americas</b>: six in New Zealand, two in France and one in Austria. The rule found them without knowing anything about countries or cultivation: they are simply very far from the rest of the cloud.</li>
+      <li><b>One is at (23.000, −102.000)</b>, whole degrees, in the middle of Zacatecas. It is a record of <i>Pinus cembroides</i> subsp. <i>orizabensis</i>, whose other 65 records are in Puebla (38), Veracruz (19), Tlaxcala (5), San Luis Potosí (3) and Querétaro (1). A coordinate in round degrees, hundreds of kilometres from its population, is a placeholder that someone never corrected.</li>
+      <li><b>The last one</b> is another <i>orizabensis</i>, on the boundary between Guanajuato and Querétaro, also outside the range of the subtaxon.</li>
+    </ul>
+    <p>The fact that the rule works <b>per taxon</b> is what makes the second finding possible: (23, −102) lies within the range of the species, but very far from that of its subspecies.</p>
+  </div>
+
+  <!-- 3.6 -->
+  <h2 id="b3-6"><span class="num">3.6</span>What cleaning does not do</h2>
+  <ul>
+    <li><b>It does not check identifications.</b> If someone confused two pines, the record has a perfect coordinate and a wrong name, and no geographic rule will detect it. That can only be fixed by examining specimens or by trusting sources.</li>
+    <li><b>It does not correct sampling bias.</b> Removing exact duplicates helps, but the build-up of records along roads is still there. Thinning to one presence per cell is done in Block 9, and is explained there.</li>
+    <li><b>It does not judge age.</b> If you are interested in the recent climate, filter by year in Block 2.</li>
+    <li><b>It does not decide for you.</b> Everything it does is recorded in the report table, and the raw set remains available for download.</li>
+  </ul>
+
+  <!-- 3.7 -->
+  <h2 id="b3-7"><span class="num">3.7</span>What to download</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.8in">File</th><th>What it is for</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">⬇ Raw CSV</span></td><td>Everything downloaded, neither filtered nor cleaned. It is your backup: keep it together with the date of the query.</td></tr>
+      <tr><td><span class="ui">⬇ Clean CSV</span></td><td>The set the following blocks will work with. It is what goes into the supplementary material of a paper.</td></tr>
+      <tr><td><span class="ui">⬇ Clean GeoJSON</span></td><td>The same points as a geographic layer, to open them in a mapping program.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.8 -->
+  <h2 id="b3-8"><span class="num">3.8</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>More than half of the records go</td><td>They are almost always exact duplicates, and that is almost always fine. Check the report table: if most of them left as duplicates, your set had many observations of the same site.</td></tr>
+      <tr><td>The outlier rule flags populations you know to be real</td><td>Raise the factor k, or switch the rule off and remove by hand whatever really is an error. With species of disjunct distribution —those of isolated mountain ranges— it is always worth reviewing it.</td></tr>
+      <tr><td>All the counts are zero</td><td>Your data were already clean, or you are cleaning a small set of your own. It is not an error.</td></tr>
+      <tr><td>Fewer records remain than you need</td><td>Go back to Block 2 and enlarge the area or the period before lowering the demands of the cleaning.</td></tr>
+      <tr><td>I want to know which ones left</td><td>Download the raw and the clean CSV and compare them by record identifier: the difference is the discarded records.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>For the methods section</div>
+    <p>One sentence is enough, and with these data it writes itself: “Of the 2,400 records downloaded from GBIF, 407 exact coordinate duplicates, 97 duplicates at four decimals and 11 spatial outliers (k = 3, per taxon) were removed, giving a final set of 1,885 records”.</p>
+  </div>
+</section>
+
+</body>
+</html>

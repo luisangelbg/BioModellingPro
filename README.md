@@ -120,7 +120,7 @@ js/example-records.js      the bundled GBIF example (Pinus cembroides); no clima
 vendor/                    Leaflet, geotiff.js, html2canvas and their licences
 datos/                     the Köppen-Geiger layer, where to download the climate layers, and who published
                            the records of the example
-manual/                    the user manual in Spanish, in HTML by parts and as a PDF
+manual/                    the user manual in Spanish and English, in HTML by parts and as PDFs
 NOTICE.md                  what is ours and what belongs to someone else, source by source
 server.ps1, *.bat          optional local web server (Windows)
 ```

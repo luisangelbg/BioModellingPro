@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 2 · Filters</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 72%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 14%; margin-right: 14%; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b2" data-pestana="2" data-orden="3" style="--acento: var(--b2)">
+  <div class="cap-apertura">
+    <div class="cap-num">2</div>
+    <div class="cap-etiqueta">Block 2 · What goes in and what stays out</div>
+    <h1>Filters: taxon, country, years, bounding box and states</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">This is where the study area is decided, together with the records that represent it. It is the block with the greatest influence on the final model, and the one that usually gets the least attention.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>2.1</b>Filtering means deciding the study area</li>
+      <li><b>2.2</b>The four facets</li>
+      <li><b>2.3</b>Filtering by state or region</li>
+      <li><b>2.4</b>Geographic clip</li>
+      <li><b>2.5</b>The result</li>
+      <li><b>2.6</b>How to choose the study area</li>
+      <li><b>2.7</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 2.1 -->
+  <h2 id="b2-1"><span class="num">2.1</span>Filtering means deciding the study area</h2>
+  <p class="lead">A filter looks like a matter of convenience —removing whatever gets in the way— but in niche modelling it is a substantive decision. The records you keep define which environments count as “occupied”, and the territory they span defines where the “available” environment they are compared against comes from. Changing the study area changes the model, even when the algorithms and the variables stay the same.</p>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>The accessible area</div>
+    <p>In the introduction we saw the BAM diagram: <b>M</b> is the part of the world the species has been able to reach during its history. A model should learn by comparing the occupied sites against that M, not against a whole continent. If the area is too large, the model faces a trivial task —telling the Mexican sierras apart from the Amazon rainforest— and its quality measures come out inflated. If it is too small, the model never sees the conditions the species avoids and learns nothing. A reasonable M is usually the biogeographic region where the species lives, plus a margin.</p>
+  </div>
+
+  <!-- 2.2 -->
+  <h2 id="b2-2"><span class="num">2.2</span>The four facets</h2>
+  <p>The first card shows four groups of checkboxes with the number of records in each category. Changes take effect at once: every click recalculates the number on the result card.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b2-facetas.png" alt="The four facets: taxonomic rank with SPECIES, SUBSPECIES and VARIETY; country with Mexico, United States of America, New Zealand, France and Austria; record type with six categories; and the range of years"></div>
+    <figcaption><b>Figure 2.1.</b> The facets of the example, with Mexico as the only country ticked. Each row carries its count, which is worked out on the <b>downloaded records</b>, not on those that survive the other filters: that way you always know how much of each thing there is in the original set.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Facet</th><th>What it is really for</th></tr></thead>
+    <tbody>
+      <tr><td><b>Taxonomic rank</b></td><td>Separating the species from its subspecies and varieties. If you are going to model the whole species, keep them all; if your question is about one infraspecific taxon, keep only that one —and check that it has enough records (section 1.7). It is also useful for comparisons: model each subspecies separately and see whether they occupy different environments.</td></tr>
+      <tr><td><b>Country</b></td><td>The quickest way to remove specimens cultivated on other continents and to confine the study to one country. If you already knew which countries you would work with, it is better to filter them in the download itself (section 1.4): here you filter what has arrived, there you avoid bringing it in. Beware: if your species crosses a border —as the Mexican pinyon does between Mexico and the United States— removing the neighbouring country truncates the real niche, not just the map.</td></tr>
+      <tr><td><b>Record type</b></td><td><code>LIVING_SPECIMEN</code> are living plants in collections: botanic gardens and arboreta. They almost always have to go. <code>PRESERVED_SPECIMEN</code> are herbarium specimens, whose identification can be checked but whose georeferencing is sometimes coarse; <code>HUMAN_OBSERVATION</code> are observations, with a precise coordinate but variable identification.</td></tr>
+      <tr><td><b>Year</b></td><td>Discarding old records whose site may have changed its land use, or keeping a period that matches the climate of your layers. If you use WorldClim 2.1, the climate represents 1970–2000: mixing it with records from 1900 is comparing different things.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2.3 -->
+  <h2 id="b2-3"><span class="num">2.3</span>Filtering by state or region</h2>
+  <p>Many studies are regional rather than national: a mountain range, a state, a watershed. The program comes with the <b>32 states of Mexico</b> and their boundaries built in, and it can assign each record the state it belongs to.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b2-estados.png" alt="State filter card with the assignment mode, the shortcuts by group of states, the list of the 32 states with their counts, the assignment summary line and the mismatch warning"></div>
+    <figcaption><b>Figure 2.2.</b> The state filter with the <span class="ui">North-east</span> group switched on: Coahuila, Nuevo León and Tamaulipas. States with no records are greyed out, and the last row gathers the records that could not be assigned to any state.</figcaption>
+  </figure>
+
+  <h3>Where each record’s state comes from</h3>
+  <p>GBIF supplies a text field with the state, but many records arrive without it and others carry it misspelt. That is why there are three modes:</p>
+  <table class="compacta">
+    <thead><tr><th style="width:2.2in">Mode</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">from the coordinates when the text is missing</span><br><span class="small">(recommended)</span></td><td>Uses the record’s text when there is one, normalising spellings and abbreviations (“Edo. de México”, “Mexico”, “Michoacan” → the same state), and when there is none it decides from the coordinate. It is the mode that makes use of the most records.</td></tr>
+      <tr><td><span class="ui">always from the coordinates</span></td><td>Ignores the text and relies only on the point-in-polygon test. Useful when you suspect the text field is unreliable.</td></tr>
+      <tr><td><span class="ui">from the record text only</span></td><td>Keeps whatever the publisher wrote. It is for auditing the data, not for modelling.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The example, state by state</div>
+    <p>With the 2,400 records of the Mexican pinyon: <b>1,697</b> got their state from the record text, <b>22</b> got it from their coordinates —Mexican records that GBIF delivered with no state— and <b>681</b> remained unassigned, which are exactly the 670 from the United States and the 11 from Europe and New Zealand: there is not a single Mexican record without a state.</p>
+    <p>The states with the most records are Coahuila (246), Durango (208), Baja California Sur (200), Chihuahua (156), Nuevo León (142) and Zacatecas (130): the Sierra Madre Occidental, the Sierra Madre Oriental and the Sierra de La Laguna, which is where the Mexican pinyon lives.</p>
+  </div>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>When the text and the coordinate disagree</div>
+    <p>In the example there are <b>54 records</b> whose written state is not the state their coordinate falls in. There are three causes: misspelt names or municipalities taken for states, records right on the boundary between two states —where an error of 200 m changes the answer— and plainly wrong coordinates. The app warns you and does not decide for you: in the recommended mode the text wins, in the coordinate mode the coordinate wins, and badly georeferenced records are dealt with in Block 3.</p>
+  </div>
+
+  <h3>Shortcuts and options</h3>
+  <ul>
+    <li><b>The group buttons</b> —<span class="ui">North-west</span>, <span class="ui">North-east</span>, <span class="ui">West and Bajío</span>, <span class="ui">Centre</span>, <span class="ui">South Pacific</span>, <span class="ui">Gulf</span>, <span class="ui">Yucatán Peninsula</span>— tick all the states of that region at once. They work as a toggle: if the group was already complete, a second click removes it.</li>
+    <li><span class="ui">all</span> · <span class="ui">none</span> · <span class="ui">only with records</span> are the list shortcuts. The last one leaves ticked only the states that have at least one record, which is a convenient starting point.</li>
+    <li><span class="ui">Use the selection as the rectangle</span> turns the chosen states into the rectangle of the geographic clip in section 2.4, and that same bounding box is later offered as the map extent in Block 9.</li>
+    <li><span class="ui">Draw the outline on the maps</span> draws the boundary of your selection on the maps of Blocks 4 and 9, so that it is clear which region is being discussed.</li>
+    <li><span class="ui">Load my layer (GeoJSON)</span> replaces the states with your own polygons: municipalities, watersheds, protected areas, management units, ejidos. The app takes the name of each polygon from its properties and builds the list just as it does with the states.</li>
+  </ul>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Where the boundaries come from</div>
+    <p>The 32 states come from Natural Earth at a scale of 1:10 million, which is in the public domain, simplified to keep them light. They are accurate enough to classify records and to draw outlines on a page-sized map, but they are <b>not</b> an official boundary: do not use them to measure areas or to settle a boundary dispute.</p>
+  </div>
+
+  <!-- 2.4 -->
+  <h2 id="b2-4"><span class="num">2.4</span>Geographic clip</h2>
+  <p>When the region you are interested in does not match any state —an elevation belt, a rectangular study zone, the area of a project— there is the clip by coordinates.</p>
+
+  <figure class="chica">
+    <div class="marco"><img src="../img/en/b2-recuadro.png" alt="Minimum and maximum latitude and minimum and maximum longitude fields, with the apply and remove buttons"></div>
+    <figcaption><b>Figure 2.3.</b> The four numbers of the bounding box, already filled in with the envelope of the three North-east states. Below them, the card has a mini map on which the rectangle can be drawn with the mouse: press <span class="ui">Draw rectangle</span> (it then reads <span class="ui">Click 2 corners…</span>) and click two opposite corners; the rectangle is applied straight away and its numbers fill the four boxes.</figcaption>
+  </figure>
+
+  <p>The bounding box and the state filter can be used together: the box clips and the state selection refines. If you are going to model, the box should be somewhat larger than the known distribution, so that the model also sees conditions the species does <i>not</i> occupy.</p>
+
+  <!-- 2.5 -->
+  <h2 id="b2-5"><span class="num">2.5</span>The result</h2>
+  <p>The last card states how many records survived and shows the table with the <b>State</b> column already filled in. This is the set that goes on to Block 3.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b2-resultado.png" alt="Result card with 425 records and the filtered table, including the state column"></div>
+    <figcaption><b>Figure 2.4.</b> The example narrowed down to a regional study: from 2,400 records to 425. The <b>State</b> column appears even where GBIF did not supply it, because the coordinate assigned it.</figcaption>
+  </figure>
+
+  <div class="caja dato">
+    <div class="dato-cifra">425</div>
+    <div class="dato-txt"><div class="caja-t">The path of the example</div>2,400 records downloaded → <b>1,719</b> when keeping only Mexico → <b>425</b> when keeping Coahuila, Nuevo León and Tamaulipas. Each step is a decision that should be written down in the methods section.</div>
+  </div>
+
+  <!-- 2.6 -->
+  <h2 id="b2-6"><span class="num">2.6</span>How to choose the study area</h2>
+  <p>There is no single rule, but there is a sequence of questions that works:</p>
+  <ol class="pasos">
+    <li><b>What is the question?</b> A national study of a species calls for the whole country; an assessment of a management unit calls for that unit and its surroundings; a comparison between subspecies calls for the area of both.</li>
+    <li><b>How far has the species been able to spread?</b> That is the biological criterion: the biogeographic region it occupies, not the rectangle that fits on the screen. Barriers —a desert, a sea, a mountain range— make good limits.</li>
+    <li><b>Is the contrast represented?</b> The area must contain sites with conditions similar to those the species occupies and also sites that are clearly different. An area that contains only its habitat prevents the model from learning what it avoids.</li>
+    <li><b>Can I justify it in one sentence?</b> If the answer is “because it looked good”, go back to point 2.</li>
+  </ol>
+
+  <!-- 2.7 -->
+  <h2 id="b2-7"><span class="num">2.7</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.1in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>The count does not drop when you tick a box</td><td>The facet counts refer to the downloaded set. If you had already filtered by another facet, the number on the result card does drop, but the one next to the box does not change.</td></tr>
+      <tr><td>Many records with “no state assigned”</td><td>Normal if your download includes other countries: no Mexican state applies to them. If they are Mexican, check the assignment mode: with <span class="ui">from the record text only</span>, every record GBIF delivered without that field is left out.</td></tr>
+      <tr><td>A state with records you did not expect</td><td>It may be a little-known real population, a cultivated specimen or a wrong coordinate. Look at it on the Block 4 map before deciding.</td></tr>
+      <tr><td>The bounding box leaves out records you wanted</td><td>Remember that longitude is negative in the Americas: a box from −104 to −97 does not include −110. The <span class="ui">Use the selection as the rectangle</span> button saves you from typing the numbers by hand.</td></tr>
+      <tr><td>Your GeoJSON loads but the list is empty</td><td>The polygons carry no recognisable name in their properties, or the file is in a projection other than latitude–longitude. Save it in geographic coordinates (EPSG:4326).</td></tr>
+      <tr><td>Fewer than fifteen records remain</td><td>The area is too small for modelling. Enlarge it, or lower the goal to describing the environment of the points (Blocks 5 and 7) without fitting a model.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

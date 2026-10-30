@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 4 · The records map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 74%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 13%; margin-right: 13%; }
+  .pest { font-family: var(--sans); font-size: 0.82em; font-weight: 500; color: var(--b4); border: 1px solid #e7d3ae; background: #fdf7ec; border-radius: 4px; padding: 0.02em 0.42em; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b4" data-pestana="4" data-orden="5" style="--acento: var(--b4)">
+  <div class="cap-apertura">
+    <div class="cap-num">4</div>
+    <div class="cap-etiqueta">Block 4 · Seeing is believing</div>
+    <h1>The records map and the map studio</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">The first map serves two quite different purposes: checking the data by eye, and producing the figure that will end up in the paper. The map studio does both, and exports at whatever resolution and in whatever format the journal asks for.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>4.1</b>The map as a quality check</li>
+      <li><b>4.2</b>What the map shows</li>
+      <li><b>4.3</b>The map studio</li>
+      <li><b>4.4</b>Exporting for publication</li>
+      <li><b>4.5</b>The preview and the clip</li>
+      <li><b>4.6</b>What a publishable map needs</li>
+      <li><b>4.7</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 4.1 -->
+  <h2 id="b4-1"><span class="num">4.1</span>The map as a quality check</h2>
+  <p class="lead">No automatic rule sees what a trained eye sees in thirty seconds of looking at a map. Before extracting a single environmental variable, it pays to look at the points and ask yourself five questions.</p>
+  <ol class="pasos">
+    <li><b>Are there points in the sea?</b> A coordinate in the ocean a few kilometres off the coast is almost always a poorly georeferenced coastal record; far from the coast, it is a sign error or a transcription error.</li>
+    <li><b>Does the distribution have the shape you expect?</b> The pinyon pine should trace the two Sierras Madre. If a uniform cloud appears over the high plateau, something is wrong.</li>
+    <li><b>Are there suspicious alignments?</b> Points lined up along a road are roadside records: legitimate, but they show where people collect, not where the species lives.</li>
+    <li><b>Is there a lone point very far away?</b> A botanic garden, a cultivated specimen or, now and then, the most interesting find of the whole study.</li>
+    <li><b>Are the subtaxa where they should be?</b> Colouring by taxon reveals at a glance a subspecies in the wrong place.</li>
+  </ol>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b4-mapa.png" alt="Map of the 1,885 cleaned pinyon pine records over northern Mexico and the south-western United States, coloured by taxon, with legend, scale bar, north arrow and coordinate grid"></div>
+    <figcaption><b>Figure 4.1.</b> The 1,885 cleaned records of the example, exported with the map studio. The two Sierras Madre stand out, as do the Sierra de La Laguna in Baja California Sur and the population in central Mexico; the colours separate the species from its subspecies and varieties. This image came straight out of the app, untouched.</figcaption>
+  </figure>
+
+  <!-- 4.2 -->
+  <h2 id="b4-2"><span class="num">4.2</span>What the map shows</h2>
+  <p>The map plots the records that survived Block 3, coloured by the criterion you choose: by taxon, by record type or in a single colour. On top of it you can switch on the cartographic elements (legend, scale bar, north arrow, grid) and the outline of the region you chose in Block 2.</p>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>The base map comes from the internet</div>
+    <p>The background tiles are downloaded from an online service. Without a connection, the map shows the points over a plain background, which is still perfectly usable, and the scale bar and the coordinates keep working. If a base map does not respond, the app switches to another one by itself.</p>
+  </div>
+
+  <!-- 4.3 -->
+  <h2 id="b4-3"><span class="num">4.3</span>The map studio</h2>
+  <p>Below the map sits the <b>map studio</b>, folded away until you need it. Its seven tabs cover everything that separates a map on screen from a publishable figure.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b4-estudio.png" alt="Map studio panel open on the Base map tab, with the base map selector, the opacity and the greyscale, brightness, contrast and saturation controls"></div>
+    <figcaption><b>Figure 4.2.</b> The studio open on <span class="pest">Base map</span>. Fourteen different backgrounds, and four controls to <i>tone it down</i>: in a scientific map the background should help readers find their way, not compete with the data.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Tab</th><th>What it controls</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pest">Base map</span></td><td>The background: greys, streets, topographic, terrain, imagery or none; its opacity and how far it is toned down in greyscale, brightness, contrast and saturation. The <span class="ui">Muted look</span> button makes the background discreet with a single click.</td></tr>
+      <tr><td><span class="pest">Text and fonts</span></td><td>Title, subtitle and credit, and the typeface of <b>each element separately</b>: the title, the legend labels, the scale bar numbers, the grid coordinates and the north arrow letter, each with its own size, bold, italic and colour.</td></tr>
+      <tr><td><span class="pest">Elements</span></td><td>What is drawn: legend (inside or outside the map, in one or several columns), scale bar, north arrow, coordinate grid and frame.</td></tr>
+      <tr><td><span class="pest">Points</span></td><td>Shape, size, outline and transparency of the symbols, and the heat map for when the points pile up.</td></tr>
+      <tr><td><span class="pest">Colours</span></td><td>The palette for the taxa or the groups, and the colour ramps for the continuous maps of Block 9.</td></tr>
+      <tr><td><span class="pest">Looks</span></td><td>Ready-made presets, and the option of saving your own look as a file to reuse it in another figure or another study.</td></tr>
+      <tr><td><span class="pest">Export</span></td><td>Framing, size, resolution, format, clip and preview: section 4.4.</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b4-elementos.png" alt="Elements tab of the map studio, with the north arrow styles, its size, corner, margin, rotation and colours, and the start of the scale bar section"></div>
+    <figcaption><b>Figure 4.3.</b> The <span class="pest">Elements</span> tab: each cartographic piece is switched on, placed and sized separately. The north arrow and the scale bar come in several styles.</figcaption>
+  </figure>
+
+  <!-- 4.4 -->
+  <h2 id="b4-4"><span class="num">4.4</span>Exporting for publication</h2>
+  <p>The <span class="pest">Export</span> tab answers the three questions any journal asks: <b>what is shown</b>, <b>at what size</b> and <b>in what format</b>.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b4-exportar.png" alt="Export tab of the map studio with the framing, the padding, the zoom fine-tune and the start of the clip to the study area section"></div>
+    <figcaption><b>Figure 4.4.</b> The framing decides which part of the world goes into the figure. <span class="ui">As it looks on screen</span> exports exactly what you see; the other framings recompose the map over the chosen extent.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.35in">Control</th><th>Options and what they are for</th></tr></thead>
+    <tbody>
+      <tr><td><b>Framing</b></td><td><span class="ui">As it looks on screen</span>, <span class="ui">Fit to the data</span>, <span class="ui">Fit to the chosen states or regions</span>, <span class="ui">The whole of Mexico</span> and <span class="ui">Manual extent</span> with its four coordinates. The padding and the zoom fine-tune refine the result without touching the map on screen.</td></tr>
+      <tr><td><b>Size</b></td><td>As shown, A4 landscape or portrait, single or double journal column (85 and 180 mm), a 16:9 slide, square, or a custom size typed in millimetres.</td></tr>
+      <tr><td><b>Resolution</b></td><td>A multiplier for the on-screen size, or 150, 300 and 600 dpi when the size is in millimetres. Most journals ask for 300 dpi for halftone figures and 600 for line art.</td></tr>
+      <tr><td><b>Format</b></td><td><b>PNG</b> (lossless, supports a transparent background), <b>JPEG</b>, <b>WebP</b>, <b>TIFF</b>, georeferenced <b>GeoTIFF</b> and <b>SVG</b> (vector, with the data and the text, but without the base map).</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Which format to choose for what</div>
+    <p><b>PNG</b> for a document or a presentation. <b>TIFF</b> when the journal requires it or when you are going to keep editing the map in a design program. <b>GeoTIFF</b> if you want to open the image in a mapping program and have it land in its place on the globe: it carries the coordinates and the reference system inside. <b>SVG</b> when you want to change the text or the colours later without losing sharpness; since it does not include the base map, it is mainly useful for figures of points on a plain background.</p>
+  </div>
+
+  <!-- 4.5 -->
+  <h2 id="b4-5"><span class="num">4.5</span>The preview and the clip</h2>
+  <p>Two features spare you the back-and-forth of exporting, looking at the file, correcting and exporting again.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b4-vistaprevia.png" alt="Export preview window with the composed image on the left and, on the right, the size in pixels and millimetres, the resolution, the extent, the approximate scale, the format and the framing controls"></div>
+    <figcaption><b>Figure 4.5.</b> The preview shows <b>the image that will be saved</b>, not an approximation, together with its size in pixels and millimetres, its resolution, its geographic extent and its approximate scale. The controls on the right change the image without closing the window.</figcaption>
+  </figure>
+
+  <p>The <b>clip to the study area</b> leaves out of the image everything that is not the country or the regions chosen in Block 2: the background tiles, the suitability surfaces and the points outside disappear, leaving only the silhouette of the territory, with its outline drawn and the outside transparent or in the colour you choose. It is the way to deliver a map of Mexico (or of a single state) without the neighbouring country peeking in.</p>
+
+  <div class="caja dato">
+    <div class="dato-cifra">1:16M</div>
+    <div class="dato-txt"><div class="caja-t">Key fact</div>The preview works out the <b>approximate scale</b> of the figure from its width in millimetres and the extent it covers. It is the number a map’s figure caption asks for, and the one almost nobody remembers to calculate.</div>
+  </div>
+
+  <!-- 4.6 -->
+  <h2 id="b4-6"><span class="num">4.6</span>What a publishable map needs</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Element</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>Scale bar</b></td><td>Without it no distance can be judged. A bar is better than a “1:16,000,000” text: the bar remains valid if the figure is reduced.</td></tr>
+      <tr><td><b>North arrow</b></td><td>Essential when the map is not oriented with north at the top, and good practice always.</td></tr>
+      <tr><td><b>Coordinates</b></td><td>The grid with its degrees lets readers locate any point and compare with other maps.</td></tr>
+      <tr><td><b>Legend</b></td><td>What each colour and each symbol means, with the scientific names in italics.</td></tr>
+      <tr><td><b>Base map credit</b></td><td>Tile providers require attribution; the app writes it in the corner by itself and it is exported with the image. The figure caption should also give the source of the records, how many there are and their date.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 4.7 -->
+  <h2 id="b4-7"><span class="num">4.7</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>The map shows the whole world</td><td>It was drawn before its space had a size. Press <span class="ui">Zoom to the data</span>, in the corner of the studio.</td></tr>
+      <tr><td>The background is grey, has no detail or carries a watermark</td><td>There is no connection, the provider did not respond, or it adds its mark under its terms of use. Switch base map (the greys are the most reliable) or use <span class="ui">None (background colour)</span>: for a figure of points, a plain background is usually enough.</td></tr>
+      <tr><td>The image does not match the screen</td><td>The framing is not <span class="ui">As it looks on screen</span>. Open the preview, or use <span class="ui">Take the map on screen to this framing</span>.</td></tr>
+      <tr><td>The lettering comes out tiny in the figure</td><td>When exporting to a paper size, the text is sized with the figure. Increase the font size of each element in <span class="pest">Text and fonts</span> and check the preview again.</td></tr>
+      <tr><td>The points pile up and nothing can be made out</td><td>Reduce the symbol size, increase its transparency, or switch to a heat map in the <span class="pest">Points</span> tab.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

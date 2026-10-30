@@ -1,0 +1,217 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 1 · Presence records</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 70%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 15%; margin-right: 15%; }
+  .campos { font-size: 9.6pt; }
+  .campos td:first-child { font-family: var(--mono); font-size: 8.6pt; color: var(--marino); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b1" data-pestana="1" data-orden="2" style="--acento: var(--b1)">
+  <div class="cap-apertura">
+    <div class="cap-num">1</div>
+    <div class="cap-etiqueta">Block 1 · The starting point</div>
+    <h1>Presence records: GBIF and your own data</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Where the points to be modelled come from. How a scientific name is resolved, how GBIF records are downloaded without losing control of what arrives, and how a table of your own from the field or the herbarium is brought in.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>1.1</b>What a presence record is</li>
+      <li><b>1.2</b>GBIF in two minutes</li>
+      <li><b>1.3</b>Resolving the scientific name</li>
+      <li><b>1.4</b>Fetching the records and filtering by country</li>
+      <li><b>1.5</b>What arrives and what it looks like</li>
+      <li><b>1.6</b>Your own records</li>
+      <li><b>1.7</b>How many records do you need?</li>
+      <li><b>1.8</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 1.1 -->
+  <h2 id="b1-1"><span class="num">1.1</span>What a presence record is</h2>
+  <p class="lead">A <b>presence record</b> is the statement that an organism of a certain species was in a certain place at a certain time, made by someone who saw or collected it. Everything this program does rests on that sentence, so it is worth taking it apart.</p>
+  <p>A record that is useful for modelling needs three things: a <b>name</b> we can trust, <b>coordinates</b> in decimal degrees and some <b>idea of their precision</b>. Everything else —who collected it, which herbarium holds it, what year it was— helps with filtering and with giving credit, but does not enter the model.</p>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Presence is not the opposite of absence</div>
+    <p>The lack of records in an area can mean three very different things: that the species is not there, that it is there but nobody has gone to look for it, or that it was looked for and not found. GBIF data almost never distinguish between them. That is why the methods in this program are <b>presence-only</b>: they learn from the contrast between the sites where the species was recorded and a sample of the environment available in the region, not between true presences and absences. It is the difference between saying “here the climate resembles that of the places where it lives” and “it lives here”.</p>
+  </div>
+
+  <table class="compacta campos">
+    <thead><tr><th style="width:1.45in">Field</th><th>What it is and why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>decimalLatitude<br>decimalLongitude</td><td>The coordinate in decimal degrees, negative west of Greenwich and south of the equator. The whole of Mexico lies between −118° and −86° longitude and between 14° and 33° latitude: in a national study, any value outside that range is suspect.</td></tr>
+      <tr><td>coordinateUncertaintyInMeters</td><td>The radius within which the true point lies. An old herbarium record georeferenced from “10 km north of Durango” may carry 10,000 m; a phone observation carries 5 or 10 m. If the uncertainty is larger than the cell size of your layers, the point may fall in the wrong climate.</td></tr>
+      <tr><td>basisOfRecord</td><td>The kind of evidence it comes from: preserved specimen, human observation, living specimen (botanic gardens), fossil material… The living specimen is the most troublesome: these are plants cultivated outside their natural range.</td></tr>
+      <tr><td>taxonRank, taxonKey</td><td>The rank of the name (species, subspecies, variety) and its numerical key in GBIF, which is what really identifies the taxon, regardless of how the name is spelt.</td></tr>
+      <tr><td>year, month</td><td>The date. It is used to discard very old records, whose site may no longer exist, and to study change over time.</td></tr>
+      <tr><td>issues</td><td>The flags GBIF raises on its own: rounded coordinates, country inferred from the coordinate, coordinate probably inverted… They are kept because they help with decisions in Block 3.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 1.2 -->
+  <h2 id="b1-2"><span class="num">1.2</span>GBIF in two minutes</h2>
+  <p>GBIF —the Global Biodiversity Information Facility— does not collect data: it <b>brings them together</b>. Herbaria, museums, citizen-science projects and national monitoring schemes publish their catalogues there, and GBIF serves them in a common format with a unified taxonomy. This has two consequences worth keeping in mind at all times:</p>
+  <ul>
+    <li><b>The quality is that of the publisher, not of GBIF.</b> A transcription error in a herbarium reaches your download intact. That is why Block 3 exists.</li>
+    <li><b>Coverage is uneven.</b> Some countries, groups and regions have thousands of records and others are almost empty. The density of points says as much about collecting effort as about the species.</li>
+  </ul>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Cite the data, not just the software</div>
+    <p>Every publication that uses GBIF records must cite the download. The app queries the online service, which does <b>not</b> issue a permanent identifier; so, at the time of downloading, write down the <b>date</b>, the <b>name searched</b>, the <b>taxon key</b> and the <b>filters</b> you used —including the countries, if you filtered by them—: with that, anyone can repeat the query. If your journal requires a DOI for the download, repeat the same query from the GBIF portal and cite the identifier it gives you.</p>
+  </div>
+
+  <!-- 1.3 -->
+  <h2 id="b1-3"><span class="num">1.3</span>Resolving the scientific name</h2>
+  <p>Before downloading anything, we need to agree on which species we are talking about. Type the name in the box and press <span class="ui">Look up name</span>: the app asks GBIF which name is accepted and under which key it is registered.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b1-buscar.png" alt="Search card with the name Pinus cembroides resolved: accepted name, authorship, rank, status, family, genus, taxon key and match confidence"></div>
+    <figcaption><b>Figure 1.1.</b> The resolved name. The key <code>5285172</code> is what is sent to GBIF; the typed name only served to get there. The <span class="ui">Use example records</span> button, on the right, loads the 2,400 records that come with the program without going online.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">What it says</th><th>How to read it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Accepted name</b></td><td>If it differs from what you typed, you typed a synonym. That is not an error: GBIF takes you to the valid name, and records published under the synonym are included.</td></tr>
+      <tr><td><b>Rank</b></td><td><code>SPECIES</code>, <code>SUBSPECIES</code>, <code>VARIETY</code>… If you search for a subspecies, only its records will arrive; if you search for the species, you can include or exclude infraspecific taxa when downloading.</td></tr>
+      <tr><td><b>Status</b></td><td><code>ACCEPTED</code> is what you want to see. <code>SYNONYM</code> or <code>DOUBTFUL</code> call for a taxonomic check before going on.</td></tr>
+      <tr><td><b>Match confidence</b></td><td>How sure GBIF is that it understood the name, with the type of match (<code>EXACT</code>, <code>FUZZY</code>…). A fuzzy match with low confidence is usually a misspelt name.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>If the app cannot find the name</div>
+    <p>Check the spelling and make sure it is the full scientific name (genus and epithet). Common names do not work: “Mexican pinyon” is not a scientific name and GBIF will not resolve it. If the name is recent and not yet in the GBIF taxonomy, use the name of the species it used to belong to and then filter by the written name in Block 2.</p>
+  </div>
+
+  <!-- 1.4 -->
+  <h2 id="b1-4"><span class="num">1.4</span>Fetching the records</h2>
+  <p>Once the name is resolved, the download card controls <i>what</i> is requested, <i>from where</i> and <i>how much</i>. All three decisions travel inside the query to GBIF: whatever is excluded here is not downloaded, and the total the app announces is already filtered.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b1-traer.png" alt="Download card with the checkboxes for records with coordinates only, excluding records with geospatial issues and including subspecies, varieties and forms, the maximum number of records and the download button"></div>
+    <figcaption><b>Figure 1.2.</b> The three checkboxes and the cap. The download proceeds page by page, with a progress bar, and can be stopped.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:2.1in">Option</th><th>What it does and when to change it</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">Only records with coordinates</span></td><td>Discards those without a point. It is always on: a record without coordinates is of no use for modelling.</td></tr>
+      <tr><td><span class="ui">Exclude records with geospatial issues flagged by GBIF</span></td><td>Asks GBIF to exclude the records it has itself flagged with serious coordinate issues. It is a cheap first filter, but it does <b>not replace</b> Block 3.</td></tr>
+      <tr><td><span class="ui">Include subspecies, varieties and forms</span></td><td>Also fetches subspecies and varieties. Tick it if you want to model the whole species or compare its subtaxa; untick it if your question concerns only the species in the strict sense.</td></tr>
+      <tr><td><span class="ui">Countries</span></td><td>Requests only the records from the ticked countries (next subsection). It is the filter that shrinks the download the most.</td></tr>
+      <tr><td><span class="ui">Maximum number of records to download</span></td><td>The cap on the download. It saves you from waiting longer than necessary while you explore.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The country filter</h3>
+  <p>Below the checkboxes is the <b>country</b> filter, which does not trim what has been downloaded: it asks GBIF, from the outset, for <b>only</b> the records from the countries you tick. The difference is large when the species is common: maize has 153,301 records with coordinates worldwide and <b>51,288</b> in Mexico. The count GBIF announces is already filtered, so you know from the start how many you are going to fetch.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b1-paises.png" alt="Country filter with the Mexico, Central America and South America shortcuts, the list of twenty-one countries with their codes and the notice of how many will be requested"></div>
+    <figcaption><b>Figure 1.3.</b> The twenty-one countries of Mexico, Central America and South America, with one shortcut per region. The buttons work as toggles, and <span class="ui">no filter</span> unticks them all: with none ticked, records are downloaded from the whole world, as usual.</figcaption>
+  </figure>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>When <i>not</i> to filter by country</div>
+    <p>When the distribution crosses a border to a country outside the list. The Mexican pinyon of the example also grows in the south-western United States: filtering to Mexico would leave out 670 records and truncate the real niche, not just the map. The rule is the one in chapter 2: the study area is decided by biology, not by convenience.</p>
+  </div>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>The cap does not take a random sample</div>
+    <p>GBIF delivers the <b>most recent records first</b>. If your species has 20,000 records and you set a cap of 2,000, you will not get 2,000 representative records: you will get the 2,000 newest, which are biased towards citizen science and towards areas with phones and signal. For a serious study, raise the cap above the total the search reports and let everything come down.</p>
+  </div>
+
+  <!-- 1.5 -->
+  <h2 id="b1-5"><span class="num">1.5</span>What arrives and what it looks like</h2>
+  <p>Once the download has finished, the last card summarises what there is and shows the first rows. This is the moment for the first check: how many records, from which countries, from which years.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b1-descargados.png" alt="Downloaded records card with the summary tiles —2,400 records, 119 infraspecific, 5 countries and years 1982 to 2026— and the records table"></div>
+    <figcaption><b>Figure 1.4.</b> The example just after loading. Scroll the table sideways to see the remaining fields. The four figures at the top are the first sniff test: five countries for a Mexican pine already tells you that something needs checking.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The example in numbers</div>
+    <p>The 2,400 Mexican pinyon records that come with the program are distributed as follows: <b>Mexico 1,719</b>, <b>United States 670</b>, <b>New Zealand 8</b>, <b>France 2</b> and <b>Austria 1</b>. There are seven named forms —the species, with 2,281 records, and six subspecies and varieties— and the dates run from 1982 to 2026. By kind of evidence: 1,343 human observations, 967 preserved specimens and 90 of other kinds.</p>
+    <p>The eleven European and New Zealand records are trees cultivated in botanic gardens and arboreta. They are legitimate as records —those trees exist— but they say nothing about where the species <i>can live</i> on its own. They will be removed in Block 2 or Block 3.</p>
+  </div>
+
+  <!-- 1.6 -->
+  <h2 id="b1-6"><span class="num">1.6</span>Your own records</h2>
+  <p>Not everything is in GBIF: data from your own sampling, from a thesis not yet published or from a local herbarium almost never are. The second card of the block accepts such data and treats them just like GBIF records.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b1-propios.png" alt="Card for loading your own records with the drop zone, the column assignment, the five-row preview and the tiles for rows read, valid records, taxa and skipped"></div>
+    <figcaption><b>Figure 1.5.</b> Five rows pasted from a spreadsheet. The app recognised the columns <code>especie</code>, <code>longitud</code> and <code>latitud</code> by itself; had it got them wrong, the three menus would let you correct the assignment.</figcaption>
+  </figure>
+
+  <ol class="pasos">
+    <li><b>Prepare the table.</b> Three columns are enough: species, longitude and latitude. The headers can be in English or in Spanish. If you want something to start from, <span class="ui">Download template</span> gives you a file with the columns already in place.</li>
+    <li><b>Upload or paste it.</b> Drag a <code>.csv</code>, <code>.txt</code> or <code>.xlsx</code> file onto the card, or copy the cells from your spreadsheet and paste them into the text box.</li>
+    <li><b>Check the column assignment.</b> The app suggests which column is which; correct it if necessary. The optional columns —country, state, locality, year, month, elevation and uncertainty— are recognised automatically and put to use in the filters.</li>
+    <li><b>Look at the four tiles</b> for rows read, valid records, taxa and skipped, and at the list of taxa with their counts. If “skipped” is not zero, some row had empty, text or out-of-range coordinates.</li>
+    <li><b>Press <span class="ui">Use these records →</span></b> and decide whether they replace the GBIF records or are added to them.</li>
+  </ol>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.9in">If your data look like this…</th><th>The app does this</th></tr></thead>
+    <tbody>
+      <tr><td>Degrees, minutes and seconds<br><span class="small">24° 01' 18" N, 104° 39' 12" W</span></td><td>Converts them to decimal degrees, with the sign that corresponds to the hemisphere.</td></tr>
+      <tr><td>Decimal comma<br><span class="small">−104,6532</span></td><td>Reads it as the decimal separator.</td></tr>
+      <tr><td>Longitude and latitude swapped</td><td>Tick <span class="ui">Swap longitude and latitude (they are the wrong way round)</span> and they are all corrected at once.</td></tr>
+      <tr><td>Longitudes without the minus sign</td><td>The checkbox below makes them negative, which is the usual case in the Americas.</td></tr>
+      <tr><td>File saved on Windows<br><span class="small">with garbled accented letters</span></td><td>Recognises the old encoding and repairs the accents.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 1.7 -->
+  <h2 id="b1-7"><span class="num">1.7</span>How many records do you need?</h2>
+  <p>The question always comes up, and the honest answer is: <b>fewer than people think, if they are well spread</b>. What a model needs is not a large number of points but points that cover the range of conditions in which the species lives. Fifty records spread across the whole mountain range teach more than five hundred crowded into two ravines.</p>
+  <div class="caja regla">
+    <div class="caja-t"><span class="ico">✓</span>Orders of magnitude</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:26%"><b>Fewer than 15</b></td><td>Do not model with flexible algorithms. A simple envelope model and a description of the environment are more honest.</td></tr>
+      <tr><td><b>From 15 to 30</b></td><td>Modelling is possible, with few variables (three or four), simple models and careful validation. Studies that have measured the effect of sample size find that this is where usable results begin.</td></tr>
+      <tr><td><b>More than 50</b></td><td>Comfortable ground for the ten algorithms and the ensemble of Block 9.</td></tr>
+      <tr><td><b>Many thousands</b></td><td>The problem is no longer the number but <b>bias</b>: thinning to one presence per cell usually improves the model more than adding data.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">These are orders of magnitude from the literature, not official thresholds: the real minimum depends on how narrow the niche is and on how much environmental variation there is in your region.</p>
+  </div>
+
+  <!-- 1.8 -->
+  <h2 id="b1-8"><span class="num">1.8</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>“Could not query GBIF”</td><td>No internet connection, or the service is not responding. The app works just the same with the bundled example or with your own files; try the download again later.</td></tr>
+      <tr><td>The download stops halfway<br><span class="small">“the connection to GBIF was lost”</span></td><td>In downloads of tens of thousands of records the connection may drop while a page is being read. The app retries up to six times with increasing waits and, if it still fails, offers a button to <b>use the records that have already arrived</b> instead of losing them. You can carry on working with that set or try the full download again later.</td></tr>
+      <tr><td>Far fewer records arrive than you expected</td><td>Check the cap and the checkboxes: <span class="ui">Only records with coordinates</span> discards many old herbarium records that were never georeferenced.</td></tr>
+      <tr><td>Countries appear where the species does not live</td><td>They are almost always cultivated specimens or coordinate errors. Do not delete them by hand: Block 2 filters them by country and Block 3 detects them by rules, so there is a record of how many there were.</td></tr>
+      <tr><td>All the records are from the last five years</td><td>The cap was too low and GBIF delivered only the most recent ones. Raise it.</td></tr>
+      <tr><td>Your file loads, but “valid records” is much lower than “rows read”</td><td>Wrongly assigned columns, coordinates containing text (“s/d”, “—”) or empty cells. Correct the assignment or clean the sheet and load it again.</td></tr>
+      <tr><td>The points end up in the Indian Ocean</td><td>Longitude and latitude swapped, or longitudes without a sign. The two checkboxes at the bottom of the card fix it.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Before moving on to Block 2</div>
+    <p>Download the raw CSV if you are going to work over several days: that way you do not depend on GBIF delivering exactly the same records next time. The downloaded records are also listed in the final report, with their date and query.</p>
+  </div>
+</section>
+
+</body>
+</html>

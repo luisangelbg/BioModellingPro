@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Appendices</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  table.form td:first-child { width: 2.1in; font-weight: 600; color: var(--negro); }
+  table.form td:last-child { font-family: var(--mono); font-size: 8.6pt; }
+  table.glos td:first-child { width: 2.05in; font-weight: 600; color: var(--negro); }
+  table.glos td:nth-child(2) { width: 1.7in; font-style: italic; color: var(--gris); }
+  ol.bib { font-size: 9.6pt; padding-left: 0; list-style: none; }
+  ol.bib li { padding-left: 0.28in; text-indent: -0.28in; margin-bottom: 0.055in; text-align: justify; }
+  .ap-t { font-family: var(--sans); font-size: 8.5pt; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gris); margin-top: 0.2in; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="apendices" data-pestana="A" data-orden="12" style="--acento: var(--bx)">
+  <div class="cap-apertura">
+    <div class="cap-num">A</div>
+    <div class="cap-etiqueta">Appendices · Reference material</div>
+    <h1>Appendices</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">What you look up rather than read: which files the app recognises and how they must be named, the formulas with their sources, the English–Spanish glossary, the error messages with their causes, the bibliography and the third-party components.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>A</b>File formats</li>
+      <li><b>B</b>Formulas of the indices</li>
+      <li><b>C</b>English–Spanish glossary</li>
+      <li><b>D</b>Messages and troubleshooting</li>
+      <li><b>E</b>References</li>
+      <li><b>F</b>Third-party components</li>
+    </ul>
+  </div>
+
+  <!-- ============================== A -->
+  <h2 id="ap-a"><span class="num">A</span>File formats</h2>
+  <p class="lead">The app does not convert files or upload them to any server: it reads them on your computer. This is the complete list of what it recognises and of how each thing has to be named.</p>
+
+  <h3>A.1 · Your own records (Block 1)</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Aspect</th><th>What it accepts</th></tr></thead>
+    <tbody>
+      <tr><td><b>Format</b></td><td><code>.csv</code>, <code>.txt</code> (separated by commas, semicolons or tabs), <code>.xlsx</code>, or text pasted from a spreadsheet.</td></tr>
+      <tr><td><b>Minimum columns</b></td><td>Species, longitude and latitude. Headers are recognised in Spanish and in English (<code>especie</code>/<code>species</code>, <code>longitud</code>/<code>lon</code>/<code>longitude</code>, <code>latitud</code>/<code>lat</code>/<code>latitude</code>) and, if they do not match, they are assigned by hand with the three menus.</td></tr>
+      <tr><td><b>Optional columns</b></td><td>Country, state, locality, year, month, elevation and uncertainty in metres. They are recognised automatically and used in the filters of Block 2.</td></tr>
+      <tr><td><b>Coordinates</b></td><td>Decimal degrees with a point or a comma; degrees-minutes-seconds with symbols or with compass letters. Two checkboxes fix in one go swapped longitude and latitude and a missing minus sign.</td></tr>
+      <tr><td><b>Encoding</b></td><td>UTF-8 and the old Windows encoding: accents are repaired on reading.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>A.2 · Raster layers (Blocks 5, 9 and 10)</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Layer</th><th>Expected file name and notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Bioclimatic</b></td><td><code>wc2.1_&lt;res&gt;_bio_1.tif</code> … <code>bio_19.tif</code>, where <code>&lt;res&gt;</code> is <code>30s</code>, <code>2.5m</code>, <code>5m</code> or <code>10m</code>. GeoTIFF in geographic coordinates (EPSG:4326).</td></tr>
+      <tr><td><b>Elevation</b></td><td><code>wc2.1_&lt;res&gt;_elev.tif</code></td></tr>
+      <tr><td><b>Köppen-Geiger</b></td><td>A categorical GeoTIFF with the class codes; the table of names is included in the app.</td></tr>
+      <tr><td><b>Monthly</b></td><td><code>wc2.1_&lt;res&gt;_tmin_01.tif</code> … <code>_12.tif</code>, and the same for <code>tmax</code> and <code>prec</code>: 36 files. A twelve-band file per variable is also accepted.</td></tr>
+      <tr><td><b>Future scenarios</b></td><td>A 19-band file with the bioclimatic variables of the scenario, or separate <code>bio_N</code> layers. They must have the same resolution and extent as those of the present.</td></tr>
+      <tr><td><b>Your own regions</b></td><td>GeoJSON of polygons in EPSG:4326, with a recognisable name in the properties of each polygon.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>A.3 · What it exports</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.5in">Type</th><th>Formats</th></tr></thead>
+    <tbody>
+      <tr><td><b>Tables</b></td><td>CSV in every block: raw and cleaned records, points × variables, metrics, coefficients, agroclimatic indices, diversity.</td></tr>
+      <tr><td><b>Points</b></td><td>Cleaned GeoJSON.</td></tr>
+      <tr><td><b>Maps</b></td><td>PNG, JPEG, WebP, TIFF, georeferenced GeoTIFF and SVG; paper sizes at 150, 300 or 600 dpi.</td></tr>
+      <tr><td><b>Surfaces</b></td><td>GeoTIFF (Float32, EPSG:4326) and ASCII grid (<code>.asc</code>) of the suitability and of each agroclimatic index.</td></tr>
+      <tr><td><b>Figures</b></td><td>Vector SVG, PNG, JPEG and WebP from the figure studio.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============================== B -->
+  <h2 id="ap-b"><span class="num">B</span>Formulas of the indices</h2>
+  <p>The same ones shown in the help cards of the app, with the source they come from. The symbols follow the notation of each original source.</p>
+
+  <div class="ap-t">Correlation and variable selection (Block 6)</div>
+  <table class="compacta form">
+    <tbody>
+      <tr><td>Pearson correlation</td><td>r = Σ(x−x̄)(y−ȳ) / √[Σ(x−x̄)² · Σ(y−ȳ)²]</td></tr>
+      <tr><td>Coefficient of determination</td><td>r² = r × r</td></tr>
+      <tr><td>Variance inflation factor</td><td>VIF_j = 1 / (1 − R²_j)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ap-t">Descriptive statistics (Block 7)</div>
+  <table class="compacta form">
+    <tbody>
+      <tr><td>Standard deviation</td><td>SD = √[ Σ(x − x̄)² / (n − 1) ]</td></tr>
+      <tr><td>Coefficient of variation</td><td>CV % = 100 × SD / |mean|</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ap-t">Multivariate analysis, ecology and diversity (Block 8)</div>
+  <table class="compacta form">
+    <tbody>
+      <tr><td>Contribution to the dimension</td><td>reference = 100 / (number of variables)</td></tr>
+      <tr><td>Inertia (correspondence analysis)</td><td>total inertia = χ² / n</td></tr>
+      <tr><td>Nearest neighbour</td><td>R = mean observed distance / mean distance expected at random</td></tr>
+      <tr><td>Levins niche breadth</td><td>B = 1 / Σp² ; standardised B = (B − 1) / (classes − 1)</td></tr>
+      <tr><td>Schoener overlap</td><td>D = 1 − ½ Σ |p_A,i − p_B,i|</td></tr>
+      <tr><td>Shannon</td><td>H′ = − Σ p_i · ln(p_i)</td></tr>
+      <tr><td>Simpson</td><td>D = Σ p_i²</td></tr>
+      <tr><td>Pielou evenness</td><td>J′ = H′ / log(S)</td></tr>
+      <tr><td>Berger–Parker dominance</td><td>d = N_max / N</td></tr>
+      <tr><td>Margalef and Menhinick richness</td><td>D_Mg = (S − 1) / ln(N) ; D_Mn = S / √N</td></tr>
+      <tr><td>Chao1</td><td>Chao1 = S + f₁² / (2·f₂)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ap-t">Modelling (Block 9)</div>
+  <table class="compacta form">
+    <tbody>
+      <tr><td>TSS</td><td>TSS = sensitivity + specificity − 1</td></tr>
+      <tr><td>Omission</td><td>omission = presences below the threshold / test presences</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ap-t">Agroclimate (Block 10)</div>
+  <table class="compacta form">
+    <tbody>
+      <tr><td>Growing degree days</td><td>GDD = Σ max(0, (T_max + T_min)/2 − T_base)</td></tr>
+      <tr><td>Reference evapotranspiration</td><td>ET₀ = 0.0023 · R_a · (T_mean + 17.8) · √(T_max − T_min)</td></tr>
+      <tr><td>Aridity index</td><td>AI = annual precipitation / annual ET₀</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Besides the formula, each help card in the app gives the reading scale, the most common mistake and the full reference. There are 97 cards spread across Blocks 6 to 10.</p>
+
+  <!-- ============================== C -->
+  <h2 id="ap-c"><span class="num">C</span>English–Spanish glossary</h2>
+  <p>The terms of the interface and the concepts of the manual, with their Spanish equivalent for anyone who reads the Spanish literature or uses the app in Spanish.</p>
+  <table class="compacta glos">
+    <thead><tr><th>English</th><th>Spanish</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td>Occurrence record</td><td>registro de presencia</td><td>The statement that an organism was at a place at a given time.</td></tr>
+      <tr><td>Presence-only</td><td>solo presencia</td><td>Data without confirmed absences; the contrast is made against the available environment.</td></tr>
+      <tr><td>Background points</td><td>puntos de fondo</td><td>A sample of the environment available in the study area.</td></tr>
+      <tr><td>Accessible area (M)</td><td>área accesible</td><td>The part of the world the species has been able to reach.</td></tr>
+      <tr><td>Suitability</td><td>idoneidad</td><td>Environmental similarity to the occupied sites, from 0 to 1.</td></tr>
+      <tr><td>Threshold</td><td>umbral</td><td>The value that turns suitability into presence or absence.</td></tr>
+      <tr><td>Spatial blocks</td><td>bloques espaciales</td><td>Validation that leaves out whole regions, not single points.</td></tr>
+      <tr><td>Extrapolation</td><td>extrapolación</td><td>Predicting under conditions the model did not see; it is flagged with the MESS.</td></tr>
+      <tr><td>Response curve</td><td>curva de respuesta</td><td>How suitability changes as one variable varies.</td></tr>
+      <tr><td>Permutation importance</td><td>importancia por permutación</td><td>The drop in performance when a variable is shuffled.</td></tr>
+      <tr><td>Ensemble</td><td>ensamble</td><td>A combination of several models.</td></tr>
+      <tr><td>Collinearity</td><td>colinealidad</td><td>Variables that predict one another.</td></tr>
+      <tr><td>Spatial thinning</td><td>adelgazado espacial</td><td>Keeping one presence per cell.</td></tr>
+      <tr><td>Extent of occurrence (EOO)</td><td>extensión de la presencia</td><td>The area of the convex polygon enclosing the records.</td></tr>
+      <tr><td>Area of occupancy (AOO)</td><td>área de ocupación</td><td>The summed area of the occupied cells.</td></tr>
+      <tr><td>Niche breadth</td><td>amplitud de nicho</td><td>How wide the range of conditions used by the species is.</td></tr>
+      <tr><td>Niche overlap</td><td>solapamiento de nicho</td><td>How much of the environmental space two taxa share.</td></tr>
+      <tr><td>Rarefaction</td><td>rarefacción</td><td>Expected richness at equal sampling effort.</td></tr>
+      <tr><td>Beta diversity</td><td>diversidad beta</td><td>The difference in composition between sites.</td></tr>
+      <tr><td>Growing degree days</td><td>grados-día</td><td>Heat accumulated above a base temperature.</td></tr>
+      <tr><td>Chilling hours</td><td>horas frío</td><td>The accumulated winter cold that deciduous fruit trees need.</td></tr>
+      <tr><td>Length of growing period</td><td>periodo de crecimiento</td><td>Days with enough temperature and moisture.</td></tr>
+      <tr><td>Limiting factor</td><td>factor limitante</td><td>The condition that most restricts the crop in each cell.</td></tr>
+      <tr><td>Climatic analogues</td><td>análogos climáticos</td><td>Sites with a climate similar to that of a reference site.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============================== D -->
+  <h2 id="ap-d"><span class="num">D</span>Messages and troubleshooting</h2>
+  <p>The warnings the app can show, with their cause and their remedy. Each chapter also has its own table of common problems.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:2.2in">Message</th><th>What it means and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>“Could not query GBIF”</td><td>No connection, or the service is down. Use the bundled example or your own files and try again later.</td></tr>
+      <tr><td>“the connection to GBIF was lost”</td><td>The download broke off after six attempts. The app offers to use the records that did arrive.</td></tr>
+      <tr><td>“GBIF answered 429 / 503”</td><td>Too many requests, or the service is overloaded. The app waits and retries by itself; if it keeps happening, try again in a few minutes.</td></tr>
+      <tr><td>“Extract the raster values first”</td><td>Block 6 needs the points × variables table from Block 5.</td></tr>
+      <tr><td>“none recognised as WorldClim or Köppen”</td><td>The file names do not follow the pattern of appendix A.2.</td></tr>
+      <tr><td>“The prepared grid uses the extent…”</td><td>An informative notice: it says which box the model was prepared with. If you changed the extent afterwards, prepare again.</td></tr>
+      <tr><td>“N of M records fall outside the extent”</td><td>Those records fall outside the chosen box and do not enter the model. It is your decision, not an error.</td></tr>
+      <tr><td>“Few presences (&lt;15)”</td><td>The model will be unstable. Enlarge the area, use higher-resolution layers or switch to an envelope method.</td></tr>
+      <tr><td>“No monthly layers: the indices will be derived from … bioclimatic layers”</td><td>There are no monthly layers: the agroclimatic indices come from a reconstructed cycle and are flagged as approximate.</td></tr>
+      <tr><td>“The pH range … is reported but not applied”</td><td>There is no soil-pH layer, so that requirement of the crop is left out of the calculation.</td></tr>
+      <tr><td>“Error reading the GeoTIFF files”</td><td>A damaged file, or one in a projection other than EPSG:4326.</td></tr>
+      <tr><td>“Preparing the Python engine…” takes a while</td><td>It is the first time in the session: Python is being downloaded into the browser. After that it stays in memory.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============================== E -->
+  <h2 id="ap-e"><span class="num">E</span>References</h2>
+  <p>The bibliography of the methods the program uses. It is the same list that appears on the home page of the app, where each method links to its reference.</p>
+  <ol class="bib">
+    <li>Allen RG, Pereira LS, Raes D, Smith M (1998) <i>Crop Evapotranspiration: Guidelines for Computing Crop Water Requirements</i>. FAO Irrigation and Drainage Paper 56, Rome.</li>
+    <li>Allouche O, Tsoar A, Kadmon R (2006) Assessing the accuracy of species distribution models: prevalence, kappa and the true skill statistic (TSS). <i>Journal of Applied Ecology</i> 43:1223–1232.</li>
+    <li>Araújo MB, New M (2007) Ensemble forecasting of species distributions. <i>Trends in Ecology &amp; Evolution</i> 22:42–47.</li>
+    <li>Baselga A (2010) Partitioning the turnover and nestedness components of beta diversity. <i>Global Ecology and Biogeography</i> 19:134–143.</li>
+    <li>Beck HE, Zimmermann NE, McVicar TR, Vergopolan N, Berg A, Wood EF (2018) Present and future Köppen-Geiger climate classification maps at 1-km resolution. <i>Scientific Data</i> 5:180214.</li>
+    <li>Breiman L (2001) Random forests. <i>Machine Learning</i> 45:5–32.</li>
+    <li>Busby JR (1991) BIOCLIM — a bioclimate analysis and prediction system. In: Margules CR, Austin MP (eds) <i>Nature Conservation: Cost Effective Biological Surveys and Data Analysis</i>. CSIRO, pp 64–68.</li>
+    <li>Carpenter G, Gillison AN, Winter J (1993) DOMAIN: a flexible modelling procedure for mapping potential distributions of plants and animals. <i>Biodiversity and Conservation</i> 2:667–680.</li>
+    <li>Chao A (1984) Nonparametric estimation of the number of classes in a population. <i>Scandinavian Journal of Statistics</i> 11:265–270.</li>
+    <li>Chao A, Jost L (2012) Coverage-based rarefaction and extrapolation: standardizing samples by completeness rather than size. <i>Ecology</i> 93:2533–2547.</li>
+    <li>Chapman AD (2005) <i>Principles and Methods of Data Cleaning: Primary Species and Species-Occurrence Data</i>. Global Biodiversity Information Facility, Copenhagen.</li>
+    <li>Clark PJ, Evans FC (1954) Distance to nearest neighbor as a measure of spatial relationships in populations. <i>Ecology</i> 35:445–453.</li>
+    <li>Colwell RK, Chao A, Gotelli NJ, Lin S-Y, Mao CX, Chazdon RL, Longino JT (2012) Models and estimators linking individual-based and sample-based rarefaction, extrapolation and comparison of assemblages. <i>Journal of Plant Ecology</i> 5:3–21.</li>
+    <li>Cortes C, Vapnik V (1995) Support-vector networks. <i>Machine Learning</i> 20:273–297.</li>
+    <li>Dormann CF, Elith J, Bacher S, et al. (2013) Collinearity: a review of methods to deal with it and a simulation study evaluating their performance. <i>Ecography</i> 36:27–46.</li>
+    <li>Elith J, Graham CH, Anderson RP, et al. (2006) Novel methods improve prediction of species’ distributions from occurrence data. <i>Ecography</i> 29:129–151.</li>
+    <li>Elith J, Kearney M, Phillips S (2010) The art of modelling range-shifting species. <i>Methods in Ecology and Evolution</i> 1:330–342.</li>
+    <li>Elith J, Leathwick JR (2009) Species distribution models: ecological explanation and prediction across space and time. <i>Annual Review of Ecology, Evolution, and Systematics</i> 40:677–697.</li>
+    <li>Elith J, Leathwick JR, Hastie T (2008) A working guide to boosted regression trees. <i>Journal of Animal Ecology</i> 77:802–813.</li>
+    <li>Elith J, Phillips SJ, Hastie T, Dudík M, Chee YE, Yates CJ (2011) A statistical explanation of MaxEnt for ecologists. <i>Diversity and Distributions</i> 17:43–57.</li>
+    <li>FAO (1996) <i>Agro-ecological Zoning: Guidelines</i>. FAO Soils Bulletin 73, Rome.</li>
+    <li>Farber O, Kadmon R (2003) Assessment of alternative approaches for bioclimatic modeling with special emphasis on the Mahalanobis distance. <i>Ecological Modelling</i> 160:115–130.</li>
+    <li>Fick SE, Hijmans RJ (2017) WorldClim 2: new 1-km spatial resolution climate surfaces for global land areas. <i>International Journal of Climatology</i> 37:4302–4315.</li>
+    <li>Guisan A, Edwards TC, Hastie T (2002) Generalized linear and generalized additive models in studies of species distributions: setting the scene. <i>Ecological Modelling</i> 157:89–100.</li>
+    <li>Hargreaves GH, Samani ZA (1985) Reference crop evapotranspiration from temperature. <i>Applied Engineering in Agriculture</i> 1:96–99.</li>
+    <li>Hastie T, Tibshirani R (1990) <i>Generalized Additive Models</i>. Chapman &amp; Hall, London.</li>
+    <li>Hastie T, Tibshirani R, Friedman J (2009) <i>The Elements of Statistical Learning</i>, 2nd edn. Springer, New York.</li>
+    <li>Hill MO (1973) Diversity and evenness: a unifying notation and its consequences. <i>Ecology</i> 54:427–432.</li>
+    <li>Hirzel AH, Le Lay G, Helfer V, Randin C, Guisan A (2006) Evaluating the ability of habitat suitability models to predict species presences. <i>Ecological Modelling</i> 199:142–152.</li>
+    <li>Hutchinson GE (1957) Concluding remarks. <i>Cold Spring Harbor Symposia on Quantitative Biology</i> 22:415–427.</li>
+    <li>Jost L (2006) Entropy and diversity. <i>Oikos</i> 113:363–375.</li>
+    <li>Levins R (1968) <i>Evolution in Changing Environments</i>. Princeton University Press.</li>
+    <li>Lobo JM, Jiménez-Valverde A, Real R (2008) AUC: a misleading measure of the performance of predictive distribution models. <i>Global Ecology and Biogeography</i> 17:145–151.</li>
+    <li>Magurran AE (2004) <i>Measuring Biological Diversity</i>. Blackwell, Oxford.</li>
+    <li>Peterson AT, Soberón J, Pearson RG, et al. (2011) <i>Ecological Niches and Geographic Distributions</i>. Princeton University Press.</li>
+    <li>Phillips SJ, Anderson RP, Schapire RE (2006) Maximum entropy modeling of species geographic distributions. <i>Ecological Modelling</i> 190:231–259.</li>
+    <li>Phillips SJ, Dudík M, Elith J, et al. (2009) Sample selection bias and presence-only distribution models: implications for background and pseudo-absence data. <i>Ecological Applications</i> 19:181–197.</li>
+    <li>Poggio L, de Sousa LM, Batjes NH, et al. (2021) SoilGrids 2.0: producing soil information for the globe with quantified spatial uncertainty. <i>SOIL</i> 7:217–240.</li>
+    <li>Ramirez-Villegas J, Jarvis A, Läderach P (2013) Empirical approaches for assessing impacts of climate change on agriculture: the EcoCrop model and a case study with grain sorghum. <i>Agricultural and Forest Meteorology</i> 170:67–78.</li>
+    <li>Renner IW, Warton DI (2013) Equivalence of MAXENT and Poisson point process models for species distribution modeling in ecology. <i>Biometrics</i> 69:274–281.</li>
+    <li>Roberts DR, Bahn V, Ciuti S, et al. (2017) Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure. <i>Ecography</i> 40:913–929.</li>
+    <li>Schoener TW (1968) The <i>Anolis</i> lizards of Bimini: resource partitioning in a complex fauna. <i>Ecology</i> 49:704–726.</li>
+    <li>Shannon CE (1948) A mathematical theory of communication. <i>Bell System Technical Journal</i> 27:379–423.</li>
+    <li>Simpson EH (1949) Measurement of diversity. <i>Nature</i> 163:688.</li>
+    <li>Soberón J, Peterson AT (2005) Interpretation of models of fundamental ecological niches and species’ distributional areas. <i>Biodiversity Informatics</i> 2:1–10.</li>
+    <li>UNEP (1992) <i>World Atlas of Desertification</i>. United Nations Environment Programme, Nairobi.</li>
+  </ol>
+  <p class="small">Besides these, the help cards of the app cite the sources of each diversity index, each normality test and each clustering method: 86 different references in all, each one next to the number it explains.</p>
+
+  <!-- ============================== F -->
+  <h2 id="ap-f"><span class="num">F</span>Third-party components</h2>
+  <p class="lead">All the analysis, figures and maps of BioModelling Pro are original code, licensed under the GPL v3 or later. What comes from outside is listed here, each item with its licence; the full breakdown is in <code>NOTICE.md</code> and the complete licence texts in <code>vendor/THIRD-PARTY-NOTICES.txt</code>.</p>
+
+  <h3>F.1 · The code</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.6in">Component</th><th>What it is for and under which licence</th></tr></thead>
+    <tbody>
+      <tr><td><b>Leaflet</b></td><td>The interactive maps. 2-clause BSD licence.</td></tr>
+      <tr><td><b>geotiff.js</b></td><td>Windowed reading of GeoTIFF files. MIT licence.</td></tr>
+      <tr><td><b>html2canvas</b></td><td>Composing the image when a map is exported. MIT licence.</td></tr>
+      <tr><td><b>Pyodide</b></td><td>The Python engine inside the browser, with NumPy, SciPy, pandas, scikit-learn, statsmodels and Matplotlib. MPL-2.0 licence and those of each package.</td></tr>
+      <tr><td><b>Natural Earth</b></td><td>The boundaries of the 32 states of Mexico (1:10 million scale). Public domain.</td></tr>
+      <tr><td><b>Map tiles</b></td><td>Base maps from several providers, used under their terms and with their attribution on the map.</td></tr>
+      <tr><td><b>Typefaces</b></td><td>Cormorant, Crimson Pro and Jost, under the SIL Open Font License 1.1 (in this manual only).</td></tr>
+    </tbody>
+  </table>
+  <h3>F.2 · The data, which also belong to someone</h3>
+  <table class="compacta">
+    <thead><tr><th style="width:1.6in">Source</th><th>What it is and on what terms</th></tr></thead>
+    <tbody>
+      <tr><td><b>GBIF</b></td><td>The example records (2,400 of <i>Pinus cembroides</i>, downloaded on 21 September 2026). Each record keeps the licence of the institution that published it: CC0, CC BY or CC BY-NC. The 70 institutions and the 91 datasets are listed in <code>datos/GBIF-FUENTES.md</code>.</td></tr>
+      <tr><td><b>WorldClim 2.1</b></td><td>The bioclimatic variables and elevation. Free for academic and non-commercial use, but <b>they may not be redistributed without prior permission</b>. Since version 1.1.0 <b>the program carries no WorldClim layer at all</b>, not even the clip the example used to bring: they are downloaded once, following the instructions in <code>datos/LEE-ME.md</code>.</td></tr>
+      <tr><td><b>Köppen-Geiger</b></td><td>The 1 km map of climate classes by Beck et al. (2018). CC BY 4.0: it can be redistributed with a citation, and that is why it does travel with the program.</td></tr>
+      <tr><td><b>SoilGrids (ISRIC)</b></td><td>The soil type of Block 5, queried online point by point. CC BY 4.0.</td></tr>
+    </tbody>
+  </table>
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Cite the data, not just the program</div>
+    <p>A result rests on three things, and all three are cited: the program, the <b>data</b> you worked with and the <b>method</b> you applied. If you download your records from gbif.org instead of from the app, GBIF gives you a download DOI that identifies exactly that dataset: use it. The full breakdown of what is original and what comes from others is in <code>NOTICE.md</code>.</p>
+  </div>
+</section>
+
+</body>
+</html>

@@ -10,6 +10,7 @@
 # capítulos le dan valores distintos (por ejemplo el ancho de figure.chica), gana la versión más frecuente y las
 # otras se acotan a las hojas de su capítulo con .hoja[data-pestana="N"].
 param([string]$Lang = 'es')
+$titulo = if ($Lang -eq 'en') { "BioModelling Pro · User's Manual" } else { "BioModelling Pro · Manual de usuario" }
 
 $ErrorActionPreference = 'Stop'
 $dir = Join-Path (Get-Location) $Lang
@@ -94,7 +95,7 @@ $html = @"
 <html lang="$Lang">
 <head>
 <meta charset="utf-8">
-<title>BioModelling Pro · Manual de usuario</title>
+<title>$titulo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- documento generado por herramientas/unir-manual.ps1: no se edita a mano; se corrigen las partes -->
 $links

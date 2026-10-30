@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 5 · Environmental variables</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 74%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 13%; margin-right: 13%; }
+  table.bio { font-size: 9.4pt; }
+  table.bio td:first-child { font-family: var(--sans); font-weight: 500; color: var(--b5); white-space: nowrap; }
+  table.bio td:last-child { white-space: nowrap; font-family: var(--sans); font-size: 8.6pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b5" data-pestana="5" data-orden="6" style="--acento: var(--b5)">
+  <div class="cap-apertura">
+    <div class="cap-num">5</div>
+    <div class="cap-etiqueta">Block 5 · The environment of each point</div>
+    <h1>Environmental variables: climate, elevation, Köppen and soil</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">Here the points stop being coordinates and become a table of conditions: nineteen bioclimatic variables, elevation, the climate type and, if you ask for it, the soil. That table is the raw material for everything that follows.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>5.1</b>What the bioclimatic variables are</li>
+      <li><b>5.2</b>Three ways to load the layers</li>
+      <li><b>5.3</b>How the value at a point is extracted</li>
+      <li><b>5.4</b>Köppen-Geiger and soil type</li>
+      <li><b>5.5</b>The result</li>
+      <li><b>5.6</b>The thematic map</li>
+      <li><b>5.7</b>Extremes give records away</li>
+      <li><b>5.8</b>Which resolution to use</li>
+      <li><b>5.9</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 5.1 -->
+  <h2 id="b5-1"><span class="num">5.1</span>What the bioclimatic variables are</h2>
+  <p class="lead">The nineteen bioclimatic variables are not raw data: they are <b>summaries</b> calculated from the monthly series of temperature and rainfall, designed to make biological sense. They do not tell you how much it rained on a given day, but how much rain falls in the driest quarter, or how far the temperature drops in the coldest month: the things that limit a plant.</p>
+
+  <table class="compacta bio">
+    <thead><tr><th style="width:0.7in">Code</th><th>What it measures</th><th style="width:0.7in">Unit</th></tr></thead>
+    <tbody>
+      <tr><td>BIO1</td><td>Annual mean temperature</td><td>°C</td></tr>
+      <tr><td>BIO2</td><td>Mean diurnal temperature range</td><td>°C</td></tr>
+      <tr><td>BIO3</td><td>Isothermality (BIO2 / BIO7 × 100)</td><td>%</td></tr>
+      <tr><td>BIO4</td><td>Temperature seasonality (standard deviation × 100)</td><td>°C×100</td></tr>
+      <tr><td>BIO5</td><td>Max temperature of warmest month</td><td>°C</td></tr>
+      <tr><td>BIO6</td><td>Min temperature of coldest month</td><td>°C</td></tr>
+      <tr><td>BIO7</td><td>Temperature annual range (BIO5 − BIO6)</td><td>°C</td></tr>
+      <tr><td>BIO8</td><td>Mean temperature of wettest quarter</td><td>°C</td></tr>
+      <tr><td>BIO9</td><td>Mean temperature of driest quarter</td><td>°C</td></tr>
+      <tr><td>BIO10</td><td>Mean temperature of warmest quarter</td><td>°C</td></tr>
+      <tr><td>BIO11</td><td>Mean temperature of coldest quarter</td><td>°C</td></tr>
+      <tr><td>BIO12</td><td>Annual precipitation</td><td>mm</td></tr>
+      <tr><td>BIO13</td><td>Precipitation of wettest month</td><td>mm</td></tr>
+      <tr><td>BIO14</td><td>Precipitation of driest month</td><td>mm</td></tr>
+      <tr><td>BIO15</td><td>Precipitation seasonality (coefficient of variation)</td><td>%</td></tr>
+      <tr><td>BIO16</td><td>Precipitation of wettest quarter</td><td>mm</td></tr>
+      <tr><td>BIO17</td><td>Precipitation of driest quarter</td><td>mm</td></tr>
+      <tr><td>BIO18</td><td>Precipitation of warmest quarter</td><td>mm</td></tr>
+      <tr><td>BIO19</td><td>Precipitation of coldest quarter</td><td>mm</td></tr>
+      <tr><td>ELEV</td><td>Elevation above sea level</td><td>m</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>Why they repeat one another</div>
+    <p>All nineteen come from the same twelve monthly temperatures and the same twelve monthly rainfall totals. BIO1 and BIO11, or BIO12 and BIO16, measure almost the same thing over most of the world. Putting them all into a model adds no new information and does cause collinearity: that is why Block 6 exists, to decide which ones to keep.</p>
+  </div>
+
+  <!-- 5.2 -->
+  <h2 id="b5-2"><span class="num">5.2</span>Three ways to load the layers</h2>
+  <p>The app neither downloads layers nor carries them inside: the WorldClim layers <b>cannot be redistributed without permission</b>, so the program ships with none of them. You download them once (<code>datos/LEE-ME.md</code>) and the app <b>reads them from your disk</b>. Köppen-Geiger, on the other hand, is included.</p>
+
+  <figure class="media">
+    <div class="marco"><img src="../img/en/b5-capas.png" alt="Raster layer loading card with the three buttons: choose folder, choose files and use the layers in the datos folder, each with its explanation and its status"></div>
+    <figcaption><b>Figure 5.1.</b> The three ways to load the layers, each with its own button and its own status note, so there is never any doubt about which one was used.</figcaption>
+  </figure>
+
+  <table class="compacta">
+    <thead><tr><th style="width:1.7in">Way</th><th>When it suits you</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ui">📁 Choose folder…</span></td><td>You have the WorldClim folder unzipped. You pick the whole folder and the app takes from it only the files it recognises. It is the most convenient option for a real study.</td></tr>
+      <tr><td><span class="ui">📄 Choose files…</span></td><td>Your layers are scattered or you want to load only some of them. Select several at once with Ctrl or Shift.</td></tr>
+      <tr><td><span class="ui">🧪 Use the layers in <code>datos/</code></span></td><td>Reads the program’s <code>datos/</code> folder, which is the best place to put the layers when you download them. It needs the local server.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>Which names it recognises</div>
+    <p>The app identifies the layers by their file name, following the WorldClim pattern: <code>wc2.1_<i>res</i>_bio_1.tif</code> … <code>bio_19.tif</code> and <code>elev.tif</code>. If your files have different names, simply rename them to that pattern. Appendix A sets out the full rules.</p>
+  </div>
+
+  <!-- 5.3 -->
+  <h2 id="b5-3"><span class="num">5.3</span>How the value at a point is extracted</h2>
+  <p>For each record and each layer, the app converts the coordinate into a row and a column of the grid and reads the value. Two details matter:</p>
+  <ul>
+    <li><b>It reads only the window it needs.</b> A 30 arc-second file has billions of cells; the app opens the file, works out where your points fall and reads only those pieces. That is why it works in the browser with layers that would not fit in memory.</li>
+    <li><b>The sampling method is chosen under <span class="ui">Sampling options</span>.</b> <span class="ui">Bilinear (recommended)</span> averages the four neighbouring cells weighted by distance, which avoids abrupt jumps between adjacent cells; <span class="ui">Nearest neighbour</span> returns the value of the cell as it is. The interpolation applies <b>only to the continuous variables</b>: categorical ones, such as Köppen, are always read by nearest neighbour, because averaging climate codes means nothing.</li>
+  </ul>
+  <p>When a point falls in a cell with no data (the sea, or outside the extent of your layers) the variable is left empty. The <span class="ui">Drop points with no data in any bioclimatic variable</span> checkbox, ticked by default, leaves them out of the table; if you untick it, they are kept with gaps and each analysis will decide what to do with them.</p>
+
+  <!-- 5.4 -->
+  <h2 id="b5-4"><span class="num">5.4</span>Köppen-Geiger and soil type</h2>
+  <p>Two <b>categorical</b> variables complete the picture. The <b>Köppen-Geiger</b> classification sums up the climate in a label (cold steppe arid, temperate with dry winter…) that is understood at once and is widely used in descriptive ecology. It is just another layer, in a small file, and it is loaded like the rest.</p>
+
+  <figure class="chica">
+    <div class="marco"><img src="../img/en/b5-suelo.png" alt="Soil type query card with the note that it is an online point-by-point query and the query and stop buttons"></div>
+    <figcaption><b>Figure 5.2.</b> The soil type is queried online, point by point and with pauses. It is the only feature of the app that sends coordinates to an external service, which is why it is kept separate and optional.</figcaption>
+  </figure>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Soil takes time</div>
+    <p>The public soil service limits how many queries per second it accepts, so the app asks slowly: with hundreds of points the query can take several minutes, and it can be stopped and resumed. For a model with many records, first decide whether soil is really needed: in most climatic niche studies it is not.</p>
+  </div>
+
+  <!-- 5.5 -->
+  <h2 id="b5-5"><span class="num">5.5</span>The result</h2>
+  <p>The extraction produces the table that feeds everything else: one row per record, one column per variable.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b5-tabla.png" alt="Extraction result card with the tiles for points with variables, continuous variables, Köppen climate and soil, and the table of points by variables"></div>
+    <figcaption><b>Figure 5.3.</b> The example: 1,885 points with 20 continuous variables and the Köppen climate. The download button delivers the complete table as CSV, the file you attach to a paper or open in another program.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>The pinyon pine’s environment in three numbers</div>
+    <p>With the 1,885 cleaned records of the example, the central half of the points (from the first to the third quartile) lives like this:</p>
+    <ul>
+      <li><b>Annual mean temperature</b> between <b>14.8 and 17.9 °C</b>, with a median of 16.2 °C (extremes 2.6 and 22.7).</li>
+      <li><b>Annual precipitation</b> between <b>414 and 551 mm</b>, with a median of 486 mm (extremes 69 and 2,098).</li>
+      <li><b>Elevation</b> between <b>1,473 and 2,210 m</b>, with a median of 1,978 m (extremes 27 and 3,065).</li>
+    </ul>
+    <p>And by climate type: <b>1,272</b> records in cold steppe arid climate (BSk), <b>227</b> in temperate with dry winter and warm summer (Cwb), <b>186</b> in hot steppe arid (BSh), <b>95</b> in hot desert arid (BWh) and <b>71</b> in temperate with no dry season (Cfb). The portrait is that of a pine of cool, semi-arid mountains.</p>
+  </div>
+
+  <!-- 5.6 -->
+  <h2 id="b5-6"><span class="num">5.6</span>The thematic map</h2>
+  <p>The last card colours the points by the value of the variable you choose. It is the quickest way to see whether a variable has geographic structure, and whether the gradient it shows makes sense.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b5-mapa.png" alt="Thematic map of the records coloured by annual precipitation, with a six-class legend in millimetres"></div>
+    <figcaption><b>Figure 5.4.</b> The records coloured by <b>BIO12</b>, annual precipitation, in six classes. The contrast stands out between the Sierra Madre Occidental, with its intermediate values, and the driest points on the high plateau and in the north. The map is edited and exported with the same studio as in chapter 4.</figcaption>
+  </figure>
+
+  <!-- 5.7 -->
+  <h2 id="b5-7"><span class="num">5.7</span>Extremes give records away</h2>
+  <p>Before moving on, look at the minimum and maximum values of two or three variables. It is a free quality check: the environment exposes records that geography could not.</p>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Three extremes in the example</div>
+    <ul>
+      <li>The lowest record is at <b>27 m elevation</b>, in the Mexicali Valley, with <b>69 mm</b> of annual rainfall. A mountain pine does not live in the desert at sea level: it is a planted tree or a wrong coordinate.</li>
+      <li>Two records in Texas, at 143 and 169 m, with 1,096 and 849 mm of rainfall: urban areas in the east of the state, far removed from the conditions of the rest.</li>
+      <li>The wettest reaches <b>2,098 mm</b> in central Veracruz, at 689 m. Again, a value that calls for review.</li>
+    </ul>
+    <p>None of the three had been flagged by the geographic rules of Block 3, because they lie within the general distribution area. They show up when you look at the environment. They can be removed by going back to Block 2 with a filter, or kept with the decision noted down.</p>
+  </div>
+
+  <!-- 5.8 -->
+  <h2 id="b5-8"><span class="num">5.8</span>Which resolution to use</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:1.3in">Resolution</th><th style="width:0.9in">Cell</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td>30 seconds</td><td>≈ 1 km</td><td>Local or mountain studies, where relief changes the climate within a few kilometres. The files are huge: it pays to crop them first.</td></tr>
+      <tr><td>2.5 minutes</td><td>≈ 4.6 km</td><td>The sensible middle ground for a state-wide or regional study.</td></tr>
+      <tr><td>5 minutes</td><td>≈ 9 km</td><td>National studies with records of uneven precision.</td></tr>
+      <tr><td>10 minutes</td><td>≈ 18 km</td><td>Continental studies and teaching: it is the one used in the examples in this manual.</td></tr>
+    </tbody>
+  </table>
+  <p>The rule of thumb: <b>the cell should not be finer than the precision of your coordinates</b>. With records georeferenced to 5 km, a 1 km layer gives a false sense of detail.</p>
+
+  <!-- 5.9 -->
+  <h2 id="b5-9"><span class="num">5.9</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>“… files read, none recognised as WorldClim or Köppen”</td><td>The file names do not follow the expected pattern, or you chose a folder that does not contain the <code>.tif</code> files. Rename them or go into the right subfolder.</td></tr>
+      <tr><td>Many points with no data</td><td>Your layers do not cover the whole area of the records (the typical case of a cropped layer) or the points fall in the sea. Compare the extent of the layers with that of your data.</td></tr>
+      <tr><td>The extraction takes a long time</td><td>Normal with 30-second layers and thousands of points: 20 large files are being read. The progress bar advances layer by layer.</td></tr>
+      <tr><td>The temperature values look multiplied</td><td>Some older distributions store temperature in tenths of a degree. If BIO1 comes out as 162 instead of 16.2, your layers are of that kind.</td></tr>
+      <tr><td>The soil query stops halfway</td><td>The service throttled the queries. Press the button again: it carries on where it stopped and keeps what has already been queried.</td></tr>
+      <tr><td>Köppen comes out empty</td><td>The Köppen-Geiger layer is missing (it is a separate file) or it was left out of the file selection.</td></tr>
+      <tr><td>The button to continue to Block 6 warns you instead of moving on</td><td>You have not yet pressed <span class="ui">Extract raster values →</span>. The correlation is computed on that table, so it has to be created first; once the extraction is finished, Blocks 7, 9 and 10 become available too (Block 8 opens after the statistics of Block 7).</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

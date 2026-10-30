@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 6 · Correlation and variable selection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 70%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 15%; margin-right: 15%; }
+  figure.matriz .marco { border: none; box-shadow: none; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b6" data-pestana="6" data-orden="7" style="--acento: var(--b6)">
+  <div class="cap-apertura">
+    <div class="cap-num">6</div>
+    <div class="cap-etiqueta">Block 6 · Fewer variables, a better model</div>
+    <h1>Correlation and variable selection</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">The nineteen bioclimatic variables often say the same thing. This block shows how much they overlap, computes the VIF live and proposes a handful of variables with little redundancy, without taking away the ones you consider essential.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>6.1</b>What collinearity is and what it breaks</li>
+      <li><b>6.2</b>The correlation matrix</li>
+      <li><b>6.3</b>The variance inflation factor</li>
+      <li><b>6.4</b>The recommended selection</li>
+      <li><b>6.5</b>Pinning the variables that matter</li>
+      <li><b>6.6</b>The pair viewer</li>
+      <li><b>6.7</b>How many variables to use?</li>
+      <li><b>6.8</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 6.1 -->
+  <h2 id="b6-1"><span class="num">6.1</span>What collinearity is and what it breaks</h2>
+  <p class="lead">Two variables are collinear when one can be predicted well from the other. In climate data this is the rule, not the exception: where it is hotter the rainfall tends to differ, and as elevation rises temperature falls. The problem is not that collinearity exists, but what it causes when it is ignored.</p>
+  <table class="compacta">
+    <thead><tr><th style="width:1.8in">What it breaks</th><th>How it shows</th></tr></thead>
+    <tbody>
+      <tr><td><b>Variable importance</b></td><td>If BIO5 and BIO10 measure almost the same thing, the model shares the credit between them and neither looks important. With only one of them, that variable comes out as decisive. The ecological conclusion changes although the data do not.</td></tr>
+      <tr><td><b>The coefficients</b></td><td>In linear models (GLM, GAM) the coefficients become unstable: they change sign and size when a handful of records is removed. Tree-based models tolerate it better, but their importance measure still suffers.</td></tr>
+      <tr><td><b>Projection to another climate</b></td><td>This is the most serious damage and the least visible. A model fitted with two correlated variables learns the relationship between them <i>as it is today</i>; if that relationship changes in the future scenario, the model extrapolates over combinations it has never seen.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 6.2 -->
+  <h2 id="b6-2"><span class="num">6.2</span>The correlation matrix</h2>
+  <p>The matrix shows the correlation between every pair of variables, computed from the values extracted at your records, not from the climate of the whole country: what matters is how they relate <b>where your species lives</b>.</p>
+
+  <figure class="media matriz">
+    <div class="marco"><img src="../img/en/b6-matriz.png" alt="Correlation matrix of the twenty variables with its dendrogram on the left, blue for negative and orange for positive, the selected variables in bold and pins on BIO1 and BIO12"></div>
+    <figcaption><b>Figure 6.1.</b> The example matrix as drawn on its card; the card’s <span class="ui">⬇ PNG</span> button exports it just as it looks. The tree on the left groups the variables that are alike: BIO6 and BIO11 (0.96), BIO14 and BIO17 (0.97), BIO13 and BIO16 (0.98), BIO8 and BIO10 (0.99). In bold, the selected variables; with a 📌 pin, the pinned ones.</figcaption>
+  </figure>
+
+  <ul>
+    <li><b>Pearson or Spearman.</b> Pearson measures linear association; Spearman measures whether one variable increases when the other does, even if the relationship is curved. With climate variables they usually agree; when they differ a lot, there is a non-linear relationship worth looking at.</li>
+    <li><b>The order is not alphabetical.</b> Rows and columns are ordered by hierarchical clustering, so the blocks of colour that appear are real groups of interchangeable variables.</li>
+    <li><b>Click a cell</b> and the pair opens: two histograms and a scatter plot to help you decide which one to keep.</li>
+  </ul>
+
+  <!-- 6.3 -->
+  <h2 id="b6-3"><span class="num">6.3</span>The variance inflation factor</h2>
+  <div class="caja teoria">
+    <div class="caja-t"><span class="ico">θ</span>What the VIF is</div>
+    <p>Correlation looks at pairs; the <b>VIF</b> looks at sets. Each variable is regressed on <b>all the others</b> in the set and VIF = 1 / (1 − R²) is computed. If the others explain 90% of its variation, the VIF is 10. A high VIF means that the variable is almost a combination of the others, even if it has no high pairwise correlation: that is the case the matrix alone cannot detect.</p>
+    <p class="small" style="margin-top:0.06in">The thresholds <b>5</b> and <b>10</b> are widely used reading conventions, not laws: below 5 collinearity is low; between 5 and 10, moderate; above 10, high.</p>
+  </div>
+  <p>In the variables table, the VIF and the maximum correlation are recomputed <b>with the variables you have ticked</b> every time you tick or untick one. You see the effect of each decision at once, and the <b>Status</b> column says why each variable was dropped: because of a high pairwise correlation or because of its VIF.</p>
+
+  <figure class="media">
+    <div class="marco"><img src="../img/en/b6-variables.png" alt="Variables table with the columns use, pin, code, variable, VIF, maximum correlation and status, showing that BIO4 was dropped for r = 0.97 with BIO3 and BIO6 for VIF = 144.1"></div>
+    <figcaption><b>Figure 6.2.</b> The variables table. BIO4 was dropped for its correlation of 0.97 with BIO3; BIO6 was dropped for a <b>VIF of 144.1</b>, although its highest pairwise correlation was only 0.67: the case that only the VIF uncovers.</figcaption>
+  </figure>
+
+  <!-- 6.4 -->
+  <h2 id="b6-4"><span class="num">6.4</span>The recommended selection</h2>
+  <p>The <span class="ui">✨ Recommended selection</span> button applies a simple, transparent procedure: first it removes the variables above the correlation threshold, keeping from each pair the one that carries more information about the rest; then, on what is left, it removes one at a time the variables above the VIF threshold, recomputing each time. Pinned variables are never touched.</p>
+  <p>Both thresholds are yours: <b>|r|</b> defaults to 0.8 and the <b>VIF</b> to 10, the conventions most used in the niche modelling literature. Lowering them leaves fewer, more independent variables; raising them does the opposite.</p>
+
+  <!-- 6.5 -->
+  <h2 id="b6-5"><span class="num">6.5</span>Pinning the variables that matter</h2>
+  <p>An automatic procedure knows no ecology. If your species is limited by frost, BIO6 has to be in the model even if the algorithm prefers another variable; if you are going to discuss mean temperature and annual rainfall, BIO1 and BIO12 cannot be missing. That is what the pin is for: <b>pinning</b> a variable makes it untouchable.</p>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>With and without pins</div>
+    <p>With the 1,885 records of the Mexican pinyon and the default thresholds (|r| &gt; 0.8, VIF &gt; 10), the <b>automatic selection</b> keeps eight variables: BIO2, BIO3, BIO9, BIO16, BIO17, BIO18, BIO19 and elevation, with a maximum |r| of <b>0.79</b> and a maximum VIF of <b>6.1</b>. Neither BIO1 nor BIO12 survives: the procedure preferred their relatives.</p>
+    <p>Pressing <span class="ui">📌 Pin BIO1 and BIO12 and recompute</span> turns the selection into nine variables (BIO1, BIO2, BIO3, BIO9, BIO12, BIO15, BIO17, BIO18 and BIO19) with a maximum |r| of <b>0.66</b> and a maximum VIF of <b>8.7</b>. In other words, requiring the two classic variables <b>lowered</b> the maximum correlation of the set, at the cost of one more variable and a somewhat higher VIF. A better result, and an interpretable one too.</p>
+  </div>
+
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>Decide once, and make it show</div>
+    <p>The selection made in this block is the one Blocks 7, 8 and 9 use by default; in Blocks 8 and 9 the <span class="ui">Those of step 6</span> button brings it back. If you change your mind later, come back here and recompute; do not leave two different selections in the same piece of work.</p>
+  </div>
+
+  <!-- 6.6 -->
+  <h2 id="b6-6"><span class="num">6.6</span>The pair viewer</h2>
+  <p>The last card lists the pairs above the threshold, from the most to the least correlated, and lets you open any of them to see the point cloud.</p>
+
+  <figure>
+    <div class="marco"><img src="../img/en/b6-pares.png" alt="Highly correlated pairs card with the list of pairs, whether each is in the selection and the buttons to keep one variable of the pair"></div>
+    <figcaption><b>Figure 6.3.</b> The pairs above the threshold. Looking at the cloud prevents two mistakes: dropping a variable because of a high correlation that is really produced by a single group of extreme points, and keeping two variables whose relationship is a perfect straight line.</figcaption>
+  </figure>
+
+  <!-- 6.7 -->
+  <h2 id="b6-7"><span class="num">6.7</span>How many variables to use?</h2>
+  <div class="caja regla">
+    <div class="caja-t"><span class="ico">✓</span>Three criteria, in this order</div>
+    <table class="compacta"><tbody>
+      <tr><td style="width:30%"><b>They make sense</b></td><td>Every variable in the model should be justifiable in one sentence of the discussion: why that one, and not another, limits your species.</td></tr>
+      <tr><td><b>They do not repeat each other</b></td><td>|r| below 0.8 among all of them and VIF below 10; if you can go down to 0.7 and 5 without losing meaningful variables, so much the better.</td></tr>
+      <tr><td><b>There are not too many</b></td><td>With few presences, a model with many variables learns the data by heart. A prudent guide is no more than one variable per ten presences.</td></tr>
+    </tbody></table>
+    <p class="regla-pie">Five to ten well-chosen variables are enough for almost any niche study; nineteen are never needed.</p>
+  </div>
+
+  <!-- 6.8 -->
+  <h2 id="b6-8"><span class="num">6.8</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>The matrix is empty</td><td>There is no variables table: go back to Block 5 and extract the raster values.</td></tr>
+      <tr><td>A huge VIF, in the hundreds</td><td>It is normal with all nineteen bioclimatic variables together; it means that the variable is almost an exact combination of others. Apply the recommended selection.</td></tr>
+      <tr><td>The selection leaves out “my” variable</td><td>Pin it and recompute. That is exactly what pinning is for.</td></tr>
+      <tr><td>Pearson and Spearman give very different results</td><td>The relationship between those variables is not linear. Open it in the pair viewer before deciding.</td></tr>
+      <tr><td>Very few variables are left</td><td>Raise the thresholds a little, or pin the ones you need. Three ecologically meaningful variables model better than ten redundant ones.</td></tr>
+      <tr><td>I changed the selection and the results of another block did not change</td><td>Blocks 7, 8 and 9 take the selection when you enter them, or, in 8 and 9, when you press <span class="ui">Those of step 6</span>. Go back to that block and reload the selection.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>

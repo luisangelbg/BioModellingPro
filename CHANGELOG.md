@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Manual. The user manual is now also in English (`manual/en/`, 96 pages, `manual/en/BioModelling Pro User's Manual
+  (English).pdf`), with screenshots of the English interface (`manual/img/en/`) and one capture recipe per figure
+  (`manual/herramientas/recetas/`). The running header and the window title follow the language of each part.
+  Nothing in the program changed.
 - Authorship. The program has a single author, Luis Ángel Barrera-Guzmán: the citation and BibTeX shown on the
   home page, the authorship line below them (`js/home.js`), `CITATION.cff`, `codemeta.json`, the README, the
   Spanish readme and `NOTICE.md` now name him alone. Nothing looks or computes differently.

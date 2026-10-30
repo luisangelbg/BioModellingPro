@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BioModelling Pro · Manual · Chapter 10 · Agroclimatic suitability</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../interior.css">
+<script src="../paginar.js"></script>
+<style>
+  figure.chica .marco { width: 66%; margin: 0 auto; }
+  figure.chica figcaption { margin-left: 17%; margin-right: 17%; }
+  figure.limpia .marco { border: none; box-shadow: none; }
+  table.idx td:first-child { font-weight: 600; color: var(--negro); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<section class="capitulo" id="cap-b10" data-pestana="10" data-orden="11" style="--acento: var(--b10)">
+  <div class="cap-apertura">
+    <div class="cap-num">10</div>
+    <div class="cap-etiqueta">Block 10 · From niche to field</div>
+    <h1>Agroclimatic suitability of crops</h1>
+    <div class="cap-regla"></div>
+    <p class="cap-resumen">The same climate data, read with the questions of agronomy: degree days, frost, chilling hours, water balance and length of the growing period, and with them the suitability of a crop, its planting calendar and the factor that limits it in each cell.</p>
+    <div class="cap-franja"><span class="k1"></span><span class="k2"></span><span class="k3"></span><span class="k4"></span><span class="k5"></span><span class="k6"></span><span class="k7"></span><span class="k8"></span><span class="k9"></span><span class="k10"></span></div>
+    <ul class="cap-contenido">
+      <li><b>10.1</b>This block does not model your species</li>
+      <li><b>10.2</b>The monthly layers</li>
+      <li><b>10.3</b>The agroclimatic indices</li>
+      <li><b>10.4</b>Suitability of a crop</li>
+      <li><b>10.5</b>The limiting factor</li>
+      <li><b>10.6</b>The crop catalogue</li>
+      <li><b>10.7</b>Comparing crops, and analogues</li>
+      <li><b>10.8</b>Future agroclimate</li>
+      <li><b>10.9</b>Common problems</li>
+    </ul>
+  </div>
+
+  <!-- 10.1 -->
+  <h2 id="b10-1"><span class="num">10.1</span>This block does not model your species</h2>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>First things first, to avoid a very common confusion</div>
+    <p>The nine previous blocks are about <b>your species</b>. This one is not. Block 10 takes the same territory and the same climate and answers a different question: <b>which crops could grow here?</b> If you are studying a pine and maize appears, it is not a mistake: maize is simply the first crop in the catalogue. Choose the one you are interested in —there are more than sixty— or enter the requirements of your own.</p>
+    <p>The two natural uses of this block are to assess the agricultural potential of the region you have already loaded, and to compare the niche of a wild species with the suitability of a related crop.</p>
+  </div>
+
+  <!-- 10.2 -->
+  <h2 id="b10-2"><span class="num">10.2</span>The monthly layers</h2>
+  <p>The agroclimatic indices are computed <b>month by month</b>: they need minimum temperature, maximum temperature and precipitation for the twelve months —36 WorldClim files, or twelve-band files—. They are loaded as in Block 5: by folder or by files.</p>
+  <div class="caja nota">
+    <div class="caja-t"><span class="ico">i</span>If you have no monthly layers</div>
+    <p>The <span class="ui">🌡 Use the layers of step 5</span> button reconstructs an approximate monthly cycle from the bioclimatic layers you have already loaded —mean temperature and extremes, seasonality, annual and quarterly rainfall— and computes a reduced set of indices with it. The app flags those indices as <b>approximate</b> and explains the assumption: the thermal peak is placed in July in the northern hemisphere. It is useful for exploring and for learning; for a technical report, load real monthly layers.</p>
+  </div>
+
+  <!-- 10.3 -->
+  <h2 id="b10-3"><span class="num">10.3</span>The agroclimatic indices</h2>
+  <p>Once the grid has been read, <span class="ui">Compute the indices →</span> produces 21 layers. These are the most widely used:</p>
+  <table class="compacta idx">
+    <thead><tr><th style="width:1.85in">Index</th><th>What it measures and what it is for</th></tr></thead>
+    <tbody>
+      <tr><td>Growing degree days (GDD)</td><td>The sum of the heat available above a base temperature. It is the currency used to judge whether a crop cycle “fits” at a site. It has no universal scale: each cultivar has its own requirement.</td></tr>
+      <tr><td>Frost days and months</td><td>How often the minimum drops below 0 °C. It determines which crops are impossible without protection.</td></tr>
+      <tr><td>Frost-free period</td><td>The consecutive days without frost: the real planting window in temperate areas.</td></tr>
+      <tr><td>Chilling hours</td><td>Hours accumulated in the cold range of winter. Deciduous fruit trees need them to break bud; the requirement depends on the cultivar, so the figures are indicative.</td></tr>
+      <tr><td>Heat days</td><td>Days above critical thresholds, which in many crops coincide with flowering.</td></tr>
+      <tr><td>Reference evapotranspiration</td><td>How much water the atmosphere can evaporate. Together with rainfall it gives the water balance.</td></tr>
+      <tr><td>Water deficit and surplus</td><td>How much water is lacking or left over, month by month: the basis of any irrigation plan.</td></tr>
+      <tr><td>Length of the growing period</td><td>The days on which there is enough temperature and moisture at the same time. It is the index that best sums up the general agricultural suitability of an area.</td></tr>
+      <tr><td>Aridity index and class</td><td>The ratio between rainfall and evapotranspiration, with the classes of the United Nations Environment Programme (hyper-arid, arid, semi-arid, dry sub-humid, humid).</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b10-indice.png" alt="Map of the length of the growing period in Mexico, clipped to the country, with its legend in days"></div>
+    <figcaption><b>Figure 10.1.</b> The length of the growing period over the whole of Mexico, computed with the example layers. The contrast between the arid north and the humid south-east can be seen at a glance. Each index can be exported as an image, as a georeferenced GeoTIFF or as an ASCII grid.</figcaption>
+  </figure>
+
+  <!-- 10.4 -->
+  <h2 id="b10-4"><span class="num">10.4</span>Suitability of a crop</h2>
+  <p>The suitability model is an <b>envelope</b>: for each cell and for <b>each possible planting month</b>, it compares what the crop needs —optimum temperature and lethal limits, water, chilling hours, elevation— with what the site offers over the whole cycle, and keeps the best month.</p>
+
+  <figure class="media limpia">
+    <div class="marco"><img src="../img/en/b10-resumen.png" alt="Summary cards of the suitability: crop, cycle used, suitable area, percentage of the region, mean suitability, best planting month and main constraint"></div>
+    <figcaption><b>Figure 10.2.</b> The summary of the suitability of maize over Mexico, with the approximate indices derived from the bioclimatic layers of the example.</figcaption>
+  </figure>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b10-aptitud.png" alt="Map of the continuous suitability of maize in Mexico"></div>
+    <figcaption><b>Figure 10.3.</b> The continuous suitability, from 0 to 1. The most suitable areas outline the Pacific and Gulf slopes, the south and the Yucatán Peninsula, while the arid north and the high plateau are left with low values.</figcaption>
+  </figure>
+
+  <div class="caja ejemplo">
+    <div class="caja-t"><span class="ico">▸</span>Maize in Mexico, with the example data</div>
+    <p>A 125-day cycle, <b>1,524,020 km²</b> with suitability ≥ 0.5 —<b>48.2%</b> of the region—, a mean suitability of <b>0.470</b>, best planting month <b>March</b> and main constraint <b>insufficient water</b>. These figures were computed with the reconstructed monthly cycle, so they are good as an exercise, not as a technical recommendation: with real monthly layers they would change, and the optimum month also depends on the cultivar and on management.</p>
+  </div>
+
+  <!-- 10.5 -->
+  <h2 id="b10-5"><span class="num">10.5</span>The limiting factor</h2>
+  <p>Knowing that a cell has a suitability of 0.3 does not tell you what to do; knowing <i>why</i> does. The limiting factor map paints, in each cell, which of the conditions restricts the crop most in its best planting month.</p>
+
+  <figure class="limpia">
+    <div class="marco"><img src="../img/en/b10-limitante.png" alt="Map of the limiting factor of maize in Mexico, with the classes no constraint, low temperature, insufficient water and killing frost"></div>
+    <figcaption><b>Figure 10.4.</b> The limiting factor of maize. The ochre of the high plateau and of the north is <b>insufficient water</b>; the blue of the high sierras and of northern Chihuahua, <b>killing frost</b> or <b>low temperature</b>; the green of the Pacific and Gulf slopes, the south and the Yucatán Peninsula, <b>no constraint</b>. Each colour suggests a different decision: irrigation, planting date, or a change of cultivar.</figcaption>
+  </figure>
+
+  <!-- 10.6 -->
+  <h2 id="b10-6"><span class="num">10.6</span>The crop catalogue</h2>
+  <p>The app comes with a catalogue of <b>more than sixty crops</b> with their reference ranges: minimum, optimum and maximum temperature, lethal limits, cycle length, water and chilling-hour requirements, and elevation range. Everything can be edited: you can change the values of a crop, save the catalogue as a file and load it again in another session or on another computer.</p>
+  <div class="caja importante">
+    <div class="caja-t"><span class="ico">!</span>The values in the catalogue are indicative</div>
+    <p>They are published ranges for the species <i>as a whole</i>, not for a particular cultivar. A highland landrace of maize and a commercial hybrid for the lowland tropics have different requirements, and the catalogue cannot know which one you use. Before making a real decision, replace the values with those of your own material: that is why the catalogue can be edited, and the app exports the parameters it used together with the results.</p>
+  </div>
+
+  <!-- 10.7 -->
+  <h2 id="b10-7"><span class="num">10.7</span>Comparing crops, and analogues</h2>
+  <ul>
+    <li><b>Comparison between crops.</b> It computes the suitability of several at once and draws the map of the <b>best crop per cell</b>, plus a table with the suitable area of each one. It is the view that answers “what is worth planting here?”.</li>
+    <li><b>Climatic analogues.</b> Given a site, it looks for the cells with the most similar climate. It is a way of transferring experience: if a variety does well in a given municipality, where else should it do well?</li>
+  </ul>
+
+  <!-- 10.8 -->
+  <h2 id="b10-8"><span class="num">10.8</span>Future agroclimate</h2>
+  <p>With monthly layers of a future scenario, the block repeats the whole calculation and delivers the <b>difference</b>: how much each index changes, how much suitable area is gained or lost, how the planting calendar shifts and which factor becomes limiting. It is the question that matters most to whoever plans: not “what will the climate be like?” but “what will I have to change?”.</p>
+  <p>The same warnings as in chapter 9 apply: scenarios are projections with uncertainty, it is advisable to use more than one climate model, and you should look at where the future climate leaves the known range.</p>
+
+  <!-- 10.9 -->
+  <h2 id="b10-9"><span class="num">10.9</span>Common problems</h2>
+  <table class="compacta">
+    <thead><tr><th style="width:2.05in">What you see</th><th>What happened and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>Maize appears even though you are studying another species</td><td>It is the first crop in the catalogue, not a prediction about your species (section 10.1). Choose another one from the list.</td></tr>
+      <tr><td>The indices are flagged as “approximate”</td><td>They were derived from the bioclimatic layers because there are no monthly layers. For a technical report, load the 36 monthly layers.</td></tr>
+      <tr><td>The map does not cover the whole country</td><td>As in Block 9: check the chosen extent and read the climate grid again. The app says which box it used.</td></tr>
+      <tr><td>The chilling hours come out as zero over the whole map</td><td>With the reconstructed monthly cycle, chilling hours are the most fragile index. They need real monthly layers.</td></tr>
+      <tr><td>The suitable area changes a lot when a parameter is touched</td><td>That is to be expected in an envelope model: the result is only as good as the ranges in the catalogue. Document the ones you used.</td></tr>
+      <tr><td>Soil pH is reported but not applied</td><td>The app warns you about it: there is no pH layer, so that requirement is left out of the calculation.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>
